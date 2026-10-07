@@ -2,17 +2,14 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/PageIntro.astro';
 import LinkCard from '../components/LinkCard.astro';
-import { competitieApp, badmintonVlaanderen, mail } from '../data/site';
+import { competitieApp, mail } from '../data/site';
+import { pagina } from '../lib/paginas';
+
+const { title, lead, description, Content } = await pagina('competitie');
 ---
 
-<BaseLayout
-  title="Competitie"
-  description="De provinciale badmintoncompetitie van Oost-Vlaanderen: competitie-app, agenda en het provinciaal addendum bij de C320."
->
-  <PageIntro
-    title="Competitie"
-    lead="PBO organiseert de provinciale badmintoncompetitie van Oost-Vlaanderen, met reeksen voor dames, heren en gemengd."
-  />
+<BaseLayout title={title} description={description}>
+  <PageIntro title={title} lead={lead} />
 
   <section class="wrap mt-8 grid gap-3 md:mt-10 md:grid-cols-2 lg:gap-5">
     <LinkCard
@@ -27,34 +24,7 @@ import { competitieApp, badmintonVlaanderen, mail } from '../data/site';
 
   <section class="wrap mt-14 grid gap-10 md:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)] lg:gap-16">
     <div class="prose-pbo px-2 md:px-0">
-      <h2 class="!mt-0">Opstelling en verplaatsingen</h2>
-      <p>
-        Een ontmoeting verplaatsen of je ploegopstelling maken doe je in de Badman-app van
-        Badminton Vlaanderen. Uitslagen en standen van alle reeksen staan op <a href={badmintonVlaanderen.home}>badmintonvlaanderen.be</a>.
-      </p>
-      <p>De PBO-app gebruik je nog om de competitieagenda te koppelen.</p>
-
-      <h2 id="c320">Provinciaal addendum C320</h2>
-      <p>
-        Deze regels vullen de artikels van Badminton Vlaanderen aan en gelden alleen voor de provinciale competitie in Oost-Vlaanderen.
-        Ze hebben dezelfde rechtsgeldigheid als de C320.
-      </p>
-      <h3>Artikel 62bis. Publicatie van de uitslagen</h3>
-      <ul>
-        <li>
-          De thuisploeg geeft de uitslagen online in het competitieprogramma in, ten laatste 24 uur na het voorziene beginuur van de
-          ontmoeting. De bezoekers bevestigen ten laatste 72 uur na het voorziene beginuur.
-        </li>
-        <li>
-          Geeft de thuisploeg de uitslagen ten laatste 3 uur na het voorziene beginuur in, en bevestigen de bezoekers ten laatste 15
-          minuten na die ingave, dan vervalt de controle van het ontmoetingsformulier door de sportcommissie.
-        </li>
-        <li>
-          Gaan de bezoekers niet akkoord met de ingave van de thuisploeg, dan verwittigen ze de sportcommissie ten laatste 72 uur na het
-          voorziene beginuur.
-        </li>
-        <li>Bij een overtreding van dit artikel krijgt de club van de betrokken ploeg 10 boetepunten.</li>
-      </ul>
+      <Content />
     </div>
 
     <aside class="h-fit rounded-card bg-accent-soft p-6 md:p-8">

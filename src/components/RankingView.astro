@@ -2,7 +2,7 @@
 import { u } from '../lib/url';
 import Icon from './Icon.astro';
 import { mail } from '../data/site';
-import { archief } from '../data/jeugdcuptour';
+import { pagina } from '../lib/paginas';
 import { categorieen, disciplines, geboortejaren, type Stand, type Toernooi } from '../lib/jeugdcup';
 import { toonPunten } from '../lib/stand';
 import { lang } from '../lib/datum';
@@ -19,10 +19,11 @@ interface Props {
 
 const { jaar, per, laatste, voorbeeld, jaren, nieuwste } = Astro.props;
 
+const { archief } = await pagina('jeugdcuptour');
 const jaarHref = (j: number) => u(j === nieuwste ? '/jeugd/jeugdcuptour/ranking' : `/jeugd/jeugdcuptour/ranking/${j}`);
 const anderen = [
   ...jaren.filter((j) => j !== jaar).map((j) => ({ label: `Ranking ${j}`, href: jaarHref(j) })),
-  ...archief.map((a) => ({ label: a.label, href: u(a.href) })),
+  ...archief.map((a) => ({ label: a.label, href: u(a.bestand) })),
 ];
 
 // Eerste combinatie met data als startpunt (zonder JavaScript zie je alles onder elkaar).

@@ -5,26 +5,15 @@ import PageIntro from '../../components/PageIntro.astro';
 import LinkCard from '../../components/LinkCard.astro';
 import { badmintonVlaanderen } from '../../data/site';
 import { huidigSeizoen, laatsteRanking } from '../../lib/jeugdcup';
+import { pagina } from '../../lib/paginas';
 
 const seizoen = await huidigSeizoen();
 const ranking = await laatsteRanking();
-
-const trainers = [
-  { naam: 'Luc Geeraerts', diploma: 'VTS-trainer A' },
-  { naam: 'Thierry De Decker', diploma: 'Trainer B' },
-  { naam: 'Michiel Van Britsom', diploma: 'Trainer B' },
-  { naam: 'Jade Braekman', diploma: 'Initiator' },
-];
+const { title, lead, description, trainers, Content } = await pagina('jeugd');
 ---
 
-<BaseLayout
-  title="Jeugd"
-  description="Jeugdwerking van PBO vzw: Victor Jeugdcuptour by PBO, de PBO-selectie en trainers, IPJO en KYU."
->
-  <PageIntro
-    title="Jeugd"
-    lead="De jeugdcuptour voor elke jeugdspeler van een Oost-Vlaamse club, extra trainingen voor de PBO-selectie, en de IPJO tegen de andere provincies."
-  />
+<BaseLayout title={title} description={description}>
+  <PageIntro title={title} lead={lead} />
 
   <section class="wrap mt-8 md:mt-10" aria-labelledby="jeugdcuptour">
     <div class="on-ink grid gap-6 rounded-[28px] bg-ink p-6 text-white md:rounded-panel md:p-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:items-center lg:gap-12">
@@ -51,16 +40,7 @@ const trainers = [
 
   <section class="wrap mt-14 grid gap-10 md:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-16">
     <div class="prose-pbo px-2 md:px-0">
-      <h2 class="!mt-0" id="selectie">PBO-selectie</h2>
-      <p>
-        De PBO-selectie is een groep jeugdspelers die onze trainers kiezen in overleg met de clubs en hun trainers. De selectie traint elke
-        week één of meer keren, bovenop de clubtrainingen. Spelplezier blijft het belangrijkste.
-      </p>
-      <p>
-        Clubtrainers kunnen altijd spelers voordragen. De selectie is geen eindpunt, maar kan wel de weg zijn naar de Topsportschool van
-        Badminton Vlaanderen.
-      </p>
-      <p>Alle trainingen staan in de <a href={u('/bestuur#kalender')}>PBO-kalender</a>.</p>
+      <Content />
     </div>
 
     <div>

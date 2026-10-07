@@ -5,9 +5,10 @@ import PageIntro from '../../../../components/PageIntro.astro';
 import RankingView from '../../../../components/RankingView.astro';
 import LinkCard from '../../../../components/LinkCard.astro';
 import { rankingPerJaar } from '../../../../lib/jeugdcup';
-import { archief } from '../../../../data/jeugdcuptour';
+import { pagina } from '../../../../lib/paginas';
 
 const jaren = await rankingPerJaar();
+const { archief } = await pagina('jeugdcuptour');
 const recent = jaren[0];
 const crumbs = [{ href: u('/jeugd'), label: 'Jeugd' }, { href: u('/jeugd/jeugdcuptour'), label: 'Jeugdcuptour' }, { label: 'Ranking' }];
 ---
@@ -28,7 +29,7 @@ const crumbs = [{ href: u('/jeugd'), label: 'Jeugd' }, { href: u('/jeugd/jeugdcu
       <RankingView {...recent} jaren={jaren.map((j) => j.jaar)} nieuwste={recent.jaar} />
     ) : (
       <section class="wrap mt-8 flex flex-col gap-3">
-        {archief.map((a) => <LinkCard href={u(a.href)} icon="document" title={a.label} />)}
+        {archief.map((a) => <LinkCard href={u(a.bestand)} icon="document" title={a.label} />)}
       </section>
     )
   }

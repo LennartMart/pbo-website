@@ -4,7 +4,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PageIntro from '../../../components/PageIntro.astro';
 import LinkCard from '../../../components/LinkCard.astro';
 import { mail } from '../../../data/site';
-import { documenten } from '../../../data/jeugdcuptour';
+import { pagina } from '../../../lib/paginas';
 import { categorieen, geboortejaren, huidigSeizoen, komende, laatsteRanking } from '../../../lib/jeugdcup';
 import { vandaag } from '../../../lib/datum';
 import { dag, maand } from '../../../lib/datum';
@@ -13,17 +13,13 @@ const [volgende] = await komende();
 const seizoen = await huidigSeizoen();
 const ranking = await laatsteRanking();
 const jaar = Number(vandaag().slice(0, 4));
+const { title, lead, description, documenten, Content } = await pagina('jeugdcuptour');
 ---
 
-<BaseLayout
-  title="Victor Jeugdcuptour by PBO"
-  description={`Hoe de Victor Jeugdcuptour by PBO werkt: wie mag meedoen, leeftijdscategorieën ${jaar}, kalender ${seizoen} en ranking.`}
->
+<BaseLayout title={title} description={description}>
   <PageIntro
-    title="Victor Jeugdcuptour by PBO"
-    lead={volgende
-      ? `Volgende halte: ${volgende.club} op ${dag(volgende.date)} ${maand(volgende.date)}.`
-      : 'Open toernooicircuit voor jeugdspelers van Oost-Vlaamse clubs.'}
+    title={title}
+    lead={volgende ? `Volgende halte: ${volgende.club} op ${dag(volgende.date)} ${maand(volgende.date)}.` : lead}
     crumbs={[{ href: u('/jeugd'), label: 'Jeugd' }, { label: 'Jeugdcuptour' }]}
   />
 
@@ -39,25 +35,7 @@ const jaar = Number(vandaag().slice(0, 4));
 
   <section class="wrap mt-14 grid gap-10 md:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:gap-16">
     <div class="prose-pbo px-2 md:px-0">
-      <h2 class="!mt-0">Zo werkt het</h2>
-      <p>
-        De jeugdcuptour is een reeks recreatieve jeugdtoernooien in Oost-Vlaanderen, van Minibad tot U19. Zo maak je op een
-        laagdrempelige manier kennis met toernooien en competitie.
-      </p>
-      <ul>
-        <li>Meedoen kan als je speelt bij een Oost-Vlaamse club die lid is van Badminton Vlaanderen.</li>
-        <li>Je speelt minstens drie wedstrijden tegen spelers uit je eigen leeftijdscategorie.</li>
-        <li>PBO organiseert de toernooien samen met de clubs, in enkel, dubbel en gemengd.</li>
-        <li>
-          Welke disciplines er zijn, lees je bij de inschrijving. Zijn er meer dan twee, dan schrijf je je voor maximaal twee in.
-        </li>
-        <li>De ranking loopt per kalenderjaar. Zo is er per reeks een winnaar.</li>
-      </ul>
-      <h2>Vragen of een fout gezien?</h2>
-      <p>
-        Mail naar <a href={`mailto:${mail.jeugdcup}`}>{mail.jeugdcup}</a>. Klopt er iets niet in de ranking, dan passen we het zo snel
-        mogelijk aan.
-      </p>
+      <Content />
     </div>
 
     <div>
@@ -86,7 +64,7 @@ const jaar = Number(vandaag().slice(0, 4));
       <h2 class="mt-10 mb-1 px-2 text-[28px] leading-tight font-extrabold md:px-0">Reglement</h2>
       <p class="mb-4 px-2 text-muted md:px-0">Hoe de toernooien verlopen en hoe de punten verdeeld worden.</p>
       <div class="flex flex-col gap-3">
-        {documenten.map((d) => <LinkCard href={u(d.href)} icon="document" title={d.title} text={d.text} />)}
+        {documenten.map((d) => <LinkCard href={u(d.bestand)} icon="document" title={d.titel} text={d.tekst} />)}
       </div>
     </div>
   </section>

@@ -30,4 +30,32 @@ const rankings = defineCollection({
   }),
 });
 
-export const collections = { toernooien, rankings };
+// Zonder bestand toont de site "Volgt binnenkort".
+const document = z.object({ titel: z.string(), tekst: z.string().optional(), bestand: z.string().optional() });
+
+/**
+ * Vaste pagina's: titel, intro en de lopende tekst (Markdown) plus de lijsten die beheerders zelf aanpassen.
+ * De opmaak rond die inhoud (kaarten, zijbalken) blijft in src/pages/.
+ */
+const paginas = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/paginas' }),
+  schema: ({ image }) =>
+    z.object({
+      title: z.string(),
+      lead: z.string(),
+      description: z.string(),
+      documenten: z.array(document).default([]),
+      // bestuur
+      bestuurders: z.array(z.object({ naam: z.string(), rol: z.string(), foto: image().optional() })).default([]),
+      medewerkers: z.array(z.object({ naam: z.string(), rol: z.string(), vacant: z.boolean().default(false) })).default([]),
+      bijdragen: z.array(z.object({ type: z.string(), perSpeler: z.string(), minimum: z.string() })).default([]),
+      // jeugd
+      trainers: z.array(z.object({ naam: z.string(), diploma: z.string() })).default([]),
+      // jeugdcuptour
+      archief: z.array(z.object({ label: z.string(), bestand: z.string() })).default([]),
+      // vacatures
+      vacatures: z.array(z.object({ titel: z.string(), tekst: z.string() })).default([]),
+    }),
+});
+
+export const collections = { toernooien, rankings, paginas };

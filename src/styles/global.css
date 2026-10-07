@@ -137,6 +137,10 @@
     line-height: 1.7;
   }
 
+  .prose-pbo > :first-child {
+    margin-top: 0;
+  }
+
   .prose-pbo > * + * {
     margin-top: 1em;
   }
@@ -166,7 +170,43 @@
     list-style: disc;
   }
 
-  .prose-pbo li + li {
+  /* Genummerde stappen: cijfer in een donkere bol */
+  .prose-pbo ol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1.25em;
+    counter-reset: stap;
+  }
+
+  .prose-pbo ol > li {
+    display: flex;
+    gap: 1rem;
+    counter-increment: stap;
+  }
+
+  .prose-pbo ol > li::before {
+    content: counter(stap);
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    margin-top: -0.15rem;
+    border-radius: 999px;
+    background: var(--color-ink);
+    color: var(--color-accent);
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .prose-pbo ol > li + li {
+    margin-top: 0;
+  }
+
+  .prose-pbo ul li + li {
     margin-top: 0.35em;
   }
 

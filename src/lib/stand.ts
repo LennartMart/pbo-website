@@ -6,7 +6,7 @@
  * - Een lege positie (gedeelde plaats) neemt de positie van de vorige rij over.
  * - Regels zonder punten op het einde (koppen, lege regels) worden overgeslagen.
  *
- * Wordt ook in /admin gebruikt voor het voorbeeld (public/admin/stand.js is een kopie, hou ze gelijk).
+ * Wordt ook in /admin gebruikt voor het voorbeeld naast het invulveld (src/scripts/admin-preview.ts).
  */
 export interface Speler {
   naam: string;

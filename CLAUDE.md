@@ -26,12 +26,14 @@ src/content/
                             date, club, hall?, prijsuitreiking?  (id = bestandsnaam, seizoen volgt uit de datum)
   rankings/<toernooi-id>/<categorie>-<discipline>.yaml
                             toernooi, categorie, discipline, stand (geplakt uit Excel), pdf?
-  paginas/<pagina>.yaml     wijzigbare data van vaste pagina's (bestuur, vacatures, documenten)
+  paginas/<pagina>.md       vaste pagina's: title, lead, description, lijsten (bestuur, documenten, ...) + lopende tekst
 ```
 
 - Een ranking is de **tussenstand** na dat toernooi, zoals berekend in Excel. De site telt niets op: per categorie en discipline toont ze de stand van het laatste toernooi in dat kalenderjaar.
 - `stand` is tekst met tabs (rechtstreeks geplakt uit Excel): positie, naam, club, punten. Dubbel per paar mag als `naam / naam` of als vier middenkolommen (naam, club, naam, club). Parser: `src/lib/stand.ts`.
 - Optioneel een pdf van de stand (`pdf`), getoond als downloadlink naast de tabel.
+- Decap-config wordt bij de build gegenereerd uit `src/lib/cms.ts` (`/admin/config.yml`, `/admin/jeugdcup/config.yml`). Velden daar en in `src/content.config.ts` gelijk houden. Handleiding: `docs/beheer.md`.
+- Markdown draait op Sätteri (Astro 7). `src/lib/markdown-basis.mjs` zet het basispad voor interne links in Markdown.
 
 - Nieuwscategorieën: `jeugd`, `selectie`, `evenement` (+ eventueel `competitie`, `recreanten`; WordPress-categorieën nog mappen)
 - Categorieën jeugdcup: `minibad`, `u11`, `u13`, `u15`, `u17-u19`
