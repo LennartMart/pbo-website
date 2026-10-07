@@ -2,11 +2,13 @@
 import { u } from '../lib/url';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon, { type IconName } from '../components/Icon.astro';
-import { komende, seizoen, laatsteRanking, categorieen } from '../data/jeugdcuptour';
+import { komende, huidigSeizoen, laatsteRanking, categorieen } from '../lib/jeugdcup';
 import { recentNieuws, uitgelicht } from '../data/nieuws';
 import { dag, dag2, maand, maandKort, weekdag, lang } from '../lib/datum';
 
-const upcoming = komende();
+const upcoming = await komende();
+const seizoen = await huidigSeizoen();
+const ranking = await laatsteRanking();
 const volgende = upcoming[0];
 const lijst = upcoming.slice(0, 5);
 
@@ -153,7 +155,7 @@ const catZin = `${catNamen.slice(0, -1).join(', ')} of ${catNamen.at(-1)}`;
 
     <div class="flex flex-col gap-3 rounded-card bg-accent p-7 lg:gap-4 lg:p-9">
       <p class="label">Laatste ranking</p>
-      <h2 class="text-[28px] leading-[1.1] font-extrabold lg:text-4xl">Na {laatsteRanking.na}</h2>
+      <h2 class="text-[28px] leading-[1.1] font-extrabold lg:text-4xl">{ranking ? `Na ${ranking.na}` : `Ranking ${seizoen}`}</h2>
       <p class="text-[15px] leading-normal lg:text-base">Zoek je naam bij {catZin}.</p>
       <a class="btn mt-1 bg-ink text-white lg:mt-2 lg:self-start" href={u('/jeugd/jeugdcuptour/ranking')}>Naar de ranking</a>
     </div>

@@ -3,7 +3,9 @@ import { u } from '../lib/url';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/PageIntro.astro';
 import LinkCard from '../components/LinkCard.astro';
-import { seizoen } from '../data/jeugdcuptour';
+import { huidigSeizoen } from '../lib/jeugdcup';
+
+const seizoen = await huidigSeizoen();
 import { mail } from '../data/site';
 ---
 

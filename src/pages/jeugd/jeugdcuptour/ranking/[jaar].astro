@@ -1,0 +1,35 @@
+---
+import { u } from '../../../../lib/url';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import PageIntro from '../../../../components/PageIntro.astro';
+import RankingView from '../../../../components/RankingView.astro';
+import { rankingPerJaar } from '../../../../lib/jeugdcup';
+
+/** Oudere kalenderjaren met data. Het nieuwste jaar staat op /jeugd/jeugdcuptour/ranking. */
+export async function getStaticPaths() {
+  const jaren = await rankingPerJaar();
+  return jaren.slice(1).map((j) => ({
+    params: { jaar: String(j.jaar) },
+    props: { ...j, jaren: jaren.map((x) => x.jaar), nieuwste: jaren[0].jaar },
+  }));
+}
+
+const props = Astro.props;
+---
+
+<BaseLayout
+  title={`Ranking jeugdcuptour ${props.jaar}`}
+  description={`Eindstand van de Victor Jeugdcuptour by PBO in ${props.jaar}, na ${props.laatste.club}.`}
+>
+  <PageIntro
+    title={`Ranking ${props.jaar}`}
+    lead={`Stand na ${props.laatste.club}, de laatste halte van ${props.jaar}.`}
+    crumbs={[
+      { href: u('/jeugd'), label: 'Jeugd' },
+      { href: u('/jeugd/jeugdcuptour'), label: 'Jeugdcuptour' },
+      { href: u('/jeugd/jeugdcuptour/ranking'), label: 'Ranking' },
+      { label: String(props.jaar) },
+    ]}
+  />
+  <RankingView {...props} />
+</BaseLayout>

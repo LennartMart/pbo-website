@@ -4,7 +4,10 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/PageIntro.astro';
 import LinkCard from '../../components/LinkCard.astro';
 import { badmintonVlaanderen } from '../../data/site';
-import { seizoen, laatsteRanking } from '../../data/jeugdcuptour';
+import { huidigSeizoen, laatsteRanking } from '../../lib/jeugdcup';
+
+const seizoen = await huidigSeizoen();
+const ranking = await laatsteRanking();
 
 const trainers = [
   { naam: 'Luc Geeraerts', diploma: 'VTS-trainer A' },
@@ -39,8 +42,8 @@ const trainers = [
         <LinkCard
           href={u('/jeugd/jeugdcuptour/ranking')}
           icon="ranking"
-          title={`Ranking ${laatsteRanking.jaar}`}
-          text={`Stand na ${laatsteRanking.na}`}
+          title={ranking ? `Ranking ${ranking.jaar}` : 'Ranking'}
+          text={ranking ? `Stand na ${ranking.na}` : 'Per categorie en discipline'}
         />
       </div>
     </div>

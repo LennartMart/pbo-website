@@ -1,0 +1,35 @@
+---
+import { u } from '../../../../lib/url';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import PageIntro from '../../../../components/PageIntro.astro';
+import RankingView from '../../../../components/RankingView.astro';
+import LinkCard from '../../../../components/LinkCard.astro';
+import { rankingPerJaar } from '../../../../lib/jeugdcup';
+import { archief } from '../../../../data/jeugdcuptour';
+
+const jaren = await rankingPerJaar();
+const recent = jaren[0];
+const crumbs = [{ href: u('/jeugd'), label: 'Jeugd' }, { href: u('/jeugd/jeugdcuptour'), label: 'Jeugdcuptour' }, { label: 'Ranking' }];
+---
+
+<BaseLayout
+  title="Ranking jeugdcuptour"
+  description={recent
+    ? `Stand van de Victor Jeugdcuptour by PBO na ${recent.laatste.club}, kalenderjaar ${recent.jaar}. Zoek je naam per categorie en discipline.`
+    : 'Stand van de Victor Jeugdcuptour by PBO per categorie en discipline.'}
+>
+  <PageIntro
+    title="Jeugdcuptour ranking"
+    lead={recent ? `Stand na ${recent.laatste.club}, kalenderjaar ${recent.jaar}.` : 'De eerste stand verschijnt na de eerste jeugdcup van het jaar.'}
+    crumbs={crumbs}
+  />
+  {
+    recent ? (
+      <RankingView {...recent} jaren={jaren.map((j) => j.jaar)} nieuwste={recent.jaar} />
+    ) : (
+      <section class="wrap mt-8 flex flex-col gap-3">
+        {archief.map((a) => <LinkCard href={u(a.href)} icon="document" title={a.label} />)}
+      </section>
+    )
+  }
+</BaseLayout>

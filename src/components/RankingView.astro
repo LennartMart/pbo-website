@@ -1,0 +1,230 @@
+---
+import { u } from '../lib/url';
+import Icon from './Icon.astro';
+import { mail } from '../data/site';
+import { archief } from '../data/jeugdcuptour';
+import { categorieen, disciplines, geboortejaren, type Stand, type Toernooi } from '../lib/jeugdcup';
+import { toonPunten } from '../lib/stand';
+import { lang } from '../lib/datum';
+
+interface Props {
+  jaar: number;
+  per: Map<string, Stand>;
+  laatste: Toernooi;
+  voorbeeld: boolean;
+  /** Andere jaren met data, nieuwste eerst. */
+  jaren: number[];
+  nieuwste: number;
+}
+
+const { jaar, per, laatste, voorbeeld, jaren, nieuwste } = Astro.props;
+
+const jaarHref = (j: number) => u(j === nieuwste ? '/jeugd/jeugdcuptour/ranking' : `/jeugd/jeugdcuptour/ranking/${j}`);
+const anderen = [
+  ...jaren.filter((j) => j !== jaar).map((j) => ({ label: `Ranking ${j}`, href: jaarHref(j) })),
+  ...archief.map((a) => ({ label: a.label, href: u(a.href) })),
+];
+
+// Eerste combinatie met data als startpunt (zonder JavaScript zie je alles onder elkaar).
+const eerste = categorieen.flatMap((c) => disciplines.map((d) => `${c.id}-${d.id}`)).find((k) => per.has(k));
+const pill =
+  'inline-flex min-h-11 items-center rounded-full border-[1.5px] border-line bg-paper px-5 text-[15px] font-semibold transition-colors hover:border-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-white';
+---
+
+<section class="wrap mt-8 md:mt-10">
+  {
+    voorbeeld && (
+      <p class="mb-4 rounded-[20px] border-[1.5px] border-dashed border-brand bg-accent-soft px-5 py-4 text-[15px] md:px-6">
+        <strong>Testversie:</strong> deze stand bevat verzonnen namen. De echte stand verschijnt zodra ze in het beheer staat.
+      </p>
+    )
+  }
+
+  <div data-filters hidden class="flex flex-col gap-5 rounded-card bg-paper p-5 md:p-7">
+    <div class="flex flex-col gap-3 md:flex-row md:items-center">
+      <span class="label w-28 shrink-0 text-muted" id="label-cat">Categorie</span>
+      <div class="flex flex-wrap gap-2" role="group" aria-labelledby="label-cat">
+        {categorieen.map((c) => <button type="button" class={pill} data-cat={c.id} aria-pressed="false">{c.label}</button>)}
+      </div>
+    </div>
+    <div class="flex flex-col gap-3 md:flex-row md:items-center">
+      <span class="label w-28 shrink-0 text-muted" id="label-disc">Discipline</span>
+      <div class="flex flex-wrap gap-2" role="group" aria-labelledby="label-disc">
+        {disciplines.map((d) => <button type="button" class={pill} data-disc={d.id} aria-pressed="false">{d.label}</button>)}
+      </div>
+    </div>
+    <div class="flex flex-col gap-3 md:flex-row md:items-center">
+      <label for="zoek-naam" class="label w-28 shrink-0 text-muted">Zoek</label>
+      <input
+        id="zoek-naam"
+        type="search"
+        autocomplete="off"
+        placeholder="Naam of club, in alle categorieën"
+        class="min-h-12 w-full rounded-full border-[1.5px] border-line bg-ground px-5 text-base placeholder:text-muted focus:border-ink md:max-w-md"
+      />
+    </div>
+  </div>
+  <p data-zoekstatus class="mt-4 px-2 text-muted md:px-0" aria-live="polite"></p>
+</section>
+
+<section class="wrap mt-4 flex flex-col gap-10 md:mt-6" data-standen data-start={eerste}>
+  {
+    categorieen.map((c) =>
+      disciplines.map((d) => {
+        const s = per.get(`${c.id}-${d.id}`);
+        return (
+          <div data-stand={`${c.id}-${d.id}`}>
+            <div class="mb-4 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-2 md:px-1">
+              <h2 class="text-[26px] leading-tight font-bold md:text-[28px]">
+                {c.label} · {d.label}
+              </h2>
+              <span class="text-[15px] text-muted">Geboortejaren: {geboortejaren(c.id, jaar)}</span>
+            </div>
+            {s ? (
+              <>
+                <div class="rounded-card bg-paper p-2 md:p-3">
+                  <table class="w-full text-left">
+                    <caption class="sr-only">
+                      Stand {c.label} {d.label.toLowerCase()} na {s.toernooi.club}, {jaar}
+                    </caption>
+                    <thead>
+                      <tr class="label text-muted">
+                        <th scope="col" class="w-12 px-3 pt-3 pb-3 font-semibold md:w-16 md:px-5">#</th>
+                        <th scope="col" class="px-3 pt-3 pb-3 font-semibold md:px-5">Speler</th>
+                        <th scope="col" class="hidden px-5 pt-3 pb-3 font-semibold sm:table-cell">Club</th>
+                        <th scope="col" class="w-20 px-3 pt-3 pb-3 text-right font-semibold md:w-24 md:px-5">Punten</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {s.rijen.map((r) => (
+                        <tr class="border-t border-wash" data-rij>
+                          <td class="num px-3 py-3.5 align-top font-display text-2xl leading-tight font-extrabold md:px-5">{r.pos}</td>
+                          <td class="px-3 py-3.5 md:px-5">
+                            {r.spelers.map((p) => (
+                              <span class="block font-semibold">
+                                {p.naam}
+                                <span class="block text-sm font-normal text-muted sm:hidden">{p.club}</span>
+                              </span>
+                            ))}
+                          </td>
+                          <td class="hidden px-5 py-3.5 text-muted sm:table-cell">
+                            {r.spelers.every((p) => p.club === r.spelers[0].club) ? (
+                              r.spelers[0].club
+                            ) : (
+                              r.spelers.map((p) => <span class="block">{p.club}</span>)
+                            )}
+                          </td>
+                          <td class="num px-3 py-3.5 text-right align-top font-semibold md:px-5">{toonPunten(r.punten)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+                <div class="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-2 text-[15px] text-muted md:px-1">
+                  <span>
+                    Stand na {s.toernooi.club}, {lang(s.toernooi.date)}
+                  </span>
+                  {s.pdf && (
+                    <a href={u(s.pdf)} class="inline-flex min-h-11 items-center gap-2 font-semibold text-brand hover:underline">
+                      <Icon name="document" size={20} /> Download als pdf
+                    </a>
+                  )}
+                </div>
+              </>
+            ) : (
+              <p class="rounded-card bg-paper p-6 text-muted md:p-8">
+                Nog geen stand voor {c.label} {d.label.toLowerCase()} in {jaar}.
+              </p>
+            )}
+          </div>
+        );
+      }),
+    )
+  }
+</section>
+
+<section class="wrap mt-14 md:mt-16">
+  {
+    anderen.length > 0 && (
+      <>
+        <h2 class="mb-5 px-2 text-[28px] leading-tight font-extrabold md:px-0 md:text-4xl">Archief</h2>
+        <ul class="flex flex-wrap gap-3 px-2 md:px-0">
+          {anderen.map((a) => (
+            <li>
+              <a href={a.href} class="inline-flex min-h-11 items-center rounded-2xl bg-paper px-5 py-3 font-semibold hover:bg-wash">
+                {a.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </>
+    )
+  }
+  <p class="mt-8 max-w-[640px] px-2 leading-normal text-muted md:px-0">
+    Klopt er iets niet? Mail naar <a class="link" href={`mailto:${mail.jeugdcup}`}>{mail.jeugdcup}</a> en we passen het aan.
+  </p>
+</section>
+
+<script>
+  const filters = document.querySelector<HTMLElement>('[data-filters]');
+  const lijst = document.querySelector<HTMLElement>('[data-standen]');
+  const status = document.querySelector<HTMLElement>('[data-zoekstatus]');
+  const zoek = document.querySelector<HTMLInputElement>('#zoek-naam');
+
+  if (filters && lijst && status && zoek) {
+    const standen = [...lijst.querySelectorAll<HTMLElement>('[data-stand]')];
+    const params = new URLSearchParams(location.search);
+    const [startCat, startDisc] = (lijst.dataset.start ?? 'u13-enkel').split(/-(?=enkel|dubbel|gemengd)/);
+    let cat = params.get('cat') ?? startCat;
+    let disc = params.get('disc') ?? startDisc;
+
+    const normaal = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+    function toon() {
+      const q = normaal(zoek!.value.trim());
+      filters!.querySelectorAll<HTMLButtonElement>('[data-cat]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.cat === cat)));
+      filters!.querySelectorAll<HTMLButtonElement>('[data-disc]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.disc === disc)));
+
+      let gevonden = 0;
+      for (const s of standen) {
+        const rijen = [...s.querySelectorAll<HTMLElement>('[data-rij]')];
+        if (q.length < 2) {
+          s.hidden = s.dataset.stand !== `${cat}-${disc}`;
+          rijen.forEach((r) => (r.hidden = false));
+          continue;
+        }
+        let hier = 0;
+        for (const r of rijen) {
+          const raak = normaal(r.textContent ?? '').includes(q);
+          r.hidden = !raak;
+          if (raak) hier++;
+        }
+        s.hidden = hier === 0;
+        gevonden += hier;
+      }
+      status!.textContent =
+        q.length < 2 ? '' : gevonden === 0 ? `Niemand gevonden voor "${zoek!.value.trim()}".` : `${gevonden} ${gevonden === 1 ? 'resultaat' : 'resultaten'} voor "${zoek!.value.trim()}".`;
+    }
+
+    function bewaar() {
+      const url = new URL(location.href);
+      url.searchParams.set('cat', cat);
+      url.searchParams.set('disc', disc);
+      history.replaceState(null, '', url);
+    }
+
+    filters.addEventListener('click', (e) => {
+      const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
+      if (!b) return;
+      if (b.dataset.cat) cat = b.dataset.cat;
+      if (b.dataset.disc) disc = b.dataset.disc;
+      zoek.value = '';
+      bewaar();
+      toon();
+    });
+    zoek.addEventListener('input', toon);
+
+    filters.hidden = false;
+    toon();
+  }
+</script>

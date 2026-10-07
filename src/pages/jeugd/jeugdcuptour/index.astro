@@ -4,15 +4,20 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PageIntro from '../../../components/PageIntro.astro';
 import LinkCard from '../../../components/LinkCard.astro';
 import { mail } from '../../../data/site';
-import { seizoen, categorieen, laatsteRanking, komende, documenten } from '../../../data/jeugdcuptour';
+import { documenten } from '../../../data/jeugdcuptour';
+import { categorieen, geboortejaren, huidigSeizoen, komende, laatsteRanking } from '../../../lib/jeugdcup';
+import { vandaag } from '../../../lib/datum';
 import { dag, maand } from '../../../lib/datum';
 
-const volgende = komende()[0];
+const [volgende] = await komende();
+const seizoen = await huidigSeizoen();
+const ranking = await laatsteRanking();
+const jaar = Number(vandaag().slice(0, 4));
 ---
 
 <BaseLayout
   title="Victor Jeugdcuptour by PBO"
-  description={`Hoe de Victor Jeugdcuptour by PBO werkt: wie mag meedoen, leeftijdscategorieën ${laatsteRanking.jaar}, kalender ${seizoen} en ranking.`}
+  description={`Hoe de Victor Jeugdcuptour by PBO werkt: wie mag meedoen, leeftijdscategorieën ${jaar}, kalender ${seizoen} en ranking.`}
 >
   <PageIntro
     title="Victor Jeugdcuptour by PBO"
@@ -27,8 +32,8 @@ const volgende = komende()[0];
     <LinkCard
       href={u('/jeugd/jeugdcuptour/ranking')}
       icon="ranking"
-      title={`Ranking ${laatsteRanking.jaar}`}
-      text={`Stand na ${laatsteRanking.na}. Zoek je naam per categorie.`}
+      title={`Ranking ${ranking?.jaar ?? jaar}`}
+      text={ranking ? `Stand na ${ranking.na}. Zoek je naam per categorie.` : 'Zoek je naam per categorie.'}
     />
   </section>
 
@@ -56,10 +61,10 @@ const volgende = komende()[0];
     </div>
 
     <div>
-      <h2 class="mb-1 px-2 text-[28px] leading-tight font-extrabold md:px-0">Categorieën {laatsteRanking.jaar}</h2>
+      <h2 class="mb-1 px-2 text-[28px] leading-tight font-extrabold md:px-0">Categorieën {jaar}</h2>
       <p class="mb-4 px-2 text-muted md:px-0">Op basis van je geboortejaar.</p>
       <table class="w-full overflow-hidden rounded-card bg-paper text-left">
-        <caption class="sr-only">Leeftijdscategorieën en geboortejaren voor kalenderjaar {laatsteRanking.jaar}</caption>
+        <caption class="sr-only">Leeftijdscategorieën en geboortejaren voor kalenderjaar {jaar}</caption>
         <thead>
           <tr class="label text-muted">
             <th scope="col" class="px-6 pt-5 pb-3 font-semibold">Categorie</th>
@@ -71,7 +76,7 @@ const volgende = komende()[0];
             categorieen.map((c) => (
               <tr class="border-t border-wash">
                 <th scope="row" class="px-6 py-4 font-display text-lg font-bold">{c.label}</th>
-                <td class="num px-6 py-4">{c.jaren}</td>
+                <td class="num px-6 py-4">{geboortejaren(c.id, jaar)}</td>
               </tr>
             ))
           }

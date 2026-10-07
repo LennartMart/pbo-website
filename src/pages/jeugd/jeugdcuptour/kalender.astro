@@ -1,0 +1,100 @@
+---
+import { u } from '../../../lib/url';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageIntro from '../../../components/PageIntro.astro';
+import Icon from '../../../components/Icon.astro';
+import { mail } from '../../../data/site';
+import { alleToernooien, huidigSeizoen, rankingPerJaar, seizoenVan, type Toernooi } from '../../../lib/jeugdcup';
+import { dag, dag2, maand, maandKort, vandaag, weekdag } from '../../../lib/datum';
+
+const nu = vandaag();
+const huidig = await huidigSeizoen();
+const toernooien = await alleToernooien();
+// Enkel de laatst gepubliceerde stand staat online; oudere tussenstanden niet.
+const laatsteStand = (await rankingPerJaar())[0]?.laatste.id;
+
+// Huidig seizoen en eventueel al geplande volgende seizoenen.
+const seizoenen = new Map<string, Toernooi[]>();
+for (const t of toernooien) {
+  const s = seizoenVan(t.date);
+  if (s < huidig) continue;
+  seizoenen.set(s, [...(seizoenen.get(s) ?? []), t]);
+}
+
+const volgende = toernooien.find((t) => t.date >= nu);
+const plaats = (t: Toernooi) => [weekdag(t.date), t.hall, t.prijsuitreiking && 'prijsuitreiking'].filter(Boolean).join(' · ');
+---
+
+<BaseLayout
+  title={`Kalender jeugdcuptour ${huidig}`}
+  description={`Alle data van de Victor Jeugdcuptour by PBO in seizoen ${huidig}: clubs, sporthallen en de prijsuitreiking.`}
+>
+  <PageIntro
+    title={`Kalender ${huidig}`}
+    lead={volgende
+      ? `Volgende halte: ${volgende.club} op ${weekdag(volgende.date).toLowerCase()} ${dag(volgende.date)} ${maand(volgende.date)}.`
+      : 'De data voor het volgende seizoen staan hier zodra ze vastliggen.'}
+    crumbs={[
+      { href: u('/jeugd'), label: 'Jeugd' },
+      { href: u('/jeugd/jeugdcuptour'), label: 'Jeugdcuptour' },
+      { label: 'Kalender' },
+    ]}
+  />
+
+  {
+    [...seizoenen.entries()].map(([seizoen, lijst], i) => (
+      <section class="wrap mt-8 md:mt-10" aria-labelledby={`seizoen-${seizoen}`}>
+        <h2
+          id={`seizoen-${seizoen}`}
+          class:list={['mb-4 px-2 text-[28px] leading-tight font-extrabold md:px-0 md:text-4xl', i === 0 && 'sr-only']}
+        >
+          Seizoen {seizoen}
+        </h2>
+        <ol class="rounded-card bg-paper p-2 md:p-3">
+          {lijst.map((t) => {
+            const gespeeld = t.date < nu;
+            const isVolgende = t.id === volgende?.id;
+            return (
+              <li
+                class:list={[
+                  'flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-wash px-3 py-4 last:border-b-0 md:gap-x-6 md:px-5',
+                  isVolgende && 'rounded-[18px] border-transparent bg-accent-soft',
+                ]}
+              >
+                <time datetime={t.date} class:list={['w-12 shrink-0 text-center md:w-16', gespeeld && 'text-muted']}>
+                  <span class="num block font-display text-[26px] leading-none font-extrabold md:text-[32px]">{dag2(t.date)}</span>
+                  <span class="block text-xs font-bold uppercase md:text-[13px]">{maandKort(t.date)}</span>
+                </time>
+                <div class="min-w-0 flex-1">
+                  {isVolgende && <p class="label mb-0.5 text-brand">Volgende halte</p>}
+                  <p class:list={['text-base font-semibold md:text-lg', gespeeld && 'text-muted']}>{t.club}</p>
+                  <p class="text-sm text-muted md:text-[15px]">{plaats(t)}</p>
+                </div>
+                {gespeeld &&
+                  (t.id === laatsteStand ? (
+                    <a
+                      href={u('/jeugd/jeugdcuptour/ranking')}
+                      class="ml-16 inline-flex min-h-11 items-center gap-2 font-semibold text-brand hover:underline md:ml-0"
+                    >
+                      Stand na deze halte <Icon name="pijl" size={18} stroke={2} />
+                    </a>
+                  ) : (
+                    <span class="ml-16 text-sm text-muted md:ml-0">Gespeeld</span>
+                  ))}
+              </li>
+            );
+          })}
+        </ol>
+      </section>
+    ))
+  }
+
+  <section class="wrap mt-10 md:mt-14">
+    <div class="flex flex-col gap-4 rounded-card bg-accent-soft p-6 md:flex-row md:items-center md:justify-between md:p-8">
+      <p class="max-w-[60ch] text-[17px] leading-normal">
+        Vragen over de kalender of een toernooi? Mail naar <a class="link" href={`mailto:${mail.jeugdcup}`}>{mail.jeugdcup}</a>.
+      </p>
+      <a href={u('/jeugd/jeugdcuptour/ranking')} class="btn shrink-0 bg-ink text-white">Naar de ranking</a>
+    </div>
+  </section>
+</BaseLayout>
