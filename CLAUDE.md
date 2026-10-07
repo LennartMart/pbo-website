@@ -59,6 +59,8 @@ src/content/
 - Pdf's uit `wp-content/uploads/` **op hetzelfde pad** bewaren in `public/`, zodat externe links blijven werken. Archiefrankings 2011–2025 blijven voorlopig pdf.
 - Sommige oude links wijzen naar `pbo.kwal.org`: opsporen en vervangen.
 - De WordPress-site zelf niet aanpassen.
+- `dist/.htaccess` wordt bij elke build gegenereerd door `scripts/htaccess.mjs` (301's, https/www, 404). Na een deploy: `node scripts/controleer-redirects.mjs --site <url>`.
+- Stappenplan voor de switch: `docs/domeinswitch.md`.
 
 ## Externe links (behouden)
 

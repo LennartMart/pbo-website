@@ -18,8 +18,8 @@ const {
 
 const fullTitle = title ? `${title} · PBO vzw` : 'PBO vzw · Badminton Oost-Vlaanderen';
 const canonical = new URL(Astro.url.pathname, Astro.site);
-// Testversies (zoals GitHub Pages) niet laten indexeren, enkel badminton-pbo.be.
-const indexeren = Astro.site?.hostname.endsWith('badminton-pbo.be') ?? false;
+// Testversies (GitHub Pages, een testsubdomein) niet laten indexeren, enkel de echte site.
+const indexeren = Astro.site?.hostname === 'www.badminton-pbo.be';
 ---
 
 <!doctype html>
