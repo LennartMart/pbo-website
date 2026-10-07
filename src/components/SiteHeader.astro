@@ -1,0 +1,99 @@
+---
+import { u } from '../lib/url';
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import mark from '../assets/logo/pbo-mark.png';
+import { nav } from '../data/site';
+
+const path = Astro.url.pathname.replace(/\/$/, '');
+const isCurrent = (href: string) => {
+  const full = u(href);
+  return path === full || path.startsWith(`${full}/`);
+};
+---
+
+<header class="wrap pt-4 pb-4 md:pt-6 md:pb-6">
+  <div class="flex items-center justify-between gap-4">
+    <a href={u('/')} class="flex items-center gap-3 rounded-xl">
+      <Image src={mark} alt="PBO vzw" height={56} densities={[1, 2]} class="h-11 w-auto md:h-14" loading="eager" />
+      <span class="font-display text-[15px] leading-[1.05] font-extrabold tracking-[-0.01em] md:text-[17px]">
+        Badminton<br />Oost-Vlaanderen
+      </span>
+    </a>
+
+    <nav aria-label="Hoofdmenu" class="hidden lg:block">
+      <ul class="flex flex-wrap items-center gap-x-7 text-[15px] font-medium">
+        {
+          nav.map((item) => (
+            <li>
+              <a
+                href={u(item.href)}
+                aria-current={isCurrent(item.href) ? 'page' : undefined}
+                class:list={[
+                  'inline-flex min-h-11 items-center transition-colors hover:text-brand',
+                  isCurrent(item.href) && 'font-semibold text-brand',
+                ]}
+              >
+                {item.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <button
+      type="button"
+      class="group flex size-12 items-center justify-center rounded-[14px] bg-paper lg:hidden"
+      aria-controls="mobiel-menu"
+      aria-expanded="false"
+      data-menu-toggle
+    >
+      <span class="sr-only" data-menu-label>Menu openen</span>
+      <Icon name="menu" size={22} stroke={2} class="group-aria-expanded:hidden" />
+      <Icon name="sluit" size={22} stroke={2} class="hidden group-aria-expanded:block" />
+    </button>
+  </div>
+
+  <nav id="mobiel-menu" aria-label="Hoofdmenu" class="on-ink mt-4 hidden rounded-[24px] bg-ink p-3 text-white lg:hidden" data-menu>
+    <ul class="flex flex-col">
+      {
+        nav.map((item) => (
+          <li>
+            <a
+              href={u(item.href)}
+              aria-current={isCurrent(item.href) ? 'page' : undefined}
+              class:list={[
+                'flex min-h-[52px] items-center rounded-2xl px-4 text-lg font-semibold hover:bg-white/10',
+                isCurrent(item.href) && 'text-accent',
+              ]}
+            >
+              {item.label}
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </nav>
+</header>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  const label = document.querySelector<HTMLElement>('[data-menu-label]');
+
+  if (button && menu && label) {
+    const set = (open: boolean) => {
+      button.setAttribute('aria-expanded', String(open));
+      menu.classList.toggle('hidden', !open);
+      label.textContent = open ? 'Menu sluiten' : 'Menu openen';
+    };
+    button.addEventListener('click', () => set(button.getAttribute('aria-expanded') !== 'true'));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && button.getAttribute('aria-expanded') === 'true') {
+        set(false);
+        button.focus();
+      }
+    });
+  }
+</script>

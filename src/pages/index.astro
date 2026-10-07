@@ -1,0 +1,189 @@
+---
+import { u } from '../lib/url';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon, { type IconName } from '../components/Icon.astro';
+import { komende, seizoen, laatsteRanking, categorieen } from '../data/jeugdcuptour';
+import { recentNieuws, uitgelicht } from '../data/nieuws';
+import { dag, dag2, maand, maandKort, weekdag, lang } from '../lib/datum';
+
+const upcoming = komende();
+const volgende = upcoming[0];
+const lijst = upcoming.slice(0, 5);
+
+const tiles: { href: string; title: string; text: string; icon: IconName }[] = [
+  { href: '/bestuur', title: 'Bestuur', text: 'Bestuursleden, contactpersonen en het secretariaat.', icon: 'bestuur' },
+  { href: '/jeugd', title: 'Jeugd', text: 'PBO-selectie, jeugdcuptour, IPJO en KYU.', icon: 'jeugd' },
+  { href: '/competitie', title: 'Competitie', text: 'Competitie-app, agenda en provinciale regels.', icon: 'competitie' },
+  { href: '/recreanten', title: 'Recreanten & G-sport', text: 'Wat PBO organiseert voor recreanten en G-sporters.', icon: 'recreanten' },
+];
+
+const plaats = (t: { hall?: string; prijsuitreiking?: boolean }) =>
+  [t.hall, t.prijsuitreiking && 'prijsuitreiking'].filter(Boolean).join(' · ');
+
+const catNamen = categorieen.map((c) => c.label);
+const catZin = `${catNamen.slice(0, -1).join(', ')} of ${catNamen.at(-1)}`;
+---
+
+<BaseLayout>
+  <!-- Hero -->
+  <section class="wrap">
+    <div
+      class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] lg:items-center lg:gap-12 lg:rounded-panel lg:bg-ink lg:p-16"
+    >
+      <div class="on-ink rounded-[28px] bg-ink px-6 py-8 text-white lg:rounded-none lg:bg-transparent lg:p-0">
+        <a
+          href={u(`/nieuws/${uitgelicht.slug}`)}
+          class="mb-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[13px] font-medium transition-colors hover:bg-white/15 md:mb-6 md:text-sm"
+        >
+          <span class="md:hidden">{uitgelicht.kortMobiel}</span>
+          <span class="hidden md:inline">{uitgelicht.kort}</span>
+          <Icon name="pijl" size={16} stroke={2} />
+        </a>
+        <h1 class="mb-4 text-[40px] leading-[1.03] font-extrabold tracking-[-0.02em] md:mb-6 md:text-[56px] xl:text-[68px]">
+          Badminton in <span class="text-accent">Oost-Vlaanderen</span>
+        </h1>
+        <p class="mb-7 max-w-[520px] text-base leading-[1.55] text-mist md:mb-9 md:text-[19px]">
+          Kalender en rankings van de jeugdcuptour, info over de competitie, de PBO-selectie en het provinciaal kampioenschap.
+        </p>
+        <div class="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:gap-3">
+          <a class="btn bg-accent text-ink" href={u('/jeugd/jeugdcuptour/ranking')}>Ranking jeugdcuptour</a>
+          <a class="btn border-[1.5px] border-white/35 text-white hover:bg-white/5" href={u('/jeugd/jeugdcuptour/kalender')}
+            >Kalender {seizoen}</a
+          >
+        </div>
+      </div>
+
+      {
+        volgende && (
+          <a
+            href={u('/jeugd/jeugdcuptour/kalender')}
+            class="group flex items-center gap-5 rounded-card bg-paper p-6 lg:block lg:p-8"
+          >
+            <time
+              datetime={volgende.date}
+              class="flex h-[84px] w-[76px] shrink-0 flex-col items-center justify-center rounded-[18px] bg-accent-soft lg:hidden"
+            >
+              <span class="num font-display text-[34px] leading-none font-extrabold">{dag(volgende.date)}</span>
+              <span class="text-[13px] font-bold uppercase">{maandKort(volgende.date)}</span>
+            </time>
+            <div class="min-w-0">
+              <p class="label mb-1 text-brand lg:mb-4">Volgende jeugdcup</p>
+              <time datetime={volgende.date} class="mb-4 hidden items-end gap-3 lg:flex">
+                <span class="num font-display text-[88px] leading-[0.9] font-extrabold tracking-[-0.03em]">{dag(volgende.date)}</span>
+                <span class="pb-1.5 text-[22px] font-semibold">{maand(volgende.date)}</span>
+              </time>
+              <p class="font-display text-[22px] leading-tight font-bold lg:mb-1 lg:text-[26px]">{volgende.club}</p>
+              <p class="text-[15px] text-muted lg:text-base">
+                {[weekdag(volgende.date), plaats(volgende)].filter(Boolean).join(' · ')}
+              </p>
+              <span class="mt-6 hidden min-h-11 items-center gap-2 font-semibold lg:inline-flex">
+                Alle data
+                <Icon name="pijl" size={18} stroke={2} class="transition-transform duration-300 group-hover:translate-x-1" />
+              </span>
+            </div>
+          </a>
+        )
+      }
+    </div>
+  </section>
+
+  <!-- Hoofdonderdelen -->
+  <section class="wrap mt-3 lg:mt-12" aria-labelledby="snel-naar">
+    <h2 id="snel-naar" class="sr-only">Snel naar</h2>
+    <ul class="grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-5">
+      {
+        tiles.map((t) => (
+          <li>
+            <a
+              href={u(t.href)}
+              class="lift flex h-full min-h-32 flex-col gap-3 rounded-[22px] bg-paper p-5 lg:min-h-[200px] lg:rounded-card lg:p-7"
+            >
+              <span class="flex size-[42px] items-center justify-center rounded-xl bg-accent-soft lg:size-12 lg:rounded-[14px]">
+                <Icon name={t.icon} size={22} class="lg:size-6" />
+              </span>
+              <span class="font-display text-lg leading-[1.15] font-bold lg:text-2xl">
+                {t.title.split(/(G-sport)/).map((part) => (part === 'G-sport' ? <span class="whitespace-nowrap">{part}</span> : part))}
+              </span>
+              <span class="hidden leading-normal text-muted lg:block">{t.text}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <!-- Jeugdcuptour -->
+  <section
+    id="kalender"
+    class="wrap mt-10 grid gap-3 lg:mt-[72px] lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)] lg:items-start lg:gap-10"
+  >
+    <div>
+      <div class="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-1 px-2 lg:mb-7 lg:px-0">
+        <div>
+          <p class="label mb-2 text-brand lg:mb-3">Victor Jeugdcuptour by PBO</p>
+          <h2 class="text-[32px] leading-[1.1] font-extrabold tracking-[-0.01em] lg:text-[44px]">Nog op de kalender</h2>
+        </div>
+        <a href={u('/jeugd/jeugdcuptour/kalender')} class="inline-flex min-h-11 items-center gap-2 font-semibold hover:text-brand">
+          Hele kalender <Icon name="pijl" size={18} stroke={2} />
+        </a>
+      </div>
+      {
+        lijst.length > 0 ? (
+          <ol class="rounded-card bg-paper p-2 lg:p-3">
+            {lijst.map((t) => (
+              <li class="flex items-center gap-4 border-b border-wash px-3 py-3.5 last:border-b-0 lg:gap-5 lg:px-5 lg:py-4">
+                <time datetime={t.date} class="w-12 shrink-0 text-center lg:w-16">
+                  <span class="num block font-display text-[26px] leading-none font-extrabold lg:text-[32px]">{dag2(t.date)}</span>
+                  <span class="block text-xs font-bold text-muted uppercase lg:text-[13px]">{maandKort(t.date)}</span>
+                </time>
+                <div class="min-w-0">
+                  <p class="text-base font-semibold lg:text-lg">{t.club}</p>
+                  <p class="text-sm text-muted lg:text-[15px]">{[weekdag(t.date), plaats(t)].filter(Boolean).join(' · ')}</p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p class="rounded-card bg-paper p-6 text-muted lg:p-8">
+            Het seizoen {seizoen} zit erop. De kalender voor het volgende seizoen staat hier zodra de data vastliggen.
+          </p>
+        )
+      }
+    </div>
+
+    <div class="flex flex-col gap-3 rounded-card bg-accent p-7 lg:gap-4 lg:p-9">
+      <p class="label">Laatste ranking</p>
+      <h2 class="text-[28px] leading-[1.1] font-extrabold lg:text-4xl">Na {laatsteRanking.na}</h2>
+      <p class="text-[15px] leading-normal lg:text-base">Zoek je naam bij {catZin}.</p>
+      <a class="btn mt-1 bg-ink text-white lg:mt-2 lg:self-start" href={u('/jeugd/jeugdcuptour/ranking')}>Naar de ranking</a>
+    </div>
+  </section>
+
+  <!-- Nieuws -->
+  <section class="wrap mt-10 lg:mt-[72px]" aria-labelledby="nieuws-titel">
+    <div class="mb-4 flex flex-wrap items-end justify-between gap-3 px-2 lg:mb-7 lg:px-0">
+      <h2 id="nieuws-titel" class="text-[32px] leading-[1.1] font-extrabold tracking-[-0.01em] lg:text-[44px]">Nieuws</h2>
+      <a href={u('/nieuws')} class="inline-flex min-h-11 items-center gap-2 font-semibold hover:text-brand">
+        Alle berichten <Icon name="pijl" size={18} stroke={2} />
+      </a>
+    </div>
+    <ul class="grid gap-3 lg:grid-cols-3 lg:gap-5">
+      {
+        recentNieuws.map((n, i) => (
+          <li class:list={[i > 1 && 'hidden lg:block']}>
+            <a
+              href={u(`/nieuws/${n.slug}`)}
+              class="lift flex h-full flex-col gap-2 rounded-[22px] bg-paper p-6 lg:gap-3 lg:rounded-card lg:p-8"
+            >
+              <time datetime={n.date} class="text-[13px] font-semibold text-brand lg:text-sm">
+                {lang(n.date)}
+              </time>
+              <h3 class="text-[21px] leading-[1.2] font-bold lg:text-[26px] lg:leading-[1.15]">{n.title}</h3>
+              <p class="text-[15px] leading-normal text-muted lg:text-base">{n.excerpt}</p>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</BaseLayout>

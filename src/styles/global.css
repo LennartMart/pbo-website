@@ -1,0 +1,192 @@
+@import "tailwindcss";
+
+/*
+  PBO-huisstijl: kleuren uit het huidige logo (groen #005E44) en de huidige header (limoen #A1F16B).
+  Donkere vlakken in diepgroen, afgeleid van het logogroen.
+*/
+@theme {
+  --color-ink: #0c2a20;
+  --color-ground: #f3f4ef;
+  --color-paper: #ffffff;
+  --color-accent: #a1f16b;
+  --color-accent-soft: #dcf7c8;
+  --color-brand: #005e44;
+  --color-muted: #4a5852;
+  --color-line: #d3d9cf;
+  --color-wash: #eceee6;
+  --color-mist: #bfd3c8;
+
+  --font-display: "Bricolage Grotesque Variable", "Bricolage Grotesque", system-ui, sans-serif;
+  --font-sans: "Instrument Sans Variable", "Instrument Sans", system-ui, sans-serif;
+
+  --radius-card: 24px;
+  --radius-panel: 32px;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@layer base {
+  html {
+    background: var(--color-ground);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-text-size-adjust: 100%;
+    scrollbar-color: #a9b6ad var(--color-ground);
+    scroll-padding-top: 24px;
+  }
+
+  body {
+    min-height: 100dvh;
+    font-size: 1rem;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: var(--color-accent);
+    color: var(--color-ink);
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-brand);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  .on-ink :focus-visible {
+    outline-color: var(--color-accent);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .wrap {
+    width: 100%;
+    max-width: 1200px;
+    margin-inline: auto;
+    padding-inline: 12px;
+  }
+
+  @media (min-width: 768px) {
+    .wrap {
+      padding-inline: 32px;
+    }
+  }
+
+  .label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .lift {
+    transition: transform 0.35s var(--ease-out-expo), box-shadow 0.35s var(--ease-out-expo);
+  }
+
+  @media (hover: hover) {
+    .lift:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 30px -18px rgb(12 42 32 / 0.35);
+    }
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 52px;
+    padding-inline: 28px;
+    border-radius: 999px;
+    font-weight: 600;
+    transition: filter 0.2s ease, background-color 0.2s ease;
+  }
+
+  .btn:hover {
+    filter: brightness(0.95);
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+
+  /* Lopende tekst op inhoudspagina's */
+  .prose-pbo {
+    max-width: 68ch;
+    font-size: 1.0625rem;
+    line-height: 1.7;
+  }
+
+  .prose-pbo > * + * {
+    margin-top: 1em;
+  }
+
+  .prose-pbo h2 {
+    margin-top: 2.2em;
+    font-size: 1.75rem;
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  .prose-pbo h3 {
+    margin-top: 1.8em;
+    font-size: 1.3rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  .prose-pbo h2 + *,
+  .prose-pbo h3 + * {
+    margin-top: 0.6em;
+  }
+
+  .prose-pbo ul {
+    padding-left: 1.2em;
+    list-style: disc;
+  }
+
+  .prose-pbo li + li {
+    margin-top: 0.35em;
+  }
+
+  .prose-pbo li::marker {
+    color: var(--color-brand);
+  }
+
+  .prose-pbo a,
+  .link {
+    color: var(--color-brand);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+    text-decoration-color: color-mix(in srgb, var(--color-brand) 40%, transparent);
+    transition: text-decoration-color 0.2s ease;
+  }
+
+  .prose-pbo a:hover,
+  .link:hover {
+    text-decoration-color: currentColor;
+  }
+}

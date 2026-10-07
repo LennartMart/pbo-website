@@ -1,0 +1,25 @@
+---
+import { u } from '../lib/url';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import LinkCard from '../components/LinkCard.astro';
+import { seizoen } from '../data/jeugdcuptour';
+import { mail } from '../data/site';
+---
+
+<BaseLayout title="Pagina niet gevonden">
+  <PageIntro
+    title="Deze pagina bestaat niet (meer)"
+    lead="De site is vernieuwd, dus sommige oude links werken niet meer. Hier vind je het meest gezochte."
+  />
+
+  <section class="wrap mt-8 grid gap-3 md:mt-10 md:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+    <LinkCard href={u('/jeugd/jeugdcuptour/ranking')} icon="ranking" title="Ranking jeugdcuptour" />
+    <LinkCard href={u('/jeugd/jeugdcuptour/kalender')} icon="kalender" title={`Kalender ${seizoen}`} />
+    <LinkCard href={u('/')} icon="home" title="Naar de startpagina" />
+  </section>
+
+  <p class="wrap mt-8 px-5 text-muted md:px-8">
+    Zoek je een oud bericht of document? Mail naar <a class="link" href={`mailto:${mail.secretariaat}`}>{mail.secretariaat}</a>.
+  </p>
+</BaseLayout>

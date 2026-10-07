@@ -1,0 +1,109 @@
+---
+import { u } from '../../lib/url';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageIntro from '../../components/PageIntro.astro';
+import LinkCard from '../../components/LinkCard.astro';
+import { badmintonVlaanderen } from '../../data/site';
+import { seizoen, laatsteRanking } from '../../data/jeugdcuptour';
+
+const trainers = [
+  { naam: 'Luc Geeraerts', diploma: 'VTS-trainer A' },
+  { naam: 'Thierry De Decker', diploma: 'Trainer B' },
+  { naam: 'Michiel Van Britsom', diploma: 'Trainer B' },
+  { naam: 'Jade Braekman', diploma: 'Initiator' },
+];
+---
+
+<BaseLayout
+  title="Jeugd"
+  description="Jeugdwerking van PBO vzw: Victor Jeugdcuptour by PBO, de PBO-selectie en trainers, IPJO en KYU."
+>
+  <PageIntro
+    title="Jeugd"
+    lead="De jeugdcuptour voor elke jeugdspeler van een Oost-Vlaamse club, extra trainingen voor de PBO-selectie, en de IPJO tegen de andere provincies."
+  />
+
+  <section class="wrap mt-8 md:mt-10" aria-labelledby="jeugdcuptour">
+    <div class="on-ink grid gap-6 rounded-[28px] bg-ink p-6 text-white md:rounded-panel md:p-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:items-center lg:gap-12">
+      <div>
+        <h2 id="jeugdcuptour" class="text-[30px] leading-[1.08] font-extrabold tracking-[-0.01em] md:text-[44px]">
+          Victor Jeugdcuptour <span class="text-accent">by PBO</span>
+        </h2>
+        <p class="mt-3 max-w-[52ch] text-mist md:mt-4 md:text-lg">
+          Laagdrempelige toernooien van Minibad tot U19. Je speelt minstens drie wedstrijden tegen leeftijdsgenoten en verzamelt punten voor de ranking van het kalenderjaar.
+        </p>
+        <a href={u('/jeugd/jeugdcuptour')} class="btn mt-6 w-full bg-accent text-ink sm:w-auto">Alles over de jeugdcuptour</a>
+      </div>
+      <div class="flex flex-col gap-3 text-ink">
+        <LinkCard href={u('/jeugd/jeugdcuptour/kalender')} icon="kalender" title={`Kalender ${seizoen}`} text="Data, clubs en sporthallen" />
+        <LinkCard
+          href={u('/jeugd/jeugdcuptour/ranking')}
+          icon="ranking"
+          title={`Ranking ${laatsteRanking.jaar}`}
+          text={`Stand na ${laatsteRanking.na}`}
+        />
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap mt-14 grid gap-10 md:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,400px)] lg:gap-16">
+    <div class="prose-pbo px-2 md:px-0">
+      <h2 class="!mt-0" id="selectie">PBO-selectie</h2>
+      <p>
+        De PBO-selectie is een groep jeugdspelers die onze trainers kiezen in overleg met de clubs en hun trainers. De selectie traint elke
+        week één of meer keren, bovenop de clubtrainingen. Spelplezier blijft het belangrijkste.
+      </p>
+      <p>
+        Clubtrainers kunnen altijd spelers voordragen. De selectie is geen eindpunt, maar kan wel de weg zijn naar de Topsportschool van
+        Badminton Vlaanderen.
+      </p>
+      <p>Alle trainingen staan in de <a href={u('/bestuur#kalender')}>PBO-kalender</a>.</p>
+    </div>
+
+    <div>
+      <h2 id="trainers" class="mb-4 px-2 text-[28px] leading-tight font-extrabold md:px-0">Trainers</h2>
+      <ul class="rounded-card bg-paper p-2">
+        {
+          trainers.map((t) => (
+            <li class="flex items-baseline justify-between gap-4 border-b border-wash px-4 py-4 last:border-b-0">
+              <span class="font-semibold">{t.naam}</span>
+              <span class="text-right text-[15px] text-muted">{t.diploma}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="wrap mt-14 grid gap-3 md:mt-20 lg:grid-cols-2 lg:gap-5">
+    <article class="rounded-card bg-paper p-6 md:p-9" aria-labelledby="ipjo">
+      <h2 id="ipjo" class="text-[28px] leading-tight font-extrabold">IPJO</h2>
+      <p class="mt-1 text-sm font-semibold text-brand">Interprovinciale jeugdontmoeting</p>
+      <div class="prose-pbo mt-4 text-base">
+        <p>
+          De vijf Vlaamse provincies spelen tegen elkaar op een tweedaags teamevenement. Per leeftijdscategorie (U11, U13, U15 en U17)
+          worden vijf disciplines gespeeld: HE, DE, HD, DD en GD. Wie de meeste categorieën wint, wint de ontmoeting.
+        </p>
+        <p>
+          De eerste IPJO was op 14 en 15 januari 1989 in De Panne. Sinds de vijfde editie wordt er met veren shuttles gespeeld.
+        </p>
+        <p><a href={badmintonVlaanderen.ipjo}>Cijfers en weetjes bij Badminton Vlaanderen</a></p>
+      </div>
+    </article>
+
+    <article class="rounded-card bg-paper p-6 md:p-9" aria-labelledby="kyu">
+      <h2 id="kyu" class="text-[28px] leading-tight font-extrabold">KYU</h2>
+      <p class="mt-1 text-sm font-semibold text-brand">Ontwikkelingstraject voor beginners</p>
+      <div class="prose-pbo mt-4 text-base">
+        <p>
+          KYU begeleidt jonge, beginnende badmintonners met gekleurde bandjes, van beginner tot gevorderde speler. Het volgt het
+          LTAD-model (Long Term Athlete Development), met de speler in het midden.
+        </p>
+        <p>
+          Elk traject steunt op zes pijlers: theoretische kennis, algemene coördinatie en transferbewegingen, slagtechniek, keuzes en
+          accenten, functionele houdingen, en footwork en tactiek.
+        </p>
+      </div>
+    </article>
+  </section>
+</BaseLayout>

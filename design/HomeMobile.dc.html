@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>PBO vzw – Home (telefoon)</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="width:390px;height:3000px;box-sizing:border-box;background:#F5F6F1;color:#0F1A2B;font-family:'Instrument Sans',system-ui,sans-serif;overflow:hidden">
+
+  <!-- Top bar -->
+  <header style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between">
+    <a href="Main.dc.html" style="display:flex;align-items:center;gap:10px">
+      <span style="width:40px;height:40px;border-radius:11px;background:#0F1A2B;color:{{accent}};display:flex;align-items:center;justify-content:center">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="19.5" r="2.3"/><path d="M10 17.5 6.5 4.5M14 17.5 17.5 4.5M12 17.2V4M5.5 4.5h13"/></svg>
+      </span>
+      <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:20px">PBO</span>
+    </a>
+    <button onClick="{{toggleMenu}}" aria-label="{{menuLabel}}" style="width:48px;height:48px;border-radius:14px;border:none;background:#fff;color:#0F1A2B;display:flex;align-items:center;justify-content:center;cursor:pointer">
+      <sc-if value="{{menuClosed}}" hint-placeholder-val="{{ true }}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </sc-if>
+      <sc-if value="{{menuOpen}}" hint-placeholder-val="{{ false }}">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </sc-if>
+    </button>
+  </header>
+
+  <!-- Menu -->
+  <sc-if value="{{menuOpen}}" hint-placeholder-val="{{ false }}">
+    <nav style="margin:0 12px 16px;background:#0F1A2B;color:#fff;border-radius:24px;padding:12px;display:flex;flex-direction:column">
+      <a href="Main.dc.html" style="padding:0 16px;min-height:52px;display:flex;align-items:center;font-size:18px;font-weight:600">Bestuur</a>
+      <a href="Ranking.dc.html" style="padding:0 16px;min-height:52px;display:flex;align-items:center;font-size:18px;font-weight:600">Jeugd</a>
+      <a href="Main.dc.html" style="padding:0 16px;min-height:52px;display:flex;align-items:center;font-size:18px;font-weight:600">Competitie</a>
+      <a href="Main.dc.html" style="padding:0 16px;min-height:52px;display:flex;align-items:center;font-size:18px;font-weight:600">Recreanten &amp; G-sport</a>
+      <a href="Main.dc.html" style="padding:0 16px;min-height:52px;display:flex;align-items:center;font-size:18px;font-weight:600">Vacatures</a>
+      <a href="Nieuws.dc.html" style="padding:0 16px;min-height:52px;display:flex;align-items:center;font-size:18px;font-weight:600;color:{{accent}}">Nieuws</a>
+    </nav>
+  </sc-if>
+
+  <!-- Hero -->
+  <section style="margin:0 12px;background:#0F1A2B;color:#fff;border-radius:28px;padding:32px 24px">
+    <a href="Nieuws.dc.html" style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.1);padding:6px 14px;border-radius:999px;font-size:13px;font-weight:500;margin-bottom:20px;min-height:44px;box-sizing:border-box">PK op 31 okt en 1 nov in Nevele<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+    <h1 style="margin:0 0 16px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:40px;line-height:1.04;letter-spacing:-0.02em">Badminton in <span style="color:{{accent}}">Oost-Vlaanderen</span></h1>
+    <p style="margin:0 0 28px;font-size:16px;line-height:1.55;color:#C9D1DD">Kalender en rankings van de jeugdcuptour, competitie, PBO-selectie en PK.</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <a href="Ranking.dc.html" style="background:{{accent}};color:#0F1A2B;font-weight:600;min-height:52px;border-radius:999px;display:flex;align-items:center;justify-content:center">Ranking jeugdcuptour</a>
+      <a href="#kalender-m" style="border:1.5px solid rgba(255,255,255,.35);color:#fff;font-weight:600;min-height:52px;border-radius:999px;display:flex;align-items:center;justify-content:center;box-sizing:border-box">Kalender 2026-2027</a>
+    </div>
+  </section>
+
+  <!-- Volgende jeugdcup -->
+  <section style="margin:12px 12px 0;background:#fff;border-radius:24px;padding:24px;display:flex;align-items:center;gap:20px">
+    <div style="flex:none;width:76px;height:84px;border-radius:18px;background:#E6F6B0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:34px;line-height:1">11</span>
+      <span style="font-size:13px;font-weight:700;text-transform:uppercase">okt</span>
+    </div>
+    <div style="min-width:0">
+      <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1F6F4A;margin-bottom:4px">Volgende jeugdcup</div>
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:22px">Gentse BC</div>
+      <div style="color:#4B5565;font-size:15px">Zondag · Sporthal Bourgoyen</div>
+    </div>
+  </section>
+
+  <!-- Tegels -->
+  <section style="margin:12px 12px 0;display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:12px">
+    <sc-for list="{{tiles}}" as="t" hint-placeholder-count="4">
+      <a href="{{t.href}}" style="background:#fff;border-radius:22px;padding:20px;display:flex;flex-direction:column;gap:12px;min-height:128px;box-sizing:border-box">
+        <span style="width:42px;height:42px;border-radius:12px;background:#E6F6B0;display:flex;align-items:center;justify-content:center">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{t.icon}}"/></svg>
+        </span>
+        <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:18px;line-height:1.15">{{t.title}}</span>
+      </a>
+    </sc-for>
+  </section>
+
+  <!-- Kalender -->
+  <section id="kalender-m" style="margin:40px 12px 0">
+    <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#1F6F4A;margin:0 8px 8px">Victor Jeugdcuptour by PBO</div>
+    <h2 style="margin:0 8px 16px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px">Nog op de kalender</h2>
+    <div style="background:#fff;border-radius:24px;padding:8px">
+      <sc-for list="{{events}}" as="e" hint-placeholder-count="5">
+        <div style="display:flex;align-items:center;gap:16px;padding:14px 12px;border-bottom:1px solid #F0F1EC">
+          <div style="width:48px;flex:none;text-align:center">
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;line-height:1">{{e.day}}</div>
+            <div style="font-size:12px;font-weight:700;color:#4B5565;text-transform:uppercase">{{e.month}}</div>
+          </div>
+          <div style="min-width:0">
+            <div style="font-weight:600;font-size:16px">{{e.club}}</div>
+            <div style="color:#4B5565;font-size:14px">{{e.weekday}} · {{e.hall}}</div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- Ranking -->
+  <section style="margin:12px 12px 0;background:{{accent}};border-radius:24px;padding:28px 24px;display:flex;flex-direction:column;gap:12px">
+    <div style="font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Laatste ranking</div>
+    <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:28px;line-height:1.1">Na BC De Mintons</div>
+    <p style="margin:0;line-height:1.5;font-size:15px">Zoek je naam bij Minibad, U11, U13, U15 of U17+U19.</p>
+    <a href="Ranking.dc.html" style="margin-top:4px;background:#0F1A2B;color:#fff;font-weight:600;min-height:52px;border-radius:999px;display:flex;align-items:center;justify-content:center">Naar de ranking</a>
+  </section>
+
+  <!-- Nieuws -->
+  <section style="margin:40px 12px 0">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin:0 8px 16px">
+      <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:32px">Nieuws</h2>
+      <a href="Nieuws.dc.html" style="font-weight:600;min-height:44px;display:inline-flex;align-items:center">Alles</a>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <sc-for list="{{news}}" as="n" hint-placeholder-count="2">
+        <a href="Nieuws.dc.html" style="background:#fff;border-radius:22px;padding:24px;display:flex;flex-direction:column;gap:8px">
+          <span style="font-size:13px;font-weight:600;color:#1F6F4A">{{n.date}}</span>
+          <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:21px;line-height:1.2">{{n.title}}</span>
+          <span style="color:#4B5565;line-height:1.5;font-size:15px">{{n.text}}</span>
+        </a>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="margin:40px 12px 0;background:#0F1A2B;color:#fff;border-radius:28px;padding:32px 24px;display:flex;flex-direction:column;gap:20px">
+    <div>
+      <div style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px">PBO vzw</div>
+      <div style="color:#C9D1DD">Badminton Oost-Vlaanderen</div>
+    </div>
+    <a href="mailto:secretariaat@badminton-pbo.be" style="min-height:44px;display:flex;align-items:center;font-weight:600">secretariaat@badminton-pbo.be</a>
+    <div style="display:flex;gap:10px">
+      <a href="https://www.facebook.com/PBO.Badminton" style="flex:1;min-height:48px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px">Facebook</a>
+      <a href="https://www.instagram.com/pbobadminton/" style="flex:1;min-height:48px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px">Instagram</a>
+      <a href="https://twitter.com/pbo_badm" style="flex:1;min-height:48px;border-radius:14px;background:rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;font-weight:600;font-size:15px">X</a>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"accent":{"editor":"color","default":"#C9F23B","options":["#C9F23B","#7DE3C0","#FFC857"]},"$preview":{"width":390,"height":3000}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { menu: false };
+  }
+  renderVals() {
+    return {
+      accent: this.props.accent ?? '#C9F23B',
+      menuOpen: this.state.menu,
+      menuClosed: !this.state.menu,
+      menuLabel: this.state.menu ? 'Menu sluiten' : 'Menu openen',
+      toggleMenu: () => this.setState({ menu: !this.state.menu }),
+      tiles: [
+        { title: 'Bestuur', href: 'Main.dc.html', icon: 'M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8' },
+        { title: 'Jeugd', href: 'Ranking.dc.html', icon: 'M12 2l3 6.5 7 1-5 5 1.2 7L12 18l-6.2 3.5L7 14.5l-5-5 7-1z' },
+        { title: 'Competitie', href: 'Main.dc.html', icon: 'M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3' },
+        { title: 'Recreanten & G-sport', href: 'Main.dc.html', icon: 'M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z' }
+      ],
+      events: [
+        { day: '11', month: 'okt', weekday: 'Zondag', club: 'Gentse BC', hall: 'Sporthal Bourgoyen' },
+        { day: '25', month: 'okt', weekday: 'Zondag', club: 'Lokerse BC', hall: 'Sporthal Durmehal' },
+        { day: '07', month: 'nov', weekday: 'Zaterdag', club: 'Dendermondse BC', hall: 'Sporthal Sint-Gillis' },
+        { day: '29', month: 'nov', weekday: 'Zondag', club: 'BK Flee shuttle', hall: 'Flabbaert Knesselare' },
+        { day: '19', month: 'dec', weekday: 'Zaterdag', club: 'Badminton Buggenhout', hall: 'De Pit · prijsuitreiking' }
+      ],
+      news: [
+        { date: '7 oktober 2026', title: 'PK PBO in Nevele/Deinze – nieuw formaat', text: 'Op 31 oktober en 1 november in Nevele, samen met BC Landegem. Met een nieuwe reeksindeling.' },
+        { date: '29 september 2026', title: 'Jeugdcuptour: ranking na BC De Mintons', text: 'De nieuwe stand staat online. Volgende halte: Gentse BC op 11 oktober.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

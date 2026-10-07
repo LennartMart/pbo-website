@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  naam: string;
+  rol: string;
+  foto?: ImageMetadata;
+  vacant?: boolean;
+}
+
+const { naam, rol, foto, vacant = false } = Astro.props;
+const initialen = naam
+  .split(' ')
+  .filter((w) => /^[A-ZÀ-Ý]/.test(w))
+  .map((w) => w[0])
+  .slice(0, 2)
+  .join('');
+---
+
+<div
+  class:list={[
+    'flex h-full items-center gap-5 rounded-card p-4 md:p-5',
+    vacant ? 'border-[1.5px] border-dashed border-line' : 'bg-paper',
+  ]}
+>
+  {
+    foto ? (
+      <Image
+        src={foto}
+        alt=""
+        width={88}
+        height={88}
+        densities={[1, 2]}
+        fit="cover"
+        position="top"
+        class="size-[88px] shrink-0 rounded-[18px] bg-wash object-cover"
+      />
+    ) : (
+      <span
+        aria-hidden="true"
+        class:list={[
+          'flex size-[88px] shrink-0 items-center justify-center rounded-[18px] font-display text-[28px] font-extrabold',
+          vacant ? 'border-[1.5px] border-dashed border-line text-muted' : 'bg-accent-soft text-brand',
+        ]}
+      >
+        {vacant ? '?' : initialen}
+      </span>
+    )
+  }
+  <div class="min-w-0">
+    <p class="text-sm font-semibold text-brand">{rol}</p>
+    <p class:list={['mt-0.5 font-display text-xl leading-tight font-bold md:text-[22px]', vacant && 'text-muted']}>{naam}</p>
+  </div>
+</div>

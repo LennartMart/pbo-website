@@ -1,0 +1,58 @@
+---
+import { u } from '../lib/url';
+import '@fontsource-variable/bricolage-grotesque/opsz.css';
+import '@fontsource-variable/instrument-sans';
+import '../styles/global.css';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = 'PBO vzw, de Provinciale Badmintonraad Oost-Vlaanderen: kalender en ranking van de jeugdcuptour, competitie, PBO-selectie en provinciaal kampioenschap.',
+} = Astro.props;
+
+const fullTitle = title ? `${title} · PBO vzw` : 'PBO vzw · Badminton Oost-Vlaanderen';
+const canonical = new URL(Astro.url.pathname, Astro.site);
+// Testversies (zoals GitHub Pages) niet laten indexeren, enkel badminton-pbo.be.
+const indexeren = Astro.site?.hostname.endsWith('badminton-pbo.be') ?? false;
+---
+
+<!doctype html>
+<html lang="nl-BE">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {!indexeren && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="icon" type="image/png" href={u('/favicon.png')} />
+    <link rel="apple-touch-icon" href={u('/apple-touch-icon.png')} />
+    <link rel="sitemap" href={u('/sitemap-index.xml')} />
+    <meta name="theme-color" content="#f3f4ef" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="nl_BE" />
+    <meta property="og:site_name" content="PBO vzw" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(u('/icon-512.png'), Astro.site)} />
+  </head>
+  <body class="flex flex-col">
+    <a
+      href="#inhoud"
+      class="sr-only z-50 rounded-full bg-ink px-5 py-3 font-semibold text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+      >Naar de inhoud</a
+    >
+    <SiteHeader />
+    <main id="inhoud" class="flex-1">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

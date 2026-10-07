@@ -1,0 +1,43 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  /** Zonder href toont de kaart een niet-klikbare "Volgt binnenkort"-versie. */
+  href?: string;
+  title: string;
+  text?: string;
+  icon: IconName;
+  /** Andere site of bestand: toont een ander pijltje en meldt het aan schermlezers. */
+  external?: boolean;
+  download?: boolean;
+}
+
+const { href, title, text, icon, external = false, download = false } = Astro.props;
+---
+
+{
+  href ? (
+    <a href={href} class="lift flex items-center gap-4 rounded-[20px] bg-paper p-4 md:gap-5 md:p-6" download={download || undefined}>
+      <span class="flex size-12 shrink-0 items-center justify-center rounded-[14px] bg-ink text-accent md:size-[52px]">
+        <Icon name={icon} />
+      </span>
+      <span class="min-w-0 flex-1">
+        <span class="block text-[17px] leading-snug font-bold md:text-lg">{title}</span>
+        {text && <span class="mt-0.5 block leading-snug text-muted">{text}</span>}
+        {external && <span class="sr-only">(andere website)</span>}
+      </span>
+      <Icon name={external ? 'extern' : 'pijl'} size={20} stroke={2} class="shrink-0" />
+    </a>
+  ) : (
+    <div class="flex items-center gap-4 rounded-[20px] border-[1.5px] border-dashed border-line p-4 md:gap-5 md:p-6">
+      <span class="flex size-12 shrink-0 items-center justify-center rounded-[14px] bg-wash text-muted md:size-[52px]">
+        <Icon name={icon} />
+      </span>
+      <span class="min-w-0 flex-1">
+        <span class="block text-[17px] leading-snug font-bold md:text-lg">{title}</span>
+        {text && <span class="mt-0.5 block leading-snug text-muted">{text}</span>}
+      </span>
+      <span class="shrink-0 rounded-full bg-accent-soft px-3 py-1 text-[13px] font-semibold text-brand">Volgt binnenkort</span>
+    </div>
+  )
+}

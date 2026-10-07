@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<title>PBO vzw – Jeugdcuptour ranking</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+.nav a:hover{color:#1F6F4A}
+.arch:hover{background:#ECEEE6}
+button{font-family:inherit}
+</style>
+</helmet>
+<div style="background:#F5F6F1;color:#0F1A2B;font-family:'Instrument Sans',system-ui,sans-serif;min-height:100%">
+
+  <header style="max-width:1200px;margin:0 auto;padding:24px 32px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px">
+    <a href="Main.dc.html" style="display:flex;align-items:center;gap:12px">
+      <span style="width:44px;height:44px;border-radius:12px;background:#0F1A2B;color:#C9F23B;display:flex;align-items:center;justify-content:center">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="19.5" r="2.3"/><path d="M10 17.5 6.5 4.5M14 17.5 17.5 4.5M12 17.2V4M5.5 4.5h13"/></svg>
+      </span>
+      <span style="display:flex;flex-direction:column;line-height:1.1">
+        <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px">PBO</span>
+        <span style="font-size:13px;color:#4B5565">Badminton Oost-Vlaanderen</span>
+      </span>
+    </a>
+    <nav class="nav" style="display:flex;flex-wrap:wrap;gap:4px 28px;font-weight:500;font-size:15px">
+      <a href="Main.dc.html" style="padding:12px 0">Bestuur</a>
+      <a href="Main.dc.html" style="padding:12px 0;color:#1F6F4A;font-weight:600">Jeugd</a>
+      <a href="Main.dc.html" style="padding:12px 0">Competitie</a>
+      <a href="Main.dc.html" style="padding:12px 0">Recreanten &amp; G-sport</a>
+      <a href="Main.dc.html" style="padding:12px 0">Vacatures</a>
+    </nav>
+  </header>
+
+  <section style="max-width:1200px;margin:0 auto;padding:24px 32px 0">
+    <div style="font-size:14px;color:#4B5565;margin-bottom:16px">Jeugd &nbsp;/&nbsp; Jeugdcuptour &nbsp;/&nbsp; <span style="color:#0F1A2B;font-weight:600">Ranking</span></div>
+    <h1 style="margin:0 0 12px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:60px;line-height:1.05;letter-spacing:-0.02em">Jeugdcuptour ranking</h1>
+    <p style="margin:0 0 36px;font-size:18px;color:#4B5565;max-width:640px;line-height:1.55">Stand na BC De Mintons, kalenderjaar 2026.</p>
+
+    <!-- Filters -->
+    <div style="background:#fff;border-radius:24px;padding:24px 28px;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+        <span style="width:110px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#4B5565">Categorie</span>
+        <sc-for list="{{cats}}" as="c" hint-placeholder-count="5">
+          <button onClick="{{c.pick}}" style="{{c.style}}">{{c.label}}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+        <span style="width:110px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#4B5565">Discipline</span>
+        <sc-for list="{{discs}}" as="d" hint-placeholder-count="3">
+          <button onClick="{{d.pick}}" style="{{d.style}}">{{d.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tabel -->
+  <section style="max-width:1200px;margin:24px auto 0;padding:0 32px">
+    <div style="display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin:0 4px 16px">
+      <h2 style="margin:0;font-family:'Bricolage Grotesque',sans-serif;font-weight:700;font-size:28px">{{heading}}</h2>
+      <span style="color:#4B5565;font-size:15px">Geboortejaren: {{years}}</span>
+    </div>
+    <div style="background:#fff;border-radius:24px;padding:12px;overflow-x:auto">
+      <div style="min-width:560px">
+        <div style="display:flex;align-items:center;gap:16px;padding:14px 20px;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:#4B5565">
+          <span style="width:48px">#</span>
+          <span style="flex:1">Speler</span>
+          <span style="flex:1">Club</span>
+          <span style="width:80px;text-align:right">Punten</span>
+        </div>
+        <sc-for list="{{rows}}" as="r" hint-placeholder-count="8">
+          <div class="arch" style="display:flex;align-items:center;gap:16px;padding:16px 20px;border-radius:16px;border-top:1px solid #ECEEE6">
+            <span style="width:48px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:24px">{{r.pos}}</span>
+            <span style="flex:1;font-weight:600">[Naam speler]</span>
+            <span style="flex:1;color:#4B5565">[Club]</span>
+            <span style="width:80px;text-align:right;font-weight:600">[pnt]</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- Archief -->
+  <section style="max-width:1200px;margin:64px auto 0;padding:0 32px">
+    <h2 style="margin:0 0 20px;font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:36px">Archief</h2>
+    <div style="display:flex;flex-wrap:wrap;gap:12px">
+      <sc-for list="{{archive}}" as="a" hint-placeholder-count="6">
+        <a class="arch" href="#archief" style="background:#fff;border-radius:16px;padding:14px 22px;min-height:44px;box-sizing:border-box;display:inline-flex;align-items:center;font-weight:600">{{a.label}}</a>
+      </sc-for>
+    </div>
+    <p style="margin:32px 0 0;color:#4B5565;max-width:640px;line-height:1.55">Klopt er iets niet? Mail naar <a href="mailto:jeugdcup@badminton-pbo.be" style="color:#1F6F4A;font-weight:600">jeugdcup@badminton-pbo.be</a> en we passen het aan.</p>
+  </section>
+
+  <footer style="max-width:1200px;margin:64px auto 0;padding:0 32px 40px">
+    <div style="background:#0F1A2B;color:#fff;border-radius:32px;padding:32px 56px;display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center">
+      <span style="font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:22px">PBO vzw</span>
+      <a href="mailto:secretariaat@badminton-pbo.be" style="min-height:44px;display:inline-flex;align-items:center">secretariaat@badminton-pbo.be</a>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1700}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { cat: 'U13', disc: 'Enkel' };
+  }
+  renderVals() {
+    const on = 'background:#0F1A2B;color:#fff;border:1.5px solid #0F1A2B;';
+    const off = 'background:#fff;color:#0F1A2B;border:1.5px solid #D5D9D0;';
+    const base = 'font-size:15px;font-weight:600;padding:10px 22px;min-height:44px;border-radius:999px;cursor:pointer;';
+    const cats = [
+      { id: 'Minibad', years: '2017 of later' },
+      { id: 'U11', years: '2016' },
+      { id: 'U13', years: '2014 en 2015' },
+      { id: 'U15', years: '2012 en 2013' },
+      { id: 'U17+U19', years: '2008 t/m 2011' }
+    ];
+    const discs = ['Enkel', 'Dubbel', 'Gemengd'];
+    const cur = cats.find((c) => c.id === this.state.cat);
+    return {
+      cats: cats.map((c) => ({ label: c.id, style: base + (c.id === this.state.cat ? on : off), pick: () => this.setState({ cat: c.id }) })),
+      discs: discs.map((d) => ({ label: d, style: base + (d === this.state.disc ? on : off), pick: () => this.setState({ disc: d }) })),
+      heading: this.state.cat + ' · ' + this.state.disc,
+      years: cur.years,
+      rows: [1, 2, 3, 4, 5, 6, 7, 8].map((p) => ({ pos: p })),
+      archive: [
+        { label: 'Eindstand 2025' }, { label: 'Eindstand 2024' }, { label: 'Eindstand 2023' },
+        { label: 'Eindstand 2022' }, { label: 'Eindstand 2021' }, { label: 'Eindstand 2020' },
+        { label: 'Eindstand 2019' }, { label: 'Eindstand 2018' }, { label: 'Eerdere seizoenen' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

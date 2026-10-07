@@ -1,0 +1,149 @@
+---
+import { u } from '../lib/url';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import LinkCard from '../components/LinkCard.astro';
+import PersonCard from '../components/PersonCard.astro';
+import { mail, badmintonVlaanderen, pboKalenderEmbed } from '../data/site';
+import thierry from '../assets/bestuur/thierry-de-decker.jpg';
+import koen from '../assets/bestuur/koen-tourne.png';
+import johan from '../assets/bestuur/johan-muller.jpg';
+import toon from '../assets/bestuur/toon-bouchier.jpg';
+import stefaan from '../assets/bestuur/stefaan-van-moeseke.jpg';
+
+const bestuurders = [
+  { naam: 'Thierry De Decker', rol: 'Voorzitter', foto: thierry },
+  { naam: 'Koen Tourné', rol: 'Penningmeester', foto: koen },
+  { naam: 'Johan Muller', rol: 'Secretaris', foto: johan },
+  { naam: 'Toon Bouchier', rol: 'Competitie', foto: toon },
+  { naam: 'Stefaan Van Moeseke', rol: 'Evenementen en website', foto: stefaan },
+];
+
+const medewerkers = [
+  { naam: 'Koen Kesteleyn', rol: 'Wedstrijdfunctionarissen' },
+  { naam: 'Vacant', rol: 'Tucht en klacht', vacant: true },
+];
+
+const bijdragen = [
+  { type: 'Recreantenclub', perSpeler: '€ 0,68', minimum: '€ 45' },
+  { type: 'Competitieclub', perSpeler: '€ 1,35', minimum: '€ 65' },
+];
+---
+
+<BaseLayout
+  title="Bestuur"
+  description="Het bestuur en de medewerkers van PBO vzw, lidmaatschap voor clubs, statuten en de PBO-kalender."
+>
+  <PageIntro
+    title="Bestuur"
+    lead="PBO vzw, voluit Provinciale Badmintonraad Oost-Vlaanderen vzw, ondersteunt badminton in de provincie: recreatief en competitief, met de jeugdwerking en de competitie voorop."
+  />
+
+  <section class="wrap mt-10 md:mt-14" aria-labelledby="bestuurders">
+    <h2 id="bestuurders" class="mb-4 px-2 text-[28px] leading-tight font-extrabold md:mb-6 md:px-0 md:text-4xl">Bestuurders</h2>
+    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+      {
+        bestuurders.map((p) => (
+          <li>
+            <PersonCard {...p} />
+          </li>
+        ))
+      }
+    </ul>
+
+    <h2 class="mt-10 mb-4 px-2 text-[28px] leading-tight font-extrabold md:mt-14 md:mb-6 md:px-0 md:text-4xl">Medewerkers</h2>
+    <ul class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+      {
+        medewerkers.map((p) => (
+          <li>
+            <PersonCard {...p} />
+          </li>
+        ))
+      }
+    </ul>
+
+    <div class="mt-6 flex flex-col gap-4 rounded-card bg-accent-soft p-6 md:flex-row md:items-center md:justify-between md:p-8">
+      <p class="max-w-[60ch] text-[17px] leading-normal">
+        Wil je in het bestuur of help je liever mee als medewerker? Mail naar <a class="link" href={`mailto:${mail.secretariaat}`}>{mail.secretariaat}</a>.
+      </p>
+      <a href={u('/vacatures')} class="btn shrink-0 bg-ink text-white">Open vacatures</a>
+    </div>
+  </section>
+
+  <section class="wrap mt-14 grid gap-10 md:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)] lg:gap-16">
+    <div>
+      <div class="prose-pbo px-2 md:px-0">
+        <h2 class="!mt-0" id="werking">Werking en lidmaatschap</h2>
+        <p>
+          Elke Oost-Vlaamse club die lid is van <a href={badmintonVlaanderen.home}>Badminton Vlaanderen</a> kan aansluiten bij
+          PBO vzw. Dat geldt voor recreantenclubs en competitieclubs.
+        </p>
+        <p>Een club zoeken in je buurt? Alle aangesloten clubs staan op de website van Badminton Vlaanderen.</p>
+        <h3>Provinciale bijdrage</h3>
+        <p>Per speler per jaar. Het eerste seizoen is gratis.</p>
+      </div>
+      <table class="mt-4 w-full max-w-[680px] overflow-hidden rounded-card bg-paper text-left">
+        <caption class="sr-only">Provinciale bijdrage per speler per jaar</caption>
+        <thead>
+          <tr class="label text-muted">
+            <th scope="col" class="px-5 pt-5 pb-3 font-semibold md:px-6">Club</th>
+            <th scope="col" class="px-5 pt-5 pb-3 font-semibold md:px-6">Per speler</th>
+            <th scope="col" class="px-5 pt-5 pb-3 font-semibold md:px-6">Minimum</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            bijdragen.map((b) => (
+              <tr class="border-t border-wash">
+                <th scope="row" class="px-5 py-4 font-semibold md:px-6">{b.type}</th>
+                <td class="num px-5 py-4 md:px-6">{b.perSpeler}</td>
+                <td class="num px-5 py-4 md:px-6">{b.minimum}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="flex flex-col gap-3 lg:pt-1">
+      <h2 class="sr-only">Documenten</h2>
+      <LinkCard
+        href={u('/wp-content/uploads/2017/09/Statuten-PBO-vzw-20170924.pdf')}
+        icon="document"
+        title="Statuten PBO vzw"
+        text="Versie van 24 september 2017 (pdf)"
+      />
+      <LinkCard
+        href={u('/wp-content/uploads/2017/07/Organogram-bestuur-2017.pdf')}
+        icon="document"
+        title="Organigram"
+        text="Structuur van het bestuur, 2017 (pdf)"
+      />
+      <LinkCard
+        href={u('/wp-content/uploads/2017/07/Taakomschrijving-PBO-bestuur.pdf')}
+        icon="document"
+        title="Taakomschrijving bestuur"
+        text="Wie doet wat binnen PBO (pdf)"
+      />
+      <p class="px-2 pt-1 text-[15px] leading-normal text-muted">
+        Het intern reglement staat niet online. Leden vragen het op bij het secretariaat.
+      </p>
+    </div>
+  </section>
+
+  <section id="kalender" class="wrap mt-14 md:mt-20" aria-labelledby="kalender-titel">
+    <div class="mb-4 px-2 md:mb-6 md:px-0">
+      <h2 id="kalender-titel" class="text-[28px] leading-tight font-extrabold md:text-4xl">PBO-kalender</h2>
+      <p class="mt-2 max-w-[60ch] text-muted">
+        Trainingen van de PBO-selectie, vergaderingen en evenementen. De kalender verandert vaak, kijk dus even na voor je vertrekt.
+      </p>
+    </div>
+    <div class="overflow-hidden rounded-card bg-paper p-2 md:p-3">
+      <iframe
+        src={pboKalenderEmbed}
+        title="PBO-kalender (Google Agenda)"
+        loading="lazy"
+        class="block h-[560px] w-full rounded-2xl border-0 md:h-[640px]"></iframe>
+    </div>
+  </section>
+</BaseLayout>

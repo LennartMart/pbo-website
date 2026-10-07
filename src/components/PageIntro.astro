@@ -1,0 +1,44 @@
+---
+interface Crumb {
+  href?: string;
+  label: string;
+}
+
+interface Props {
+  title: string;
+  lead?: string;
+  crumbs?: Crumb[];
+}
+
+const { title, lead, crumbs } = Astro.props;
+---
+
+<section class="wrap pt-4 md:pt-6">
+  <div class="px-2 md:px-0">
+    {
+      crumbs && (
+        <nav aria-label="Kruimelpad" class="mb-4 text-sm text-muted">
+          <ol class="flex flex-wrap items-center gap-x-2">
+            {crumbs.map((c, i) => (
+              <li class="flex items-center gap-x-2">
+                {i > 0 && <span aria-hidden="true">/</span>}
+                {c.href ? (
+                  <a href={c.href} class="inline-flex min-h-11 items-center hover:text-brand">
+                    {c.label}
+                  </a>
+                ) : (
+                  <span aria-current="page" class="font-semibold text-ink">
+                    {c.label}
+                  </span>
+                )}
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )
+    }
+    <h1 class="text-[40px] leading-[1.05] font-extrabold tracking-[-0.02em] md:text-[52px] lg:text-[60px]">{title}</h1>
+    {lead && <p class="mt-3 max-w-[640px] text-lg leading-[1.55] text-muted">{lead}</p>}
+    <slot />
+  </div>
+</section>

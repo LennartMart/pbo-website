@@ -1,0 +1,73 @@
+---
+import { Image } from 'astro:assets';
+import markLight from '../assets/logo/pbo-mark-light.png';
+import mobiSports from '../assets/sponsors/mobi-sports.png';
+import { mail, social, competitieApp, sponsor } from '../data/site';
+
+const columns = [
+  {
+    title: 'Contact',
+    links: [
+      { href: `mailto:${mail.secretariaat}`, label: mail.secretariaat },
+      { href: `mailto:${mail.jeugdcup}`, label: mail.jeugdcup },
+    ],
+  },
+  {
+    title: 'Competitie',
+    links: [
+      { href: competitieApp.home, label: 'Competitie-app' },
+      { href: competitieApp.agenda, label: 'Competitieagenda' },
+    ],
+  },
+  {
+    title: 'Volg ons',
+    links: social.map((s) => ({ href: s.href, label: s.label })),
+  },
+];
+---
+
+<footer class="wrap mt-16 pb-10 md:mt-[72px]">
+  <a
+    href={sponsor.href}
+    class="lift flex flex-col gap-3 rounded-card bg-paper p-5 md:flex-row md:items-center md:gap-8 md:px-8 md:py-6"
+  >
+    <span class="shrink-0 text-sm font-semibold text-muted">Met steun van</span>
+    <Image
+      src={mobiSports}
+      alt="Mobi-sports, badmintonsolutions, racket- en teamwear"
+      width={768}
+      densities={[1, 2]}
+      class="h-auto w-full max-w-[560px] rounded-lg"
+    />
+  </a>
+
+  <div class="on-ink mt-3 rounded-[28px] bg-ink px-6 py-8 text-white md:rounded-panel md:px-14 md:py-12">
+    <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_auto_auto_auto] lg:gap-x-14">
+      <div class="flex items-start gap-4">
+        <Image src={markLight} alt="" height={64} densities={[1, 2]} class="h-14 w-auto md:h-16" />
+        <div>
+          <div class="font-display text-2xl font-extrabold md:text-[28px]">PBO vzw</div>
+          <div class="text-mist">Provinciale Badmintonraad Oost-Vlaanderen</div>
+        </div>
+      </div>
+
+      {
+        columns.map((col) => (
+          <div>
+            <h2 class="label mb-2 font-sans text-accent">{col.title}</h2>
+            <ul>
+              {col.links.map((l) => (
+                <li>
+                  <a href={l.href} class="inline-flex min-h-11 items-center [overflow-wrap:anywhere] hover:text-accent">
+                    {l.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+  <p class="pt-6 text-center text-sm text-muted">PBO vzw · Badminton Oost-Vlaanderen</p>
+</footer>

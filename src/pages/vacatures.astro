@@ -1,0 +1,52 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import { mail } from '../data/site';
+
+const vacatures = [
+  {
+    id: 'recreanten',
+    titel: 'Recreantenverantwoordelijke',
+    tekst:
+      'Je bent binnen PBO het eerste aanspreekpunt voor recreantenclubs en voor recreanten in competitieclubs. Je gaat een tweetal keer per seizoen naar de vergadering van Badminton Vlaanderen en verdedigt daar de provinciale belangen.',
+  },
+  {
+    id: 'g-sport',
+    titel: 'G-sportverantwoordelijke',
+    tekst:
+      'Je bent binnen PBO het eerste aanspreekpunt voor clubs met een werking voor badmintonners met een beperking. Je gaat één keer per jaar naar de vergadering van Badminton Vlaanderen en werkt mee aan de uitbouw van G-sport in de provincie.',
+  },
+];
+
+const mailto = (onderwerp: string) => `mailto:${mail.voorzitter}?subject=${encodeURIComponent(`Vacature: ${onderwerp}`)}`;
+---
+
+<BaseLayout
+  title="Vacatures"
+  description="PBO vzw zoekt een recreantenverantwoordelijke en een G-sportverantwoordelijke. Ook spontaan meehelpen kan."
+>
+  <PageIntro title="Vacatures" lead="PBO vzw draait op vrijwilligers. Deze plaatsen zijn nu vrij." />
+
+  <section class="wrap mt-8 grid gap-3 md:mt-10 lg:grid-cols-2 lg:gap-5">
+    {
+      vacatures.map((v) => (
+        <article id={v.id} class="flex flex-col rounded-card bg-paper p-6 md:p-9">
+          <h2 class="text-[26px] leading-tight font-extrabold md:text-[30px]">{v.titel}</h2>
+          <p class="mt-3 flex-1 text-[17px] leading-relaxed text-muted">{v.tekst}</p>
+          <a href={mailto(v.titel)} class="btn mt-6 bg-ink text-white sm:self-start">
+            Mail de voorzitter
+          </a>
+        </article>
+      ))
+    }
+  </section>
+
+  <section class="wrap mt-3 lg:mt-5">
+    <div class="rounded-card bg-accent-soft p-6 md:p-9">
+      <h2 class="text-2xl leading-tight font-extrabold md:text-[28px]">Liever ergens mee helpen?</h2>
+      <p class="mt-2 max-w-[60ch] text-[17px] leading-normal">
+        Ook voor één evenement of één taak ben je welkom. Laat weten waar je zin in hebt via <a class="link" href={`mailto:${mail.voorzitter}`}>{mail.voorzitter}</a>.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
