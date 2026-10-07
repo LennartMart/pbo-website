@@ -1,0 +1,54 @@
+---
+import { u } from '../../../lib/url';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PageIntro from '../../../components/PageIntro.astro';
+import NieuwsKaart from '../../../components/NieuwsKaart.astro';
+import NieuwsJaren from '../../../components/NieuwsJaren.astro';
+import { alleBerichten, jaarVan, type Bericht } from '../../../lib/nieuws';
+import { maand } from '../../../lib/datum';
+
+export async function getStaticPaths() {
+  const berichten = await alleBerichten();
+  const jaren = [...new Set(berichten.map(jaarVan))];
+  return jaren.map((jaar) => ({
+    params: { jaar: String(jaar) },
+    props: { jaar, jaren, berichten: berichten.filter((b) => jaarVan(b) === jaar) },
+  }));
+}
+
+const { jaar, jaren, berichten } = Astro.props;
+
+// Per maand, nieuwste eerst.
+const perMaand = new Map<string, Bericht[]>();
+for (const b of berichten) {
+  const m = maand(b.data.date);
+  perMaand.set(m, [...(perMaand.get(m) ?? []), b]);
+}
+---
+
+<BaseLayout title={`Nieuws ${jaar}`} description={`Alle nieuwsberichten van PBO vzw uit ${jaar}.`}>
+  <PageIntro
+    title={`Nieuws ${jaar}`}
+    lead={`${berichten.length} ${berichten.length === 1 ? 'bericht' : 'berichten'}.`}
+    crumbs={[{ href: u('/nieuws'), label: 'Nieuws' }, { label: String(jaar) }]}
+  />
+
+  <div class="wrap">
+    {
+      [...perMaand.entries()].map(([m, lijst]) => (
+        <section class="mt-10">
+          <h2 class="mb-4 px-2 text-2xl leading-tight font-extrabold capitalize md:px-0">{m}</h2>
+          <ul class="grid gap-3 md:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+            {lijst.map((b) => (
+              <li>
+                <NieuwsKaart bericht={b} />
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+
+    <NieuwsJaren jaren={jaren} huidig={jaar} />
+  </div>
+</BaseLayout>

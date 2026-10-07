@@ -1,0 +1,52 @@
+---
+import { render } from 'astro:content';
+import { u } from '../../lib/url';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import LinkCard from '../../components/LinkCard.astro';
+import { mail } from '../../data/site';
+import { alleBerichten, categorieNaam, overRanking } from '../../lib/nieuws';
+import { lang } from '../../lib/datum';
+
+export async function getStaticPaths() {
+  const berichten = await alleBerichten();
+  return berichten.map((bericht) => ({ params: { slug: bericht.id }, props: { bericht } }));
+}
+
+const { bericht } = Astro.props;
+const { title, date, category, excerpt } = bericht.data;
+const { Content } = await render(bericht);
+---
+
+<BaseLayout title={title} description={excerpt}>
+  <article class="mx-auto w-full max-w-[808px] px-3 pt-4 md:px-8 md:pt-6" data-pagefind-body>
+    <a href={u('/nieuws')} class="mb-6 inline-flex min-h-11 items-center gap-2 px-2 font-semibold hover:text-brand md:px-0" data-pagefind-ignore>
+      <Icon name="terug" size={18} stroke={2} /> Terug naar nieuws
+    </a>
+    <div class="px-2 md:px-0">
+      <p class="mb-5 flex flex-wrap items-center gap-3" data-pagefind-ignore>
+        <span class="rounded-full bg-accent-soft px-3.5 py-1.5 text-[13px] font-bold tracking-[0.06em] text-brand uppercase" data-pagefind-filter="categorie">
+          {categorieNaam(category)}
+        </span>
+        <time datetime={date} class="text-muted" data-pagefind-meta="datum">{lang(date)}</time>
+      </p>
+      <h1 class="mb-7 text-[36px] leading-[1.06] font-extrabold tracking-[-0.02em] md:text-[52px]" data-pagefind-meta="title">{title}</h1>
+      <div class="prose-pbo prose-nieuws max-w-none">
+        <Content />
+      </div>
+    </div>
+
+    {
+      overRanking(bericht) && (
+        <div class="mt-10" data-pagefind-ignore>
+          <LinkCard href={u('/jeugd/jeugdcuptour/ranking')} icon="ranking" title="Naar de ranking" text="Zoek je naam per categorie en discipline" />
+        </div>
+      )
+    }
+
+    <div class="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-line px-2 pt-7 md:px-0" data-pagefind-ignore>
+      <span class="text-muted">Vragen? <a class="link" href={`mailto:${mail.secretariaat}`}>{mail.secretariaat}</a></span>
+      <a href={u('/nieuws')} class="btn bg-ink text-white">Meer nieuws</a>
+    </div>
+  </article>
+</BaseLayout>

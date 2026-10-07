@@ -8,6 +8,7 @@
  * Velden moeten overeenkomen met src/content.config.ts.
  */
 import { categorieen, disciplines } from './jeugdcup-labels';
+import { nieuwsCategorieen } from './nieuws-labels';
 import { alleToernooien, type Toernooi } from './jeugdcup';
 import { lang, vandaag } from './datum';
 
@@ -262,8 +263,37 @@ const paginasCollectie = {
   ],
 };
 
-/** Collecties die enkel beheerders zien. Fase 4 voegt nieuws toe. */
-export const beheerCollecties = async (): Promise<object[]> => [await rankingsCollectie(), toernooienCollectie, paginasCollectie];
+const nieuwsCollectie = {
+  name: 'nieuws',
+  label: 'Nieuws',
+  label_singular: 'bericht',
+  description: 'Nieuwsberichten. Het nieuwste bericht met "Uitgelicht" staat bovenaan het nieuws en als link op de home.',
+  folder: 'src/content/nieuws',
+  extension: 'md',
+  format: 'frontmatter',
+  create: true,
+  delete: true,
+  slug: '{{title}}',
+  summary: '{{date}} · {{title}}',
+  sortable_fields: ['date', 'title'],
+  view_filters: nieuwsCategorieen.map((c) => ({ label: c.label, field: 'category', pattern: c.id })),
+  view_groups: [{ label: 'Jaar', field: 'date', pattern: '\\d{4}' }],
+  media_folder: '/public/uploads/nieuws',
+  public_folder: '/uploads/nieuws',
+  fields: [
+    { label: 'Titel', name: 'title', widget: 'string', hint: 'Concreet: wat, waar, wanneer. Bv. "Jeugdcuptour: ranking na Gentse BC".' },
+    { label: 'Datum', name: 'date', widget: 'datetime', format: 'YYYY-MM-DD', date_format: 'DD-MM-YYYY', time_format: false, picker_utc: true },
+    { label: 'Categorie', name: 'category', widget: 'select', options: opties(nieuwsCategorieen), default: 'jeugd' },
+    { label: 'Korte samenvatting', name: 'excerpt', widget: 'text', hint: 'Eén of twee zinnen. Verschijnt op de nieuwskaart en in Google.' },
+    { label: 'Uitgelicht', name: 'uitgelicht', widget: 'boolean', required: false, default: false, hint: 'Bovenaan het nieuws en als link op de home.' },
+    { label: 'Korte tekst voor de home', name: 'kort', widget: 'string', required: false, hint: 'Enkel bij uitgelicht. Bv. "PK op 31 oktober en 1 november in Nevele".' },
+    { label: 'Bericht', name: 'body', widget: 'markdown', buttons: ['bold', 'italic', 'link', 'heading-two', 'heading-three', 'bulleted-list', 'numbered-list', 'quote'], editor_components: ['image'] },
+    { label: 'Oud adres', name: 'legacyUrl', widget: 'hidden', required: false },
+  ],
+};
+
+/** Collecties die enkel beheerders zien. */
+export const beheerCollecties = async (): Promise<object[]> => [nieuwsCollectie, await rankingsCollectie(), toernooienCollectie, paginasCollectie];
 
 export function cmsConfig({ site, collections }: { site: URL; collections: object[] }) {
   return {

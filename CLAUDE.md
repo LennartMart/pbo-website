@@ -53,7 +53,7 @@ src/content/
 
 ## Migratie en redirects
 
-- Nieuws: WordPress-berichten (ca. 80 pagina's, 2011–2026) omzetten naar Markdown. Probeer eerst de WP REST API (`/wp-json/wp/v2/posts`), anders een export.
+- Nieuws: WordPress-berichten (ca. 80 pagina's, 2011–2026) omzetten naar Markdown met `node scripts/migreer-wordpress.mjs` (WP REST API), of via de workflow "Nieuws migreren uit WordPress" (GitHub Actions kan wel aan de WordPress-site). Het script schrijft `scripts/uitvoer/migratie-rapport.md`; categorieën en paginalinks mappen in het script (`CATEGORIE_REGELS`, `PAGINA_MAP`).
 - Oude URL's `/YYYY/MM/DD/<slug>/` → `/nieuws/<slug>` via `public/.htaccess` (301).
 - `/jeugd/jeugdcup/pbo-jeugdcuptour-ranking/` → `/jeugd/jeugdcuptour/ranking`, idem voor `pbo-jeugdcuptour-kalender`.
 - Pdf's uit `wp-content/uploads/` **op hetzelfde pad** bewaren in `public/`, zodat externe links blijven werken. Archiefrankings 2011–2025 blijven voorlopig pdf.

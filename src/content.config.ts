@@ -58,4 +58,20 @@ const paginas = defineCollection({
     }),
 });
 
-export const collections = { toernooien, rankings, paginas };
+/** Nieuws. Berichten uit WordPress hebben een legacyUrl (oude adres, voor redirects). */
+const nieuws = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/nieuws' }),
+  schema: z.object({
+    title: z.string(),
+    date: isoDatum,
+    category: z.enum(['jeugd', 'selectie', 'evenement', 'competitie', 'recreanten', 'algemeen']),
+    excerpt: z.string(),
+    /** Bovenaan het nieuwsoverzicht en als link in de hero van de home. */
+    uitgelicht: z.boolean().default(false),
+    /** Korte tekst voor de link op de home, bv. "PK op 31 oktober en 1 november in Nevele". */
+    kort: z.string().optional(),
+    legacyUrl: z.string().optional(),
+  }),
+});
+
+export const collections = { toernooien, rankings, paginas, nieuws };

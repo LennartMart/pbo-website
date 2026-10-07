@@ -3,12 +3,15 @@ import { u } from '../lib/url';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon, { type IconName } from '../components/Icon.astro';
 import { komende, huidigSeizoen, laatsteRanking, categorieen } from '../lib/jeugdcup';
-import { recentNieuws, uitgelicht } from '../data/nieuws';
+import { alleBerichten, kiesUitgelicht } from '../lib/nieuws';
 import { dag, dag2, maand, maandKort, weekdag, lang } from '../lib/datum';
 
 const upcoming = await komende();
 const seizoen = await huidigSeizoen();
 const ranking = await laatsteRanking();
+const berichten = await alleBerichten();
+const uitgelicht = kiesUitgelicht(berichten);
+const recentNieuws = berichten.slice(0, 3);
 const volgende = upcoming[0];
 const lijst = upcoming.slice(0, 5);
 
@@ -33,14 +36,17 @@ const catZin = `${catNamen.slice(0, -1).join(', ')} of ${catNamen.at(-1)}`;
       class="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(320px,400px)] lg:items-center lg:gap-12 lg:rounded-panel lg:bg-ink lg:p-16"
     >
       <div class="on-ink rounded-[28px] bg-ink px-6 py-8 text-white lg:rounded-none lg:bg-transparent lg:p-0">
-        <a
-          href={u(`/nieuws/${uitgelicht.slug}`)}
-          class="mb-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[13px] font-medium transition-colors hover:bg-white/15 md:mb-6 md:text-sm"
-        >
-          <span class="md:hidden">{uitgelicht.kortMobiel}</span>
-          <span class="hidden md:inline">{uitgelicht.kort}</span>
-          <Icon name="pijl" size={16} stroke={2} />
-        </a>
+        {
+          uitgelicht && (
+            <a
+              href={u(`/nieuws/${uitgelicht.id}`)}
+              class="mb-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[13px] font-medium transition-colors hover:bg-white/15 md:mb-6 md:text-sm"
+            >
+              {uitgelicht.data.kort ?? uitgelicht.data.title}
+              <Icon name="pijl" size={16} stroke={2} class="shrink-0" />
+            </a>
+          )
+        }
         <h1 class="mb-4 text-[40px] leading-[1.03] font-extrabold tracking-[-0.02em] md:mb-6 md:text-[56px] xl:text-[68px]">
           Badminton in <span class="text-accent">Oost-Vlaanderen</span>
         </h1>
@@ -174,14 +180,14 @@ const catZin = `${catNamen.slice(0, -1).join(', ')} of ${catNamen.at(-1)}`;
         recentNieuws.map((n, i) => (
           <li class:list={[i > 1 && 'hidden lg:block']}>
             <a
-              href={u(`/nieuws/${n.slug}`)}
+              href={u(`/nieuws/${n.id}`)}
               class="lift flex h-full flex-col gap-2 rounded-[22px] bg-paper p-6 lg:gap-3 lg:rounded-card lg:p-8"
             >
-              <time datetime={n.date} class="text-[13px] font-semibold text-brand lg:text-sm">
-                {lang(n.date)}
+              <time datetime={n.data.date} class="text-[13px] font-semibold text-brand lg:text-sm">
+                {lang(n.data.date)}
               </time>
-              <h3 class="text-[21px] leading-[1.2] font-bold lg:text-[26px] lg:leading-[1.15]">{n.title}</h3>
-              <p class="text-[15px] leading-normal text-muted lg:text-base">{n.excerpt}</p>
+              <h3 class="text-[21px] leading-[1.2] font-bold lg:text-[26px] lg:leading-[1.15]">{n.data.title}</h3>
+              <p class="text-[15px] leading-normal text-muted lg:text-base">{n.data.excerpt}</p>
             </a>
           </li>
         ))

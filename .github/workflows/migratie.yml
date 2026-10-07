@@ -1,0 +1,42 @@
+name: Nieuws migreren uit WordPress
+
+# Handmatig starten: Actions → "Nieuws migreren uit WordPress" → Run workflow (kies de branch).
+# Haalt alle berichten en gelinkte uploads op en commit ze op die branch. Zie scripts/migreer-wordpress.mjs.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bron:
+        description: WordPress-site om uit te lezen
+        default: https://testsite.badminton-pbo.be
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  migreer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: node scripts/migreer-wordpress.mjs --bron "${{ inputs.bron }}"
+
+      - name: Controleren of de site nog bouwt
+        run: npm run build
+
+      - name: Committen
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/content public/wp-content scripts/uitvoer
+          git diff --cached --quiet && echo "Niets gewijzigd." && exit 0
+          git commit -m "Nieuws en uploads gemigreerd uit ${{ inputs.bron }}"
+          git push
