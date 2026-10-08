@@ -48,8 +48,8 @@ export type Toernooi = CollectionEntry<'kalender'>['data']['haltes'][number] & {
 export const rankingJaar = (t: Toernooi) => Number(t.datum.slice(0, 4));
 
 /**
- * Een halte op de lijn door de tijd: later tot en met de vorige halte, dan de volgende tot en met haar speeldag,
- * daarna gespeeld. Enkel wat vanaf vandaag nog kan, met de dagen voor Periode.
+ * Een halte door de tijd (lijnplan op de home, kalender): later tot en met de vorige halte, dan de volgende tot en met
+ * haar speeldag, daarna gespeeld. Enkel wat vanaf vandaag nog kan, met de dagen voor Periode.
  */
 export function statussen(t: Toernooi, alle: Toernooi[], nu = vandaag()) {
   const vorige = alle[alle.indexOf(t) - 1];

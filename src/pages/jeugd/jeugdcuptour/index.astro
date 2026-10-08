@@ -5,20 +5,25 @@ import PageIntro from '../../../components/PageIntro.astro';
 import LinkCard from '../../../components/LinkCard.astro';
 import { mail } from '../../../data/site';
 import { pagina } from '../../../lib/paginas';
-import { categorieen, geboortejaren, huidigSeizoen, komende, laatsteRanking, volgendeHalteZin } from '../../../lib/jeugdcup';
+import { alleToernooien, categorieen, geboortejaren, huidigSeizoen, laatsteRanking, tijdlijn, volgendeHalteZin } from '../../../lib/jeugdcup';
 import { vandaag } from '../../../lib/datum';
 
-const [volgende] = await komende();
 const seizoen = await huidigSeizoen();
 const ranking = await laatsteRanking();
 const jaar = Number(vandaag().slice(0, 4));
 const { title, lead, description, documenten, Content } = await pagina('jeugdcuptour');
+// Volgende halte als intro, per halte die nog komt (Periode); na de laatste de vaste intro.
+const intro = tijdlijn(await alleToernooien()).map(({ van, tot, volgende }) => ({
+  van,
+  tot,
+  tekst: volgende ? volgendeHalteZin(volgende) : lead,
+}));
 ---
 
 <BaseLayout title={title} description={description}>
   <PageIntro
     title={title}
-    lead={volgende ? volgendeHalteZin(volgende) : lead}
+    lead={intro}
     crumbs={[{ href: u('/jeugd'), label: 'Jeugd' }, { label: 'Jeugdcuptour' }]}
   />
 
