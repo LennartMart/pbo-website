@@ -11,40 +11,23 @@
  * Bestanden onder /wp-content/uploads/ staan als echte bestanden in dist (zelfde pad) en hebben
  * geen redirect nodig.
  */
-import { readdir, readFile, writeFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import YAML from 'yaml';
+import { writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { OUDE_PAGINAS, ROOT, legacyUrls } from './oude-site.mjs';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const NIEUWS = join(ROOT, 'src/content/nieuws');
 const DOEL = join(ROOT, 'dist/.htaccess');
 
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-/** Vaste redirects van oude WordPress-pagina's. Pad zonder begin- en eindslash. */
-const PAGINAS = [
-  ['jeugd/jeugdcup/pbo-jeugdcuptour-ranking', '/jeugd/jeugdcuptour/ranking'],
-  ['jeugd/jeugdcup/pbo-jeugdcuptour-kalender', '/jeugd/jeugdcuptour/kalender'],
-  ['jeugd/jeugdcup', '/jeugd/jeugdcuptour'],
-];
+/** Vaste redirects van oude WordPress-pagina's (scripts/oude-site.mjs), zonder beginslash. */
+const PAGINAS = Object.entries(OUDE_PAGINAS).map(([oud, nieuw]) => [oud.slice(1), nieuw]);
 
-async function afwijkendeSlugs() {
-  const regels = [];
-  for (const bestand of (await readdir(NIEUWS)).filter((f) => f.endsWith('.md'))) {
-    const tekst = await readFile(join(NIEUWS, bestand), 'utf8');
-    const fm = tekst.match(/^---\n([\s\S]*?)\n---/)?.[1];
-    const legacy = fm && YAML.parse(fm)?.legacyUrl;
-    if (!legacy) continue;
-    const slug = bestand.replace(/\.md$/, '');
-    const oud = legacy.replace(/^\/+|\/+$/g, '');
-    const oudeSlug = oud.split('/').pop();
-    if (oudeSlug !== slug) regels.push(`RewriteRule ^${esc(oud)}/?$ /nieuws/${slug} [R=301,L]`);
-  }
-  return regels.sort();
-}
-
-const extra = await afwijkendeSlugs();
+/** Berichten waarvan de slug veranderde: daar volstaat de algemene regel /JJJJ/MM/DD/<slug>/ niet. */
+const extra = (await legacyUrls())
+  .map(([slug, legacy]) => [slug, legacy.replace(/^\/+|\/+$/g, '')])
+  .filter(([slug, oud]) => oud.split('/').pop() !== slug)
+  .map(([slug, oud]) => `RewriteRule ^${esc(oud)}/?$ /nieuws/${slug} [R=301,L]`)
+  .sort((a, b) => a.localeCompare(b));
 
 const inhoud = `# Gegenereerd door scripts/htaccess.mjs bij elke build. Niet met de hand aanpassen.
 

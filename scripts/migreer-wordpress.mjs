@@ -22,8 +22,8 @@ import { fileURLToPath } from 'node:url';
 import TurndownService from 'turndown';
 import { decodeHTML } from 'entities';
 import YAML from 'yaml';
+import { OUDE_PAGINAS, ROOT, leesFrontmatter } from './oude-site.mjs';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const optie = (naam, standaard) => {
   const i = args.indexOf(`--${naam}`);
@@ -35,11 +35,9 @@ const ZONDER_UPLOADS = args.includes('--zonder-uploads');
 /** Domeinen waarvan links intern worden. */
 const OUDE_HOSTS = ['badminton-pbo.be', 'www.badminton-pbo.be', 'testsite.badminton-pbo.be', 'pbo.kwal.org', 'www.pbo.kwal.org', new URL(BRON).host];
 
-/** Oude WordPress-pagina's → nieuwe routes. Paden zonder slash op het einde. */
+/** Oude WordPress-pagina's → nieuwe routes: de redirects uit oude-site.mjs plus de pagina's die hun pad houden. */
 export const PAGINA_MAP = {
-  '/jeugd/jeugdcup/pbo-jeugdcuptour-ranking': '/jeugd/jeugdcuptour/ranking',
-  '/jeugd/jeugdcup/pbo-jeugdcuptour-kalender': '/jeugd/jeugdcuptour/kalender',
-  '/jeugd/jeugdcup': '/jeugd/jeugdcuptour',
+  ...OUDE_PAGINAS,
   '/jeugd': '/jeugd',
   '/bestuur': '/bestuur',
   '/competitie': '/competitie',
@@ -221,11 +219,9 @@ async function archiefRankings(paginas) {
   }));
   const uniek = [...new Map(links.map((l) => [l.bestand, l])).values()];
   const pad = join(ROOT, 'src/content/paginas/jeugdcuptour.md');
-  const bron = await readFile(pad, 'utf8');
-  const [, fm, body] = bron.match(/^---\n([\s\S]*?)\n---\n?([\s\S]*)$/);
-  const data = YAML.parse(fm);
+  const { data, body } = leesFrontmatter(await readFile(pad, 'utf8'));
   data.archief = uniek;
-  await writeFile(pad, frontmatter(data) + '\n' + body.replace(/^\n+/, ''));
+  await writeFile(pad, frontmatter(data) + '\n' + body.replace(/^(\r?\n)+/, ''));
   return uniek.length;
 }
 
