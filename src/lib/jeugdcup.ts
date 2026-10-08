@@ -1,5 +1,5 @@
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
-import { vandaag } from './datum';
+import { dag, maand, vandaag } from './datum';
 import { leesStand, type Rij } from './stand';
 
 export * from './jeugdcup-labels';
@@ -44,7 +44,8 @@ export interface Toernooi {
   hall?: string;
   adres?: string;
   start?: string;
-  inschrijving?: string;
+  toernooilink?: string;
+  inschrijvenTot?: string;
   prijsuitreiking?: boolean;
 }
 
@@ -55,14 +56,42 @@ export function routeUrl(t: Toernooi) {
 }
 
 /**
+ * De toernooilink is één pagina die meegroeit: tot "inschrijven tot" om in te schrijven, daarna tot en met
+ * de speeldag voor de loting en de wedstrijden, na de halte voor de uitslagen.
+ */
+export function toernooiLink(t: Toernooi, nu = vandaag()) {
+  if (!t.toernooilink) return undefined;
+  const href = t.toernooilink;
+  if (t.date < nu) return { href, label: 'Uitslagen', sr: `van ${t.club}`, icon: 'document' } as const;
+  if (t.date > nu && (!t.inschrijvenTot || nu <= t.inschrijvenTot)) {
+    const tot = t.inschrijvenTot ? ` tot ${dag(t.inschrijvenTot)} ${maand(t.inschrijvenTot)}` : '';
+    return { href, label: `Inschrijven${tot}`, sr: `voor ${t.club}`, icon: 'inschrijven' } as const;
+  }
+  return { href, label: 'Wedstrijden', sr: `bij ${t.club}`, icon: 'klok' } as const;
+}
+
+/**
  * De echte site (www.badminton-pbo.be) toont nooit voorbeelddata met verzonnen namen.
  * In `npm run dev` en op testversies (GitHub Pages, testsubdomein) staan ze er wel, met een melding.
  */
 const productie = !import.meta.env.DEV && new URL(import.meta.env.SITE ?? 'https://www.badminton-pbo.be').hostname === 'www.badminton-pbo.be';
 
+/** "BC De Mintons" → "bc-de-mintons". */
+const slug = (s: string) =>
+  s
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+/** Alle haltes uit src/content/kalender/<seizoen>.yaml, op datum. Id: <datum>-<club>, bv. 2026-09-26-bc-de-mintons. */
 export async function alleToernooien(): Promise<Toernooi[]> {
-  const items = await getCollection('toernooien');
-  return items.map((t) => ({ id: t.id, ...t.data })).sort((a, b) => a.date.localeCompare(b.date));
+  const seizoenen = await getCollection('kalender');
+  return seizoenen
+    .flatMap((s) => s.data.haltes)
+    .map((h) => ({ id: `${h.date}-${slug(h.club)}`, ...h }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 }
 
 /** Seizoen van vandaag. Na de laatste halte schuift het door naar het volgende seizoen zodra dat data heeft. */
@@ -90,7 +119,9 @@ export interface Stand {
 let gewaarschuwd = false;
 
 export async function alleStanden(): Promise<Stand[]> {
-  const toernooien = new Map((await alleToernooien()).map((t) => [t.id, t]));
+  const haltes = await alleToernooien();
+  const opId = new Map(haltes.map((t) => [t.id, t]));
+  const opDatum = new Map(haltes.map((t) => [t.date, t]));
   let items: CollectionEntry<'rankings'>[] = await getCollection('rankings');
   if (productie && items.some((r) => r.data.voorbeeld)) {
     if (!gewaarschuwd) console.warn('[jeugdcup] Voorbeeldstanden niet gepubliceerd: build voor www.badminton-pbo.be.');
@@ -98,8 +129,9 @@ export async function alleStanden(): Promise<Stand[]> {
     items = items.filter((r) => !r.data.voorbeeld);
   }
   return items.map((r) => {
-    const toernooi = toernooien.get(r.data.toernooi.id);
-    if (!toernooi) throw new Error(`Ranking ${r.id}: toernooi "${r.data.toernooi.id}" bestaat niet in src/content/toernooien/.`);
+    // Op datum als terugval: een verbeterde clubnaam verandert het id van de halte.
+    const toernooi = opId.get(r.data.toernooi) ?? opDatum.get(r.data.toernooi.slice(0, 10));
+    if (!toernooi) throw new Error(`Stand ${r.id}: halte "${r.data.toernooi}" staat niet (meer) in de kalender (src/content/kalender/).`);
     return {
       id: r.id,
       toernooi,

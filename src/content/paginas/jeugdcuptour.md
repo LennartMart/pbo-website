@@ -80,7 +80,7 @@ De jeugdcuptour is een reeks recreatieve jeugdtoernooien in Oost-Vlaanderen, van
 - Je speelt minstens drie wedstrijden tegen spelers uit je eigen leeftijdscategorie.
 - PBO organiseert de toernooien samen met de clubs, in enkel, dubbel en gemengd.
 - Welke disciplines er zijn, lees je bij de inschrijving. Zijn er meer dan twee, dan schrijf je je voor maximaal twee in.
-- Is de inschrijving voor een halte open, dan staat de link bij die halte in de [kalender](/jeugd/jeugdcuptour/kalender).
+- In de [kalender](/jeugd/jeugdcuptour/kalender) staat bij elke halte de link naar het toernooi: eerst om in te schrijven, dan voor je wedstrijden en na de halte voor de uitslagen.
 - De ranking loopt per kalenderjaar, per categorie apart voor jongens en meisjes. Zo is er per reeks een winnaar.
 
 ## Vragen of een fout gezien?

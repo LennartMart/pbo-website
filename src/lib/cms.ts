@@ -109,28 +109,55 @@ export const rankingsCollectie = async () => ({
   ],
 });
 
-const toernooienCollectie = {
-  name: 'toernooien',
+const datum = { widget: 'datetime', format: 'YYYY-MM-DD', date_format: 'DD-MM-YYYY', time_format: false, picker_utc: true };
+
+/**
+ * Eén item per seizoen met een lijst haltes: zo voeg je een hele kalender in één keer toe en schrap je haltes in bulk.
+ * Het id van een halte (<datum>-<club>) leidt src/lib/jeugdcup.ts af; standen vinden hun halte desnoods op datum.
+ * Seizoenen niet verwijderen: de standen verwijzen naar hun haltes.
+ */
+const kalenderCollectie = {
+  name: 'kalender',
   label: 'Jeugdcup-kalender',
-  label_singular: 'halte',
-  description: 'Eén item per jeugdcup. Het seizoen volgt uit de datum (augustus tot juli).',
-  folder: 'src/content/toernooien',
+  label_singular: 'seizoen',
+  description: 'Eén kalender per seizoen (augustus tot juli). Zet alle haltes in de lijst en publiceer één keer.',
+  folder: 'src/content/kalender',
   extension: 'yaml',
   format: 'yaml',
   create: true,
-  delete: true,
-  identifier_field: 'club',
-  slug: '{{fields.date}}-{{fields.club}}',
-  summary: '{{date}} · {{club}}',
-  sortable_fields: ['date', 'club'],
+  delete: false,
+  identifier_field: 'seizoen',
+  slug: '{{seizoen}}',
+  summary: 'Seizoen {{seizoen}}',
+  sortable_fields: [{ field: 'seizoen', default_sort: 'desc' }],
   fields: [
-    { label: 'Datum', name: 'date', widget: 'datetime', format: 'YYYY-MM-DD', date_format: 'DD-MM-YYYY', time_format: false, picker_utc: true },
-    { label: 'Club', name: 'club', widget: 'string', hint: 'Zoals de club zichzelf noemt, bv. "Gentse BC".' },
-    { label: 'Sporthal', name: 'hall', widget: 'string', required: false },
-    { label: 'Adres', name: 'adres', widget: 'string', required: false, hint: 'Straat, nummer en gemeente, bv. "Driepikkelstraat 30, 9030 Mariakerke". Voor de routelink.' },
-    { label: 'Beginuur', name: 'start', widget: 'string', required: false, hint: 'Zoals het op de site komt, bv. "9.00 uur".' },
-    { label: 'Inschrijving', name: 'inschrijving', widget: 'string', required: false, hint: 'Volledige link naar het inschrijvingsformulier (https://...).' },
-    { label: 'Prijsuitreiking', name: 'prijsuitreiking', widget: 'boolean', required: false, default: false },
+    { label: 'Seizoen', name: 'seizoen', widget: 'string', pattern: ['^\\d{4}-\\d{4}$', 'Twee jaartallen, bv. 2027-2028'], hint: 'Van augustus tot juli, bv. "2027-2028".' },
+    {
+      label: 'Haltes',
+      label_singular: 'halte',
+      name: 'haltes',
+      widget: 'list',
+      collapsed: true,
+      summary: '{{fields.date}} · {{fields.club}}',
+      hint: 'De volgorde maakt niet uit: de site zet ze op datum. Een gespeelde halte met standen niet verwijderen.',
+      fields: [
+        { ...datum, label: 'Datum', name: 'date' },
+        { label: 'Club', name: 'club', widget: 'string', hint: 'Zoals de club zichzelf noemt, bv. "Gentse BC".' },
+        { label: 'Sporthal', name: 'hall', widget: 'string', required: false },
+        { label: 'Adres', name: 'adres', widget: 'string', required: false, hint: 'Straat, nummer en gemeente, bv. "Driepikkelstraat 30, 9030 Mariakerke". Voor de routelink.' },
+        { label: 'Beginuur', name: 'start', widget: 'string', required: false, hint: 'Zoals het op de site komt, bv. "9.00 uur".' },
+        {
+          label: 'Toernooilink',
+          name: 'toernooilink',
+          widget: 'string',
+          required: false,
+          pattern: ['^https://\\S+$', 'Volledige link, beginnend met https://'],
+          hint: 'De pagina van het toernooi op tournamentsoftware. De knop op de kalender past zich aan: eerst "Inschrijven", dan "Wedstrijden", na de halte "Uitslagen".',
+        },
+        { ...datum, label: 'Inschrijven tot', name: 'inschrijvenTot', required: false, default: '', hint: 'Laatste dag om in te schrijven. Daarna toont de kalender "Wedstrijden".' },
+        { label: 'Prijsuitreiking', name: 'prijsuitreiking', widget: 'boolean', required: false, default: false },
+      ],
+    },
   ],
 };
 
@@ -397,7 +424,7 @@ const instellingenCollectie = {
 export const beheerCollecties = async (): Promise<object[]> => [
   nieuwsCollectie,
   await rankingsCollectie(),
-  toernooienCollectie,
+  kalenderCollectie,
   paginasCollectie,
   instellingenCollectie,
 ];

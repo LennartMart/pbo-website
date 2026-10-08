@@ -1,0 +1,44 @@
+seizoen: 2026-2027
+haltes:
+  - date: 2026-09-26
+    club: BC De Mintons
+    hall: Sporthal De Witte Molen
+  - date: 2026-10-11
+    club: Gentse BC
+    hall: Sporthal Bourgoyen
+    toernooilink: https://badvla.tournamentsoftware.com/tournament/F7B4C9A6-C1AF-4327-A467-2881B678D067
+  - date: 2026-10-25
+    club: Lokerse BC
+    hall: Sporthal Durmehal
+    toernooilink: https://badvla.tournamentsoftware.com/tournament/18610A9A-4FEF-4CD3-B620-1E2CED38E331
+  - date: 2026-11-07
+    club: Dendermondse BC
+    hall: Sporthal Sint-Gillis
+    toernooilink: https://badvla.tournamentsoftware.com/tournament/888B4F1E-1F01-41C2-97EF-51BB058364A4
+  - date: 2026-11-29
+    club: BK Flee shuttle
+    hall: Sporthal Flabbaert Knesselare
+  - date: 2026-12-19
+    club: Badminton Buggenhout
+    hall: Sportcentrum De Pit
+    prijsuitreiking: true
+  - date: 2027-01-23
+    club: BC Denderleeuw
+    hall: Sporthal Ottoy
+  - date: 2027-02-13
+    club: PK Jeugd
+  - date: 2027-02-27
+    club: Wit-Wit Ronse
+    hall: "Sporthal 't Rosco"
+  - date: 2027-03-14
+    club: BC Landegem
+    hall: Sporthal Oostbroek Nevele
+  - date: 2027-03-21
+    club: BC Latem-De Pinte
+    hall: Sporthal Sint-Martens-Latem
+  - date: 2027-04-25
+    club: BC Temse
+    hall: Sporthal Temsica
+  - date: 2027-05-16
+    club: BC De Pluimplukkers
+    hall: S&R Rozebroeken

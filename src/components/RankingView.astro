@@ -410,6 +410,12 @@ const segment =
       : geldig(bewaard.cat, bewaard.geslacht)
         ? [bewaard.cat!, bewaard.geslacht!]
         : [startCat, startGeslacht];
+    // Link met enkel een categorie (de home): die categorie, jongens of meisjes zoals vorige keer als daar een stand is.
+    const linkCat = params.get('cat');
+    if (!params.get('geslacht') && linkCat && geslachtKnoppen.some((b) => aantal(linkCat, b.dataset.geslacht!) > 0)) {
+      geslacht = bewaard.geslacht ?? geslacht;
+      kiesCategorie(linkCat);
+    }
 
     /** Bij een andere categorie: blijf bij jongens of meisjes als daar een stand is, anders het andere. */
     function kiesCategorie(nieuw: string) {

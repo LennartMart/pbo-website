@@ -1,4 +1,4 @@
-import { defineCollection, reference } from 'astro:content';
+import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
 
@@ -7,20 +7,29 @@ const isoDatum = z
   .union([z.string().regex(/^\d{4}-\d{2}-\d{2}/), z.date()])
   .transform((d) => (typeof d === 'string' ? d.slice(0, 10) : d.toISOString().slice(0, 10)));
 
-const toernooien = defineCollection({
-  loader: glob({ pattern: '**/*.yaml', base: './src/content/toernooien' }),
-  schema: z.object({
-    date: isoDatum,
-    club: z.string(),
-    hall: z.string().optional(),
-    /** Straat en gemeente, voor de routelink. Zonder adres zoekt de link op sporthal en club. */
-    adres: z.string().optional(),
-    /** Beginuur zoals het op de site komt, bv. "9.00 uur". */
-    start: z.string().optional(),
-    /** Link naar het inschrijvingsformulier van deze halte. */
-    inschrijving: z.url().optional(),
-    prijsuitreiking: z.boolean().optional(),
-  }),
+/** Decap schrijft een leeggemaakt veld als ''. */
+const leeg = (v: unknown) => (v === '' || v === null ? undefined : v);
+
+/** Eén halte van de jeugdcuptour. Het id (<datum>-<club>) leidt src/lib/jeugdcup.ts af. */
+const halte = z.object({
+  date: isoDatum,
+  club: z.string(),
+  hall: z.preprocess(leeg, z.string().optional()),
+  /** Straat en gemeente, voor de routelink. Zonder adres zoekt de link op sporthal en club. */
+  adres: z.preprocess(leeg, z.string().optional()),
+  /** Beginuur zoals het op de site komt, bv. "9.00 uur". */
+  start: z.preprocess(leeg, z.string().optional()),
+  /** Toernooipagina (tournamentsoftware): eerst inschrijven, dan wedstrijden, na de halte uitslagen. */
+  toernooilink: z.preprocess(leeg, z.url().optional()),
+  /** Laatste dag om in te schrijven. Daarna heet de toernooilink "Wedstrijden". */
+  inschrijvenTot: z.preprocess(leeg, isoDatum.optional()),
+  prijsuitreiking: z.boolean().optional(),
+});
+
+/** Eén bestand per seizoen met een lijst haltes, zodat beheerders ze in bulk toevoegen en schrappen. */
+const kalender = defineCollection({
+  loader: glob({ pattern: '*.yaml', base: './src/content/kalender' }),
+  schema: z.object({ seizoen: z.string(), haltes: z.array(halte).default([]) }),
 });
 
 const categorie = z.enum(['minibad', 'u11', 'u13', 'u15', 'u17-u19']);
@@ -28,7 +37,8 @@ const categorie = z.enum(['minibad', 'u11', 'u13', 'u15', 'u17-u19']);
 const rankings = defineCollection({
   loader: glob({ pattern: '**/*.yaml', base: './src/content/rankings' }),
   schema: z.object({
-    toernooi: reference('toernooien'),
+    /** Id van de halte (<datum>-<club>). Vindt de site dat id niet, dan zoekt ze op de datum. */
+    toernooi: z.string(),
     categorie,
     geslacht: z.enum(['jongens', 'meisjes']),
     stand: z.string(),
@@ -105,4 +115,4 @@ const instellingen = defineCollection({
     }),
 });
 
-export const collections = { toernooien, rankings, paginas, nieuws, instellingen };
+export const collections = { kalender, rankings, paginas, nieuws, instellingen };

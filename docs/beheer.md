@@ -29,9 +29,15 @@ De site toont per categorie, jongens en meisjes apart, altijd de stand van het l
 
 ## Jeugdcupkalender (beheerders)
 
-**Jeugdcup-kalender → + halte**: datum, club, sporthal en eventueel prijsuitreiking. Het seizoen volgt uit de datum (augustus tot juli). De nieuwe halte verschijnt in de keuzelijst bij de rankings na de volgende build, dus binnen een paar minuten.
+De kalender heeft één item per seizoen (augustus tot juli), met een lijst haltes. Zo zet je een hele kalender in één keer online.
 
-Een halte die al standen heeft niet verwijderen of hernoemen: de standen verwijzen naar de bestandsnaam.
+- **Nieuw seizoen:** **Jeugdcup-kalender → + seizoen**, vul het seizoen in (bv. `2027-2028`) en klik bij **Haltes** zo vaak als nodig op **+ halte**. Publiceer één keer.
+- **Haltes toevoegen of schrappen:** open het seizoen, voeg toe of verwijder met het kruisje bij de halte, en publiceer. De volgorde maakt niet uit: de site zet ze op datum.
+- **Per halte:** datum, club, sporthal, adres en beginuur (voor de routelink), prijsuitreiking, en de **toernooilink** naar tournamentsoftware.
+- **Toernooilink:** één link per halte, die je nooit hoeft te vervangen. De knop op de kalender past zich aan: **Inschrijven** tot de datum bij **Inschrijven tot**, daarna **Wedstrijden** tot en met de speeldag, en na de halte **Uitslagen**. Zonder "Inschrijven tot" blijft het "Inschrijven" tot de speeldag.
+- Een nieuwe halte verschijnt in de keuzelijst bij de rankings na de volgende build, binnen een paar minuten.
+
+Een gespeelde halte met standen niet verwijderen, anders bouwt de site niet meer. De datum, de club of de sporthal verbeteren mag wel. Een seizoen verwijderen kan niet in het beheer.
 
 ## Vaste pagina's (beheerders)
 

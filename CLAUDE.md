@@ -22,8 +22,9 @@ Een **gewone user** mag enkel **uitslagen/rankings van de jeugdcuptour** toevoeg
 ```
 src/content/
   nieuws/<slug>.md          title, date, category, excerpt, legacyUrl?
-  toernooien/<datum>-<club>.yaml
-                            date, club, hall?, prijsuitreiking?  (id = bestandsnaam, seizoen volgt uit de datum)
+  kalender/<seizoen>.yaml   seizoen, haltes: date, club, hall?, adres?, start?, toernooilink?, inschrijvenTot?, prijsuitreiking?
+                            (één bestand per seizoen, zodat beheerders haltes in bulk toevoegen en schrappen;
+                            id van een halte = <datum>-<club> in slug-vorm, seizoen volgt uit de datum)
   rankings/<toernooi-id>/<categorie>-<geslacht>.yaml
                             toernooi, categorie, geslacht (jongens/meisjes), stand (geplakt uit Excel), pdf?
   paginas/<pagina>.md       vaste pagina's: title, lead, description, lijsten (bestuur, documenten, ...) + lopende tekst
@@ -34,6 +35,8 @@ src/content/
 - Een ranking is de **tussenstand** na dat toernooi, zoals berekend in Excel. De site telt niets op: per categorie, jongens en meisjes apart, toont ze de stand van het laatste toernooi in dat kalenderjaar.
 - `stand` is tekst met tabs (rechtstreeks geplakt uit Excel): positie, naam, club, punten. Getallen tussen club en totaal (lidnummer, punten per halte) negeert de parser, dus de hele Excel-rij mag mee. Parser: `src/lib/stand.ts`.
 - Optioneel een pdf van de stand (`pdf`), getoond als downloadlink naast de tabel.
+- Een stand vindt haar halte op id, en anders op datum (een verbeterde clubnaam verandert het id).
+- `toernooilink` is de tournamentsoftware-pagina van een halte. De knop op de kalender heet "Inschrijven" (tot `inschrijvenTot`), dan "Wedstrijden" tot en met de speeldag, en daarna "Uitslagen" (`toernooiLink()` in `src/lib/jeugdcup.ts`).
 - Decap-config wordt bij de build gegenereerd uit `src/lib/cms.ts` (`/admin/config.yml`, `/admin/jeugdcup/config.yml`). Velden daar en in `src/content.config.ts` gelijk houden. Handleiding: `docs/beheer.md`.
 - Markdown draait op Sätteri (Astro 7). `src/lib/markdown-basis.mjs` zet het basispad voor interne links in Markdown.
 
