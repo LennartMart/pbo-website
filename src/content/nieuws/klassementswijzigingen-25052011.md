@@ -1,0 +1,121 @@
+---
+title: Klassementswijzigingen 25/05/2011
+date: 2011-05-26
+category: algemeen
+excerpt: 30001 DE MINTONS BC Baeyens Sander 50092877 B2 30/05/2011 Bernaert Maxime 50105239 C2 30/05/2011 Van Royen Evy 50081119 B1 30/05/2011 30004 4GHENT BC
+legacyUrl: /2011/05/26/klassementswijzigingen-25052011/
+---
+
+[![](/wp-content/uploads/2011/05/klassementicon.png "klassementicon")](http://pbo.cubbit.eu/wp/?attachment_id=276)30001 DE MINTONS BC
+
+Baeyens Sander 50092877 B2 30/05/2011
+
+Bernaert Maxime 50105239 C2 30/05/2011
+
+Van Royen Evy 50081119 B1 30/05/2011
+
+30004 4GHENT BC
+
+Kesteleyn Koen 50026856 B2 30/05/2011
+
+30005 BEVEREN BC
+
+Truyman Emry 50079541 B2 30/05/2011
+
+30007 LATEM BC
+
+De Meyer Evelyn 50050689 B1 30/05/2011
+
+30009 GENTSE BC
+
+De Clercq Bart 50096253 C1 30/05/2011
+
+Schelstraete Griet 50109412 C2 30/05/2011
+
+Vanheuverswyn Jeroen 50068783 C1 30/05/2011
+
+30010 STEKENE BC
+
+Dullaert Katrien 50105750 C2 30/05/2011
+
+Godefroid Kim 50095006 C2 30/05/2011
+
+30020 DRIVE BC (OVL)
+
+De Rop Didier 50055140 C2 30/05/2011
+
+30022 CHALLENGE WETTEREN BC
+
+Buggenhoudt Kris 50007546 C2 30/05/2011
+
+30026 BADMINTON BUGGENHOUT VZW
+
+Van Den Bossche Jana 50065123 B2 30/05/2011
+
+30027 PLUIMPLUKKERS BC
+
+Serrus Elisabeth 50084768 C1 30/05/2011
+
+30042 LOKERSE BC
+
+De Wilde Gianni 50083976 B2 30/05/2011
+
+Famaey Bart 50050550 B1 30/05/2011
+
+Thuysbaert Astrid 50091611 C2 30/05/2011
+
+Vermeulen Kris 50075710 C1 30/05/2011
+
+30045 NILSTON BC
+
+Schotte Aurelie 50073907 B1 30/05/2011
+
+30049 BC VLA – BAD
+
+De Groote Stijn 50086514 C2 30/05/2011
+
+Lauwerier Emelien 50092037 C1 30/05/2011
+
+Peirs Jonathan 50068747 C1 30/05/2011
+
+30050 LANDEGEM BC
+
+Mussche Emma 50103886 B2 30/05/2011
+
+30055 WIT-WIT BC
+
+De Vos Julie 50046716 B1 30/05/2011
+
+Dossche Ilse 50036907 B2 30/05/2011
+
+Spileers Glenn 50077187 B2 30/05/2011
+
+Waeterloos Dimitri 50058094 B1 30/05/2011
+
+30061 GERAARDSBERGEN BC
+
+Dejonckheere Luc 50047779 B2 30/05/2011
+
+Demil Dirk 50071530 B2 30/05/2011
+
+Van Nieuwenhove Catherine 50056365 B2 30/05/2011
+
+30066 DENDERLEEUW BC
+
+Club Naam – Voornaam Lidnr Klassement Vanaf
+
+De Decker Filip 50088130 B2 30/05/2011
+
+30067 DYNAMIC LEDE
+
+Thomas Sarah 50067368 C2 30/05/2011
+
+30069 POLDERBOS BC
+
+Van Herpe Miguel 50071238 B2 30/05/2011
+
+30071 OUDEGEM BC
+
+Van Geert Yoni 50103260 C2 30/05/2011
+
+Verwaeren Roel 50049393 B1 30/05/2011

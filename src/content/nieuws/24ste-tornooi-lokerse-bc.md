@@ -1,0 +1,25 @@
+---
+title: 24ste tornooi Lokerse BC
+date: 2013-02-17
+category: evenement
+excerpt: Op zaterdag 27 en zondag 28 april 2013 organiseert Lokerse BC voor de 24ste keer hun ABCD-tornooi. Op niet minder dan 16 banen kunnen alle klassementen strijden in een fijne omgeving. Op zaterdagavond kan je, naast het…
+legacyUrl: /2013/02/17/24ste-tornooi-lokerse-bc/
+---
+
+[![](/pbo/wp/wp-content/uploads/2013/02/24ste-Internationaal-ABCD-Tornooi-Lokeren-small.jpg "24ste Internationaal ABCD Tornooi Lokeren (small)")](/pbo/wp/events/24ste-tornooi-lokerse-bc/attachment/24ste-internationaal-abcd-tornooi-lokeren-small/)Op zaterdag 27 en zondag 28 april 2013 organiseert Lokerse BC voor de 24ste keer hun ABCD-tornooi. Op niet minder dan 16 banen kunnen alle klassementen strijden in een fijne omgeving. Op zaterdagavond kan je, naast het terrein, je beentjes nog even extra strekken op de fuif. Meer informatie en inschrijvingen kan je [hier](http://badmintonvlaanderen.toernooi.nl/sport/tournament.aspx?id=02D6DA2B-FF6A-47CD-B5E0-FB0929E014F5) vinden.
+
+Hieronder meer informatie van de club over hun tornooi:
+
+We verdelen **een prijzenpot van meer dan €7500**!
+
+-   We passen het systeem toe van **Pay per Match** met **progressief prijzengeld** voor de **winnaars** (cash)
+
+<table width="630" border="1" cellspacing="0" cellpadding="0"><tbody><tr><td width="57"><p align="center"><strong>Prijzen geld</strong></p></td><td colspan="3" width="231"><p align="center"><strong>Enkels *</strong></p></td><td colspan="3" width="252"><p align="center"><strong>Dubbels *</strong></p></td></tr><tr><td width="57">&nbsp;</td><td width="72"><p align="center"><strong>Winnaar</strong></p></td><td width="78"><p align="center"><strong>vanaf kwart</strong></p></td><td width="80"><p align="center"><strong>voorrondes</strong></p></td><td width="72"><p align="center"><strong>Winnaars</strong></p></td><td width="86"><p align="center"><strong>vanaf kwart</strong></p></td><td width="93"><p align="center"><strong>voorrondes</strong></p></td></tr><tr><td width="57"><p align="center"><strong>A</strong></p></td><td width="72"><p align="center">€ 200</p></td><td width="78"><p align="center">€ 40</p></td><td width="80"><p align="center">€ 20</p></td><td width="72"><p align="center">€ 2 x 100</p></td><td width="86"><p align="center">€ 2 x 20</p></td><td width="93"><p align="center">€ 2 x 10</p></td></tr><tr><td width="57"><p align="center"><strong>B1</strong></p></td><td width="72"><p align="center">€ 50</p></td><td width="78"><p align="center">€ 20</p></td><td width="80"><p align="center">€ 10</p></td><td width="72"><p align="center">€ 2 x 25</p></td><td width="86"><p align="center">€ 2 x 10</p></td><td width="93"><p align="center">€&nbsp; 2 x 5</p></td></tr><tr><td width="57"><p align="center"><strong>B2</strong></p></td><td width="72"><p align="center">€ 40</p></td><td width="78"><p align="center">€ 12</p></td><td width="80"><p align="center">€ 6</p></td><td width="72"><p align="center">€ 2 x 40</p></td><td width="86"><p align="center">€ 2 x 6</p></td><td width="93"><p align="center">€ 2 x 3</p></td></tr><tr><td width="57"><p align="center"><strong>C1</strong></p></td><td width="72"><p align="center">€ 30</p></td><td width="78"><p align="center">€ 10</p></td><td width="80"><p align="center">€ 5</p></td><td width="72"><p align="center">€ 2 x 15</p></td><td width="86"><p align="center">€ 2 x 5</p></td><td width="93"><p align="center">€ 2 x 2,5</p></td></tr><tr><td width="57"><p align="center"><strong>C2</strong></p></td><td width="72"><p align="center">€ 15</p></td><td width="78"><p align="center">€ 5</p></td><td width="80"><p align="center">€ 3</p></td><td width="72"><p align="center">€ 2x 7,5</p></td><td width="86"><p align="center">€ 2 x 2,5</p></td><td width="93"><p align="center">€ 2 x 1,5</p></td></tr><tr><td width="57"><p align="center"><strong>D</strong></p></td><td width="72"><p align="center">€ 13</p></td><td width="78"><p align="center">€ 4</p></td><td width="80"><p align="center">€ 2</p></td><td width="72"><p align="center">€ 2 x 6,5</p></td><td width="86"><p align="center">€ 2 x 2</p></td><td width="93"><p align="center">€ 2 x 1</p></td></tr></tbody></table>
+
+(\* : Prijzengeld per koppel, bye’s & walk overs worden niet uitgekeerd)
+
+-   De **Team Challenge Wisselbeker** is een beker voor clubs. De club die er in slaagt om de meeste (van de 30) onderdelen op haar naam te schrijven wint de wisselbeker. De club die als eerste de wisselbeker **3 keer kan winnen ontvangt de Jackpot** waar **jaarlijks €200 aan toegevoegd wordt!** (dwz. dat de Jackpot binnen 3 jaar op €600 staat, binnen 5 jaar op €1000 enzovoort). Het reglement kan je terugvinden op onze website.
+
+-   Op **zaterdagavond** organiseren we naar aloude traditie onze **Lokerse-badmintonfuif** met **DJ Mats**. Het feestje gaat door in de cafétaria van de sporthal. Inkom is gratis.
+
+-   Op 5 min wandelen van de sporthal kan je een **bed + rijkelijk ontbijt reserveren** in **“Het** **Koetshuis”**. Reserveren kan **enkel per 2 nachten** (vrijdag- & zaterdagnacht) en **kost €30**. Info en reservatie via [de.wilde.frank@telenet.be](mailto:de.wilde.frank@telenet.be)
