@@ -15,6 +15,8 @@
   --color-line: #d3d9cf;
   --color-wash: #eceee6;
   --color-mist: #bfd3c8;
+  /* Randen van knoppen en invoervelden: minstens 3:1 op ground en paper (WCAG 1.4.11). */
+  --color-edge: #7f8c85;
 
   --font-display: "Bricolage Grotesque Variable", "Bricolage Grotesque", system-ui, sans-serif;
   --font-sans: "Instrument Sans Variable", "Instrument Sans", system-ui, sans-serif;
@@ -56,6 +58,23 @@
   ::selection {
     background: var(--color-accent);
     color: var(--color-ink);
+  }
+
+  input,
+  textarea {
+    caret-color: var(--color-brand);
+  }
+
+  /* Wisknop in zoekvelden: zelfde kruisje als het menu, in ink in plaats van browserblauw. */
+  input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    margin-left: 8px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%230c2a20' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6 6 18'/%3E%3C/svg%3E")
+      center / contain no-repeat;
+    cursor: pointer;
   }
 
   :focus-visible {

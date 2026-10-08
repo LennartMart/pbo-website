@@ -16,6 +16,8 @@ export async function getStaticPaths() {
 const { bericht } = Astro.props;
 const { title, date, category, excerpt } = bericht.data;
 const { Content } = await render(bericht);
+// Jeugdberichten (jeugdcup, ranking) gaan naar de jeugdcupverantwoordelijke, de rest naar het secretariaat.
+const vragen = category === 'jeugd' ? mail.jeugdcup : category === 'recreanten' ? mail.recreanten : mail.secretariaat;
 ---
 
 <BaseLayout title={title} description={excerpt}>
@@ -45,7 +47,7 @@ const { Content } = await render(bericht);
     }
 
     <div class="mt-10 flex flex-wrap items-center justify-between gap-4 border-t border-line px-2 pt-7 md:px-0" data-pagefind-ignore>
-      <span class="text-muted">Vragen? <a class="link" href={`mailto:${mail.secretariaat}`}>{mail.secretariaat}</a></span>
+      <span class="text-muted">Vragen? <a class="link" href={`mailto:${vragen}`}>{vragen}</a></span>
       <a href={u('/nieuws')} class="btn bg-ink text-white">Meer nieuws</a>
     </div>
   </article>

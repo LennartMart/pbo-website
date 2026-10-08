@@ -13,6 +13,12 @@ const toernooien = defineCollection({
     date: isoDatum,
     club: z.string(),
     hall: z.string().optional(),
+    /** Straat en gemeente, voor de routelink. Zonder adres zoekt de link op sporthal en club. */
+    adres: z.string().optional(),
+    /** Beginuur zoals het op de site komt, bv. "9.00 uur". */
+    start: z.string().optional(),
+    /** Link naar het inschrijvingsformulier van deze halte. */
+    inschrijving: z.url().optional(),
     prijsuitreiking: z.boolean().optional(),
   }),
 });
@@ -25,12 +31,12 @@ const rankings = defineCollection({
     discipline: z.enum(['enkel', 'dubbel', 'gemengd']),
     stand: z.string(),
     pdf: z.string().optional(),
-    /** Testdata: de ranking toont dan een melding. */
+    /** Testdata: de ranking toont dan een melding. Op www.badminton-pbo.be verschijnt ze niet. */
     voorbeeld: z.boolean().default(false),
   }),
 });
 
-// Zonder bestand toont de site "Volgt binnenkort".
+// Zonder bestand toont de site "Nog niet online".
 const document = z.object({ titel: z.string(), tekst: z.string().optional(), bestand: z.string().optional() });
 
 /**

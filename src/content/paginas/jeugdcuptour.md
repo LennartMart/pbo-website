@@ -12,12 +12,13 @@ archief: []
 
 ## Zo werkt het
 
-De jeugdcuptour is een reeks recreatieve jeugdtoernooien in Oost-Vlaanderen, van Minibad tot U19. Zo maak je op een laagdrempelige manier kennis met toernooien en competitie.
+De jeugdcuptour is een reeks recreatieve jeugdtoernooien in Oost-Vlaanderen, van Minibad tot U19. Elk toernooi, of jeugdcup, is een halte van de tour. Zo maak je op een laagdrempelige manier kennis met toernooien en competitie.
 
 - Meedoen kan als je speelt bij een Oost-Vlaamse club die lid is van Badminton Vlaanderen.
 - Je speelt minstens drie wedstrijden tegen spelers uit je eigen leeftijdscategorie.
 - PBO organiseert de toernooien samen met de clubs, in enkel, dubbel en gemengd.
 - Welke disciplines er zijn, lees je bij de inschrijving. Zijn er meer dan twee, dan schrijf je je voor maximaal twee in.
+- Is de inschrijving voor een halte open, dan staat de link bij die halte in de [kalender](/jeugd/jeugdcuptour/kalender).
 - De ranking loopt per kalenderjaar. Zo is er per reeks een winnaar.
 
 ## Vragen of een fout gezien?

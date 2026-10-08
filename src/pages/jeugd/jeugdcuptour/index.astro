@@ -66,6 +66,13 @@ const { title, lead, description, documenten, Content } = await pagina('jeugdcup
       <div class="flex flex-col gap-3">
         {documenten.map((d) => <LinkCard href={u(d.bestand)} icon="document" title={d.titel} text={d.tekst} />)}
       </div>
+      {
+        documenten.some((d) => !d.bestand) && (
+          <p class="mt-3 px-2 text-[15px] leading-normal text-muted md:px-0">
+            Nog niet online? Vraag het via <a class="link" href={`mailto:${mail.jeugdcup}?subject=${encodeURIComponent('Reglement jeugdcuptour')}`}>{mail.jeugdcup}</a>.
+          </p>
+        )
+      }
     </div>
   </section>
 </BaseLayout>

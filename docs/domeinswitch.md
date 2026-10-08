@@ -11,7 +11,7 @@ De nieuwe site komt op dezelfde shared hosting als WordPress (Apache + PHP). Wer
    - **Uploads die niet te downloaden waren**: zelf opzoeken of de link in het bericht aanpassen.
    - **pbo.kwal.org**: die links zijn al vervangen door relatieve paden. Kijk na of de bestanden bestaan.
 3. Kijk een paar oude berichten na op de testversie (GitHub Pages).
-4. Vervang de voorbeeldstanden in `src/content/rankings/2026-09-26-de-mintons/` door de echte stand (via `/admin/jeugdcup/`), of verwijder ze.
+4. Vervang de voorbeeldstanden in `src/content/rankings/2026-09-26-de-mintons/` door de echte stand (via `/admin/jeugdcup/`), of verwijder ze. Een build voor `www.badminton-pbo.be` laat standen met `voorbeeld: true` sowieso weg (de build meldt dat), dus verzonnen namen komen nooit op de echte site.
 
 ## 2. Login voor /admin
 

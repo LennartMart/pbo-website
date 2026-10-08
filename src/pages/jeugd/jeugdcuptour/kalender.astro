@@ -4,7 +4,7 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PageIntro from '../../../components/PageIntro.astro';
 import Icon from '../../../components/Icon.astro';
 import { mail } from '../../../data/site';
-import { alleToernooien, huidigSeizoen, rankingPerJaar, seizoenVan, type Toernooi } from '../../../lib/jeugdcup';
+import { alleToernooien, huidigSeizoen, rankingPerJaar, routeUrl, seizoenVan, type Toernooi } from '../../../lib/jeugdcup';
 import { dag, dag2, maand, maandKort, vandaag, weekdag } from '../../../lib/datum';
 
 const nu = vandaag();
@@ -13,16 +13,21 @@ const toernooien = await alleToernooien();
 // Enkel de laatst gepubliceerde stand staat online; oudere tussenstanden niet.
 const laatsteStand = (await rankingPerJaar())[0]?.laatste.id;
 
-// Huidig seizoen en eventueel al geplande volgende seizoenen.
-const seizoenen = new Map<string, Toernooi[]>();
+// Huidig seizoen en eventueel al geplande volgende seizoenen, per seizoen opgesplitst per kalenderjaar
+// (de ranking loopt per kalenderjaar, dus de jaarwissel midden in het seizoen is een echte grens).
+const seizoenen = new Map<string, Map<string, Toernooi[]>>();
 for (const t of toernooien) {
   const s = seizoenVan(t.date);
   if (s < huidig) continue;
-  seizoenen.set(s, [...(seizoenen.get(s) ?? []), t]);
+  const jaren = seizoenen.get(s) ?? new Map<string, Toernooi[]>();
+  const jaar = t.date.slice(0, 4);
+  jaren.set(jaar, [...(jaren.get(jaar) ?? []), t]);
+  seizoenen.set(s, jaren);
 }
 
 const volgende = toernooien.find((t) => t.date >= nu);
-const plaats = (t: Toernooi) => [weekdag(t.date), t.hall, t.prijsuitreiking && 'prijsuitreiking'].filter(Boolean).join(' · ');
+const meta = (t: Toernooi) => [weekdag(t.date), t.start && `vanaf ${t.start}`, t.hall].filter(Boolean).join(' · ');
+const actie = 'inline-flex min-h-11 items-center gap-1.5 rounded-full font-semibold text-brand hover:underline';
 ---
 
 <BaseLayout
@@ -42,7 +47,7 @@ const plaats = (t: Toernooi) => [weekdag(t.date), t.hall, t.prijsuitreiking && '
   />
 
   {
-    [...seizoenen.entries()].map(([seizoen, lijst], i) => (
+    [...seizoenen.entries()].map(([seizoen, jaren], i) => (
       <section class="wrap mt-8 md:mt-10" aria-labelledby={`seizoen-${seizoen}`}>
         <h2
           id={`seizoen-${seizoen}`}
@@ -50,41 +55,76 @@ const plaats = (t: Toernooi) => [weekdag(t.date), t.hall, t.prijsuitreiking && '
         >
           Seizoen {seizoen}
         </h2>
-        <ol class="rounded-card bg-paper p-2 md:p-3">
-          {lijst.map((t) => {
-            const gespeeld = t.date < nu;
-            const isVolgende = t.id === volgende?.id;
-            return (
-              <li
-                class:list={[
-                  'flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-wash px-3 py-4 last:border-b-0 md:gap-x-6 md:px-5',
-                  isVolgende && 'rounded-[18px] border-transparent bg-accent-soft',
-                ]}
-              >
-                <time datetime={t.date} class:list={['w-12 shrink-0 text-center md:w-16', gespeeld && 'text-muted']}>
-                  <span class="num block font-display text-[26px] leading-none font-extrabold md:text-[32px]">{dag2(t.date)}</span>
-                  <span class="block text-xs font-bold uppercase md:text-[13px]">{maandKort(t.date)}</span>
-                </time>
-                <div class="min-w-0 flex-1">
-                  {isVolgende && <p class="label mb-0.5 text-brand">Volgende halte</p>}
-                  <p class:list={['text-base font-semibold md:text-lg', gespeeld && 'text-muted']}>{t.club}</p>
-                  <p class="text-sm text-muted md:text-[15px]">{plaats(t)}</p>
-                </div>
-                {gespeeld &&
-                  (t.id === laatsteStand ? (
-                    <a
-                      href={u('/jeugd/jeugdcuptour/ranking')}
-                      class="ml-16 inline-flex min-h-11 items-center gap-2 font-semibold text-brand hover:underline md:ml-0"
+        <div class="flex flex-col gap-6">
+          {[...jaren.entries()].map(([jaar, lijst]) => (
+            <div>
+              <h3 class="mb-2.5 flex flex-wrap items-baseline gap-x-3 px-2 md:px-1">
+                <span class="num font-display text-[22px] font-extrabold md:text-2xl">{jaar}</span>
+                <span class="font-sans text-[15px] font-normal text-muted">telt voor de ranking {jaar}</span>
+              </h3>
+              <ol class="rounded-card bg-paper p-2 md:p-3">
+                {lijst.map((t) => {
+                  const gespeeld = t.date < nu;
+                  const isVolgende = t.id === volgende?.id;
+                  const route = !gespeeld && routeUrl(t);
+                  return (
+                    <li
+                      id={`halte-${t.id}`}
+                      class:list={[
+                        'grid scroll-mt-6 grid-cols-[3rem_minmax(0,1fr)] gap-x-4 border-b border-wash px-3 py-4 last:border-b-0 md:grid-cols-[4rem_minmax(0,1fr)_auto] md:items-center md:gap-x-6 md:px-5',
+                        isVolgende && 'rounded-[18px] border-transparent bg-accent-soft',
+                      ]}
                     >
-                      Stand na deze halte <Icon name="pijl" size={18} stroke={2} />
-                    </a>
-                  ) : (
-                    <span class="ml-16 text-sm text-muted md:ml-0">Gespeeld</span>
-                  ))}
-              </li>
-            );
-          })}
-        </ol>
+                      <time datetime={t.date} class:list={['row-span-2 text-center md:row-span-1', gespeeld && 'text-muted']}>
+                        <span class="num block font-display text-[26px] leading-none font-extrabold md:text-[32px]">{dag2(t.date)}</span>
+                        <span class="block text-xs font-bold uppercase md:text-[13px]">{maandKort(t.date)}</span>
+                      </time>
+                      <div class="min-w-0">
+                        <p class="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+                          <span class:list={['text-base font-semibold md:text-lg', gespeeld && 'text-muted']}>{t.club}</span>
+                          {isVolgende && <span class="rounded-full bg-ink px-2.5 py-0.5 text-xs font-bold text-accent">Volgende halte</span>}
+                          {t.prijsuitreiking && (
+                            <span class="inline-flex items-center gap-1 rounded-full bg-wash px-2.5 py-0.5 text-xs font-bold text-ink">
+                              <Icon name="competitie" size={14} stroke={2.2} /> Prijsuitreiking
+                            </span>
+                          )}
+                        </p>
+                        <p class:list={['text-sm md:text-[15px]', isVolgende ? 'text-ink/80' : 'text-muted']}>
+                          {meta(t)}
+                          {t.adres && !gespeeld && <span class="block">{t.adres}</span>}
+                        </p>
+                      </div>
+                      {(gespeeld || route || t.inschrijving) && (
+                        <div class="col-start-2 mt-1 flex flex-wrap gap-x-5 md:col-start-3 md:mt-0 md:justify-end">
+                          {gespeeld &&
+                            (t.id === laatsteStand ? (
+                              <a href={u('/jeugd/jeugdcuptour/ranking')} class={actie}>
+                                Stand na deze halte <Icon name="pijl" size={18} stroke={2} />
+                              </a>
+                            ) : (
+                              <span class="inline-flex min-h-11 items-center text-sm text-muted">Gespeeld</span>
+                            ))}
+                          {t.inschrijving && !gespeeld && (
+                            <a href={t.inschrijving} class={actie}>
+                              <Icon name="inschrijven" size={18} stroke={2} /> Inschrijven
+                              <span class="sr-only"> voor {t.club} (andere website)</span>
+                            </a>
+                          )}
+                          {route && (
+                            <a href={route} class={actie} target="_blank" rel="noopener">
+                              <Icon name="route" size={18} stroke={2} /> Route
+                              <span class="sr-only"> naar {t.hall ?? t.club} (Google Maps, nieuw venster)</span>
+                            </a>
+                          )}
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </div>
+          ))}
+        </div>
       </section>
     ))
   }

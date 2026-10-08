@@ -15,11 +15,12 @@ const recentNieuws = berichten.slice(0, 3);
 const volgende = upcoming[0];
 const lijst = upcoming.slice(0, 5);
 
+// Volgorde zoals de bezoekers: jeugd en competitie eerst, het bestuur als laatste.
 const tiles: { href: string; title: string; text: string; icon: IconName }[] = [
-  { href: '/bestuur', title: 'Bestuur', text: 'Bestuursleden, contactpersonen en het secretariaat.', icon: 'bestuur' },
   { href: '/jeugd', title: 'Jeugd', text: 'PBO-selectie, jeugdcuptour, IPJO en KYU.', icon: 'jeugd' },
   { href: '/competitie', title: 'Competitie', text: 'Agenda, standen en provinciale regels.', icon: 'competitie' },
   { href: '/recreanten', title: 'Recreanten & G-sport', text: 'Wat PBO organiseert voor recreanten en G-sporters.', icon: 'recreanten' },
+  { href: '/bestuur', title: 'Bestuur', text: 'Bestuursleden, contactpersonen en het secretariaat.', icon: 'bestuur' },
 ];
 
 const plaats = (t: { hall?: string; prijsuitreiking?: boolean }) =>
@@ -75,17 +76,16 @@ const catZin = `${catNamen.slice(0, -1).join(', ')} of ${catNamen.at(-1)}`;
               <span class="text-[13px] font-bold uppercase">{maandKort(volgende.date)}</span>
             </time>
             <div class="min-w-0">
-              <p class="label mb-1 text-brand lg:mb-4">Volgende jeugdcup</p>
               <time datetime={volgende.date} class="mb-4 hidden items-end gap-3 lg:flex">
                 <span class="num font-display text-[88px] leading-[0.9] font-extrabold tracking-[-0.03em]">{dag(volgende.date)}</span>
                 <span class="pb-1.5 text-[22px] font-semibold">{maand(volgende.date)}</span>
               </time>
-              <p class="font-display text-[22px] leading-tight font-bold lg:mb-1 lg:text-[26px]">{volgende.club}</p>
+              <p class="font-display text-[22px] leading-tight font-bold lg:mb-1 lg:text-[26px]">Jeugdcup bij {volgende.club}</p>
               <p class="text-[15px] text-muted lg:text-base">
                 {[weekdag(volgende.date), plaats(volgende)].filter(Boolean).join(' · ')}
               </p>
-              <span class="mt-6 hidden min-h-11 items-center gap-2 font-semibold lg:inline-flex">
-                Alle data
+              <span class="mt-6 hidden min-h-11 items-center gap-2 font-semibold text-brand lg:inline-flex">
+                Hele kalender
                 <Icon name="pijl" size={18} stroke={2} class="transition-transform duration-300 group-hover:translate-x-1" />
               </span>
             </div>
@@ -128,8 +128,8 @@ const catZin = `${catNamen.slice(0, -1).join(', ')} of ${catNamen.at(-1)}`;
     <div>
       <div class="mb-4 flex flex-wrap items-end justify-between gap-x-4 gap-y-1 px-2 lg:mb-7 lg:px-0">
         <div>
-          <p class="label mb-2 text-brand lg:mb-3">Victor Jeugdcuptour by PBO</p>
-          <h2 class="text-[32px] leading-[1.1] font-extrabold tracking-[-0.01em] lg:text-[44px]">Nog op de kalender</h2>
+          <h2 class="text-[32px] leading-[1.1] font-extrabold tracking-[-0.01em] lg:text-[44px]">Volgende jeugdcups</h2>
+          <p class="mt-1 text-muted lg:mt-2">Victor Jeugdcuptour by PBO, seizoen {seizoen}</p>
         </div>
         <a href={u('/jeugd/jeugdcuptour/kalender')} class="inline-flex min-h-11 items-center gap-2 font-semibold hover:text-brand">
           Hele kalender <Icon name="pijl" size={18} stroke={2} />
@@ -139,15 +139,21 @@ const catZin = `${catNamen.slice(0, -1).join(', ')} of ${catNamen.at(-1)}`;
         lijst.length > 0 ? (
           <ol class="rounded-card bg-paper p-2 lg:p-3">
             {lijst.map((t) => (
-              <li class="flex items-center gap-4 border-b border-wash px-3 py-3.5 last:border-b-0 lg:gap-5 lg:px-5 lg:py-4">
-                <time datetime={t.date} class="w-12 shrink-0 text-center lg:w-16">
-                  <span class="num block font-display text-[26px] leading-none font-extrabold lg:text-[32px]">{dag2(t.date)}</span>
-                  <span class="block text-xs font-bold text-muted uppercase lg:text-[13px]">{maandKort(t.date)}</span>
-                </time>
-                <div class="min-w-0">
-                  <p class="text-base font-semibold lg:text-lg">{t.club}</p>
-                  <p class="text-sm text-muted lg:text-[15px]">{[weekdag(t.date), plaats(t)].filter(Boolean).join(' · ')}</p>
-                </div>
+              <li class="border-b border-wash last:border-b-0">
+                <a
+                  href={u(`/jeugd/jeugdcuptour/kalender#halte-${t.id}`)}
+                  class="group flex items-center gap-4 rounded-2xl px-3 py-3.5 transition-colors hover:bg-ground lg:gap-5 lg:px-5 lg:py-4"
+                >
+                  <time datetime={t.date} class="w-12 shrink-0 text-center lg:w-16">
+                    <span class="num block font-display text-[26px] leading-none font-extrabold lg:text-[32px]">{dag2(t.date)}</span>
+                    <span class="block text-xs font-bold text-muted uppercase lg:text-[13px]">{maandKort(t.date)}</span>
+                  </time>
+                  <span class="min-w-0 flex-1">
+                    <span class="block text-base font-semibold lg:text-lg">{t.club}</span>
+                    <span class="block text-sm text-muted lg:text-[15px]">{[weekdag(t.date), plaats(t)].filter(Boolean).join(' · ')}</span>
+                  </span>
+                  <Icon name="pijl" size={18} stroke={2} class="shrink-0 text-muted transition-transform group-hover:translate-x-0.5" />
+                </a>
               </li>
             ))}
           </ol>
@@ -160,9 +166,10 @@ const catZin = `${catNamen.slice(0, -1).join(', ')} of ${catNamen.at(-1)}`;
     </div>
 
     <div class="flex flex-col gap-3 rounded-card bg-accent p-7 lg:gap-4 lg:p-9">
-      <p class="label">Laatste ranking</p>
-      <h2 class="text-[28px] leading-[1.1] font-extrabold lg:text-4xl">{ranking ? `Na ${ranking.na}` : `Ranking ${seizoen}`}</h2>
-      <p class="text-[15px] leading-normal lg:text-base">Zoek je naam bij {catZin}.</p>
+      <h2 class="text-[28px] leading-[1.1] font-extrabold lg:text-4xl">{ranking ? `Ranking ${ranking.jaar}` : 'Ranking jeugdcuptour'}</h2>
+      <p class="text-[15px] leading-normal lg:text-base">
+        {ranking && <>Stand na {ranking.na}, {dag(ranking.datum)} {maand(ranking.datum)}. </>}Zoek je naam bij {catZin}.
+      </p>
       <a class="btn mt-1 bg-ink text-white lg:mt-2 lg:self-start" href={u('/jeugd/jeugdcuptour/ranking')}>Naar de ranking</a>
     </div>
   </section>

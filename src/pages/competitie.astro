@@ -36,7 +36,8 @@ const { title, lead, description, Content } = await pagina('competitie');
     <aside class="h-fit rounded-card bg-accent-soft p-6 md:p-8">
       <h2 class="text-2xl leading-tight font-extrabold">Vragen over de competitie?</h2>
       <p class="mt-2 leading-normal">
-        In het bestuur is Toon Bouchier verantwoordelijk voor de competitie. Stuur je vraag naar het secretariaat.
+        In het bestuur is Toon Bouchier verantwoordelijk voor de competitie. Stuur je vraag naar
+        <a class="link [overflow-wrap:anywhere]" href={`mailto:${mail.secretariaat}`}>{mail.secretariaat}</a>.
       </p>
       <a href={`mailto:${mail.secretariaat}`} class="btn mt-5 w-full bg-ink px-5 text-white">Mail het secretariaat</a>
     </aside>

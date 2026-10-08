@@ -38,7 +38,7 @@ const documenten = {
   fields: [
     { label: 'Titel', name: 'titel', widget: 'string' },
     { label: 'Korte uitleg', name: 'tekst', widget: 'string', required: false, hint: 'Bv. "Versie van 24 september 2017 (pdf)"' },
-    bestand('Bestand', 'Zonder bestand toont de site "Volgt binnenkort".'),
+    bestand('Bestand', 'Zonder bestand toont de site "Nog niet online".'),
   ],
 };
 
@@ -127,6 +127,9 @@ const toernooienCollectie = {
     { label: 'Datum', name: 'date', widget: 'datetime', format: 'YYYY-MM-DD', date_format: 'DD-MM-YYYY', time_format: false, picker_utc: true },
     { label: 'Club', name: 'club', widget: 'string', hint: 'Zoals de club zichzelf noemt, bv. "Gentse BC".' },
     { label: 'Sporthal', name: 'hall', widget: 'string', required: false },
+    { label: 'Adres', name: 'adres', widget: 'string', required: false, hint: 'Straat, nummer en gemeente, bv. "Driepikkelstraat 30, 9030 Mariakerke". Voor de routelink.' },
+    { label: 'Beginuur', name: 'start', widget: 'string', required: false, hint: 'Zoals het op de site komt, bv. "9.00 uur".' },
+    { label: 'Inschrijving', name: 'inschrijving', widget: 'string', required: false, hint: 'Volledige link naar het inschrijvingsformulier (https://...).' },
     { label: 'Prijsuitreiking', name: 'prijsuitreiking', widget: 'boolean', required: false, default: false },
   ],
 };

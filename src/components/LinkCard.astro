@@ -2,7 +2,7 @@
 import Icon, { type IconName } from './Icon.astro';
 
 interface Props {
-  /** Zonder href toont de kaart een niet-klikbare "Volgt binnenkort"-versie. */
+  /** Zonder href toont de kaart een niet-klikbare "Nog niet online"-versie. */
   href?: string;
   title: string;
   text?: string;
@@ -37,7 +37,7 @@ const { href, title, text, icon, external = false, download = false } = Astro.pr
         <span class="block text-[17px] leading-snug font-bold md:text-lg">{title}</span>
         {text && <span class="mt-0.5 block leading-snug text-muted">{text}</span>}
       </span>
-      <span class="shrink-0 rounded-full bg-accent-soft px-3 py-1 text-[13px] font-semibold text-brand">Volgt binnenkort</span>
+      <span class="shrink-0 rounded-full bg-wash px-3 py-1 text-[13px] font-semibold text-muted">Nog niet online</span>
     </div>
   )
 }

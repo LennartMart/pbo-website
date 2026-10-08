@@ -44,9 +44,10 @@ const indexeren = Astro.site?.hostname === 'www.badminton-pbo.be';
     <meta property="og:image" content={new URL(u('/icon-512.png'), Astro.site)} />
   </head>
   <body class="flex flex-col">
+    <!-- Buiten beeld tot hij focus krijgt; geen sr-only, want not-sr-only zet de padding op 0. -->
     <a
       href="#inhoud"
-      class="sr-only z-50 rounded-full bg-ink px-5 py-3 font-semibold text-white focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+      class="fixed top-3 left-3 z-50 -translate-y-[calc(100%+1rem)] rounded-full bg-ink px-5 py-3 font-semibold text-white focus:translate-y-0"
       >Naar de inhoud</a
     >
     <SiteHeader />

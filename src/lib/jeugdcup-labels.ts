@@ -34,3 +34,20 @@ export function geboortejaren(id: CategorieId, jaar: number) {
       return `${jaar - 18} tot en met ${jaar - 15}`;
   }
 }
+
+/** Korte vorm voor op een knop: "2017+", "2016", "2014–15", "2008–11". */
+export function geboortejarenKort(id: CategorieId, jaar: number) {
+  const kort = (van: number, tot: number) => `${van}–${String(tot).slice(2)}`;
+  switch (id) {
+    case 'minibad':
+      return `${jaar - 9}+`;
+    case 'u11':
+      return `${jaar - 10}`;
+    case 'u13':
+      return kort(jaar - 12, jaar - 11);
+    case 'u15':
+      return kort(jaar - 14, jaar - 13);
+    case 'u17-u19':
+      return kort(jaar - 18, jaar - 15);
+  }
+}

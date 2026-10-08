@@ -17,7 +17,7 @@ const jaren = [...new Set(berichten.map(jaarVan))];
 const ouderJaar = berichten.length > AANTAL + 1 ? jaarVan(lijst.at(-1)!) : undefined;
 const chips = nieuwsCategorieen.filter((c) => lijst.some((b) => b.data.category === c.id));
 const pill =
-  'inline-flex min-h-11 items-center rounded-full border-[1.5px] border-line bg-paper px-5 text-[15px] font-semibold transition-colors hover:border-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-white';
+  'inline-flex min-h-11 items-center rounded-full border-[1.5px] border-edge bg-paper px-5 text-[15px] font-semibold transition-colors hover:border-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-white';
 ---
 
 <BaseLayout title="Nieuws" description="Nieuws van PBO vzw: jeugdcuptour, PBO-selectie, provinciaal kampioenschap en competitie in Oost-Vlaanderen.">
@@ -34,14 +34,18 @@ const pill =
           type="search"
           autocomplete="off"
           placeholder="Toernooi, club of seizoen"
-          class="min-h-[52px] rounded-full border-[1.5px] border-line bg-paper px-5 text-base placeholder:text-muted focus:border-ink"
+          class="min-h-[52px] rounded-full border-[1.5px] border-edge bg-paper px-5 text-base placeholder:text-muted focus:border-ink"
         />
       </div>
     </div>
 
-    <div data-resultaten hidden aria-live="polite">
-      <p data-resultaten-status class="mb-4 px-2 text-muted md:px-0"></p>
+    <div data-resultaten hidden>
+      <p data-resultaten-status class="mb-4 px-2 font-semibold md:px-0" aria-live="polite"></p>
       <ul data-resultaten-lijst class="grid gap-3 md:grid-cols-2 lg:grid-cols-3 lg:gap-5"></ul>
+      <div data-resultaten-niets hidden class="rounded-card bg-paper p-6 leading-normal md:p-8">
+        <p>Probeer een clubnaam, een toernooi of een jaartal, bijvoorbeeld "Mintons", "PK" of "2024".</p>
+        <p class="mt-2 text-muted">Oudere berichten vind je ook per jaar, hieronder.</p>
+      </div>
     </div>
 
     <div data-overzicht>
@@ -140,7 +144,7 @@ const pill =
   }
 
   // Zoeken met Pagefind (index wordt na de build gemaakt; in `npm run dev` bestaat ze niet).
-  type Resultaat = { url: string; excerpt: string; meta: { title?: string; datum?: string } };
+  type Resultaat = { url: string; excerpt: string; meta: { title?: string; datum?: string }; filters?: { categorie?: string[] } };
   type Pagefind = {
     options(o: { baseUrl: string }): Promise<void>;
     debouncedSearch(q: string): Promise<{ results: { data(): Promise<Resultaat> }[] } | null>;
@@ -152,6 +156,7 @@ const pill =
   const resultaten = document.querySelector<HTMLElement>('[data-resultaten]');
   const status = document.querySelector<HTMLElement>('[data-resultaten-status]');
   const lijst = document.querySelector<HTMLElement>('[data-resultaten-lijst]');
+  const niets = document.querySelector<HTMLElement>('[data-resultaten-niets]');
 
   const pad = u('/pagefind/pagefind.js');
   const laad = import(/* @vite-ignore */ pad).catch(() => null) as Promise<Pagefind | null>;
@@ -159,7 +164,7 @@ const pill =
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
   laad.then(async (pagefind) => {
-    if (!pagefind || !zoekVak || !invoer || !overzicht || !resultaten || !status || !lijst) return;
+    if (!pagefind || !zoekVak || !invoer || !overzicht || !resultaten || !status || !lijst || !niets) return;
     // Pagefind kent het basispad niet (GitHub Pages: /pbo-website/).
     await pagefind.options({ baseUrl: u('/') });
     zoekVak.hidden = false;
@@ -177,16 +182,21 @@ const pill =
       overzicht.hidden = true;
       resultaten.hidden = false;
       status.textContent =
-        data.length === 0 ? `Niets gevonden voor "${q}".` : `${zoek.results.length} ${zoek.results.length === 1 ? 'bericht' : 'berichten'} voor "${q}".`;
-      // Excerpt van Pagefind bevat enkel <mark>; titel en datum escapen.
+        data.length === 0 ? `Niets gevonden voor "${q}".` : `${zoek.results.length} ${zoek.results.length === 1 ? 'bericht' : 'berichten'} voor "${q}"`;
+      niets.hidden = data.length > 0;
+      // Zelfde opbouw als NieuwsKaart. Excerpt van Pagefind bevat enkel <mark>; de rest escapen.
       lijst.innerHTML = data
-        .map(
-          (r) => `<li><a href="${esc(r.url)}" class="lift flex h-full flex-col gap-2 rounded-card bg-paper p-6 md:p-7">
-            ${r.meta.datum ? `<span class="text-sm text-muted">${esc(r.meta.datum)}</span>` : ''}
-            <span class="font-display text-[21px] leading-[1.2] font-bold">${esc(r.meta.title ?? '')}</span>
-            <span class="leading-normal text-muted [&_mark]:bg-accent-soft [&_mark]:text-ink">${r.excerpt}</span>
-          </a></li>`,
-        )
+        .map((r) => {
+          const cat = r.filters?.categorie?.[0];
+          return `<li><a href="${esc(r.url)}" class="lift flex h-full flex-col gap-3 rounded-card bg-paper p-6 md:p-7">
+            <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
+              ${cat ? `<span class="rounded-full bg-accent-soft px-3 py-1 text-xs font-bold tracking-[0.06em] text-brand uppercase">${esc(cat)}</span>` : ''}
+              ${r.meta.datum ? `<span class="text-sm text-muted">${esc(r.meta.datum)}</span>` : ''}
+            </span>
+            <span class="font-display text-[21px] leading-[1.2] font-bold md:text-[23px]">${esc(r.meta.title ?? '')}</span>
+            <span class="leading-normal text-muted [&_mark]:rounded-sm [&_mark]:bg-accent-soft [&_mark]:px-0.5 [&_mark]:text-ink">${r.excerpt}</span>
+          </a></li>`;
+        })
         .join('');
     });
   });

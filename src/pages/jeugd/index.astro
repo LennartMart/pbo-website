@@ -55,6 +55,11 @@ const { title, lead, description, trainers, Content } = await pagina('jeugd');
           ))
         }
       </ul>
+      {
+        trainers.some((t) => t.diploma.includes('VTS')) && (
+          <p class="mt-3 px-2 text-[15px] text-muted md:px-0">VTS: Vlaamse Trainersschool, de opleiding voor sporttrainers in Vlaanderen.</p>
+        )
+      }
     </div>
   </section>
 
@@ -65,7 +70,8 @@ const { title, lead, description, trainers, Content } = await pagina('jeugd');
       <div class="prose-pbo mt-4 text-base">
         <p>
           De vijf Vlaamse provincies spelen tegen elkaar op een tweedaags teamevenement. Per leeftijdscategorie (U11, U13, U15 en U17)
-          worden vijf disciplines gespeeld: HE, DE, HD, DD en GD. Wie de meeste categorieën wint, wint de ontmoeting.
+          worden vijf disciplines gespeeld: enkel en dubbel voor jongens en voor meisjes, en gemengd dubbel (HE, DE, HD, DD en GD). Wie de
+          meeste categorieën wint, wint de ontmoeting.
         </p>
         <p>
           De eerste IPJO was op 14 en 15 januari 1989 in De Panne. Sinds de vijfde editie wordt er met veren shuttles gespeeld.

@@ -1,0 +1,52 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  items: { label: string; href: string; pdf?: boolean }[];
+}
+
+const { items } = Astro.props;
+// De recentste standen meteen zichtbaar, de rest (tot 2010) achter één klik.
+const ZICHTBAAR = 6;
+const eerst = items.slice(0, ZICHTBAAR);
+const ouder = items.slice(ZICHTBAAR);
+const link = 'flex min-h-14 items-center gap-3 rounded-2xl bg-paper px-4 py-3 font-semibold transition-colors hover:bg-wash';
+---
+
+{
+  items.length > 0 && (
+    <div>
+      <ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        {eerst.map((a) => (
+          <li>
+            <a href={a.href} class={link}>
+              <Icon name={a.pdf ? 'document' : 'ranking'} size={20} class="shrink-0 text-brand" />
+              <span class="min-w-0 flex-1">{a.label}</span>
+              {a.pdf && <span class="text-sm font-normal text-muted">pdf</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+      {ouder.length > 0 && (
+        <details class="group mt-2">
+          <summary class="inline-flex min-h-12 cursor-pointer list-none items-center gap-2 rounded-full px-4 font-semibold text-brand hover:bg-wash [&::-webkit-details-marker]:hidden">
+            <Icon name="omlaag" size={18} stroke={2.2} class="transition-transform group-open:rotate-180" />
+            <span class="group-open:hidden">Oudere standen ({ouder.length})</span>
+            <span class="hidden group-open:inline">Minder tonen</span>
+          </summary>
+          <ul class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            {ouder.map((a) => (
+              <li>
+                <a href={a.href} class={link}>
+                  <Icon name={a.pdf ? 'document' : 'ranking'} size={20} class="shrink-0 text-brand" />
+                  <span class="min-w-0 flex-1">{a.label}</span>
+                  {a.pdf && <span class="text-sm font-normal text-muted">pdf</span>}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </div>
+  )
+}

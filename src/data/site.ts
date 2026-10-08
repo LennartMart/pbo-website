@@ -1,10 +1,11 @@
+/** Hoofdmenu. Vacatures staat onder Bestuur en in de footer. */
 export const nav = [
-  { href: '/bestuur', label: 'Bestuur' },
+  { href: '/jeugd/jeugdcuptour', label: 'Jeugdcuptour' },
   { href: '/jeugd', label: 'Jeugd' },
   { href: '/competitie', label: 'Competitie' },
   { href: '/recreanten', label: 'Recreanten & G-sport' },
-  { href: '/vacatures', label: 'Vacatures' },
   { href: '/nieuws', label: 'Nieuws' },
+  { href: '/bestuur', label: 'Bestuur' },
 ];
 
 export const mail = {

@@ -4,6 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/PageIntro.astro';
 import LinkCard from '../components/LinkCard.astro';
 import PersonCard from '../components/PersonCard.astro';
+import Icon from '../components/Icon.astro';
 import { mail, pboKalenderEmbed } from '../data/site';
 import { pagina } from '../lib/paginas';
 
@@ -87,6 +88,10 @@ const { title, lead, description, bestuurders, medewerkers, bijdragen, documente
       <p class="mt-2 max-w-[60ch] text-muted">
         Trainingen van de PBO-selectie, vergaderingen en evenementen. De kalender verandert vaak, kijk dus even na voor je vertrekt.
       </p>
+      <a href={pboKalenderEmbed} target="_blank" rel="noopener" class="mt-3 inline-flex min-h-11 items-center gap-2 font-semibold text-brand hover:underline">
+        <Icon name="extern" size={18} stroke={2} /> Open in Google Agenda
+        <span class="sr-only">(nieuw venster)</span>
+      </a>
     </div>
     <div class="overflow-hidden rounded-card bg-paper p-2 md:p-3">
       <iframe

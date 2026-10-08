@@ -3,14 +3,24 @@ import { u } from '../../../../lib/url';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import PageIntro from '../../../../components/PageIntro.astro';
 import RankingView from '../../../../components/RankingView.astro';
-import LinkCard from '../../../../components/LinkCard.astro';
-import { rankingPerJaar } from '../../../../lib/jeugdcup';
+import RankingArchief from '../../../../components/RankingArchief.astro';
+import { komende, rankingPerJaar } from '../../../../lib/jeugdcup';
 import { pagina } from '../../../../lib/paginas';
+import { dag, maand, weekdag } from '../../../../lib/datum';
 
 const jaren = await rankingPerJaar();
 const { archief } = await pagina('jeugdcuptour');
+const [volgende] = await komende();
 const recent = jaren[0];
 const crumbs = [{ href: u('/jeugd'), label: 'Jeugd' }, { href: u('/jeugd/jeugdcuptour'), label: 'Jeugdcuptour' }, { label: 'Ranking' }];
+
+const datum = (iso: string) => `${dag(iso)} ${maand(iso)}`;
+// "Volgende stand na Gentse BC op 11 oktober", of bij de jaarwissel: de nieuwe ranking begint daar.
+const verder = !recent || !volgende
+  ? ''
+  : Number(volgende.date.slice(0, 4)) === recent.jaar
+    ? ` Volgende stand na ${volgende.club} op ${datum(volgende.date)}.`
+    : ` De ranking ${Number(volgende.date.slice(0, 4))} begint bij ${volgende.club} op ${datum(volgende.date)}.`;
 ---
 
 <BaseLayout
@@ -20,16 +30,25 @@ const crumbs = [{ href: u('/jeugd'), label: 'Jeugd' }, { href: u('/jeugd/jeugdcu
     : 'Stand van de Victor Jeugdcuptour by PBO per categorie en discipline.'}
 >
   <PageIntro
-    title="Jeugdcuptour ranking"
-    lead={recent ? `Stand na ${recent.laatste.club}, kalenderjaar ${recent.jaar}.` : 'De eerste stand verschijnt na de eerste jeugdcup van het jaar.'}
+    title={recent ? `Ranking ${recent.jaar}` : 'Ranking jeugdcuptour'}
+    lead={recent
+      ? `Stand na ${recent.laatste.club}, ${weekdag(recent.laatste.date).toLowerCase()} ${datum(recent.laatste.date)}.${verder}`
+      : `Er staat nog geen stand online.${volgende ? ` De volgende jeugdcup is bij ${volgende.club} op ${datum(volgende.date)}.` : ''}`}
     crumbs={crumbs}
   />
   {
     recent ? (
-      <RankingView {...recent} jaren={jaren.map((j) => j.jaar)} nieuwste={recent.jaar} />
+      <RankingView
+        {...recent}
+        jaren={jaren.map((j) => j.jaar)}
+        nieuwste={recent.jaar}
+        volgende={volgende && Number(volgende.date.slice(0, 4)) === recent.jaar ? volgende : undefined}
+      />
     ) : (
-      <section class="wrap mt-8 flex flex-col gap-3">
-        {archief.map((a) => <LinkCard href={u(a.bestand)} icon="document" title={a.label} />)}
+      <section class="wrap mt-8">
+        <h2 class="mb-1 px-2 text-[28px] leading-tight font-extrabold md:px-0 md:text-4xl">Eerdere standen</h2>
+        <p class="mb-5 px-2 text-muted md:px-0">De ranking loopt per kalenderjaar. In januari begint een nieuwe stand.</p>
+        <RankingArchief items={archief.map((a) => ({ label: a.label, href: u(a.bestand), pdf: true }))} />
       </section>
     )
   }
