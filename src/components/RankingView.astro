@@ -1,33 +1,27 @@
 ---
 import { u } from '../lib/url';
 import Icon from './Icon.astro';
-import Beweging from './Beweging.astro';
 import RankingArchief from './RankingArchief.astro';
 import { mail } from '../data/site';
 import { pagina } from '../lib/paginas';
 import {
-  bewegingen,
   categorieen,
   categorieLabel,
   geboortejaren,
   geboortejarenKort,
   geslachtLabel,
   geslachten,
-  type Beweging as BewegingType,
   type Stand,
   type Toernooi,
 } from '../lib/jeugdcup';
-import { toonPunten, type Rij } from '../lib/stand';
+import { toonPunten } from '../lib/stand';
 import { compact } from '../lib/zoek';
 import { dag, maand } from '../lib/datum';
 
 interface Props {
   jaar: number;
   per: Map<string, Stand>;
-  /** Stand van de halte ervoor, per categorie-geslacht, voor de plaatswinst. */
-  vorige: Map<string, Stand>;
   laatste: Toernooi;
-  voorbeeld: boolean;
   /** Andere jaren met data, nieuwste eerst. */
   jaren: number[];
   nieuwste: number;
@@ -35,7 +29,7 @@ interface Props {
   volgende?: Toernooi;
 }
 
-const { jaar, per, vorige, laatste, voorbeeld, jaren, nieuwste, volgende } = Astro.props;
+const { jaar, per, laatste, jaren, nieuwste, volgende } = Astro.props;
 
 const { archief } = await pagina('jeugdcuptour');
 const jaarHref = (j: number) => u(j === nieuwste ? '/jeugd/jeugdcuptour/ranking' : `/jeugd/jeugdcuptour/ranking/${j}`);
@@ -49,8 +43,7 @@ const datum = (iso: string) => `${dag(iso)} ${maand(iso)}`;
 // Eerste combinatie met data als startpunt (zonder JavaScript zie je alles onder elkaar).
 const eerste = categorieen.flatMap((c) => geslachten.map((g) => `${c.id}-${g.id}`)).find((k) => per.has(k));
 
-// Bewegingen per stand, en een kaart per speler voor het zoeken (naam + club).
-const beweging = new Map([...per].map(([k, s]) => [k, bewegingen(s, vorige.get(k))]));
+// Een kaart per speler voor het zoeken (naam + club), met elke stand waarin die staat.
 interface Lijn {
   key: string;
   cat: string;
@@ -58,8 +51,6 @@ interface Lijn {
   rij: number;
   pos: number;
   punten: number;
-  partners: string[];
-  beweging?: BewegingType;
 }
 const spelers = new Map<string, { naam: string; club?: string; lijnen: Lijn[] }>();
 for (const c of categorieen) {
@@ -68,21 +59,10 @@ for (const c of categorieen) {
     const s = per.get(key);
     if (!s) continue;
     s.rijen.forEach((r, i) => {
-      for (const p of r.spelers) {
-        const id = `${p.naam}|${p.club ?? ''}`.toLowerCase();
-        const kaart = spelers.get(id) ?? { naam: p.naam, club: p.club, lijnen: [] };
-        kaart.lijnen.push({
-          key,
-          cat: c.id,
-          geslacht: g.id,
-          rij: i,
-          pos: r.pos,
-          punten: r.punten,
-          partners: r.spelers.filter((x) => x !== p).map((x) => x.naam),
-          beweging: beweging.get(key)![i],
-        });
-        spelers.set(id, kaart);
-      }
+      const id = `${r.naam}|${r.club ?? ''}`.toLowerCase();
+      const kaart = spelers.get(id) ?? { naam: r.naam, club: r.club, lijnen: [] };
+      kaart.lijnen.push({ key, cat: c.id, geslacht: g.id, rij: i, pos: r.pos, punten: r.punten });
+      spelers.set(id, kaart);
     });
   }
 }
@@ -96,9 +76,6 @@ const podiumStijl = [
   { order: 'order-1', blok: 'h-[88px] bg-paper md:h-28' },
   { order: 'order-3', blok: 'h-[72px] bg-paper md:h-24' },
 ];
-const clubs = (r: Rij) => [...new Set(r.spelers.map((p) => p.club).filter(Boolean))];
-
-const metBeweging = (key: string) => vorige.has(key);
 const chip =
   'flex min-h-[52px] min-w-0 flex-col items-center justify-center rounded-full border-[1.5px] border-edge bg-paper px-1 text-center leading-tight transition-colors hover:border-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-white sm:px-5';
 const segment =
@@ -106,14 +83,6 @@ const segment =
 ---
 
 <section class="wrap mt-6 md:mt-8">
-  {
-    voorbeeld && (
-      <p class="mb-5 inline-flex items-center gap-2 rounded-full bg-accent-soft px-4 py-2 text-sm font-semibold text-brand">
-        Testversie: verzonnen namen
-      </p>
-    )
-  }
-
   <!-- Zoeken: de snelste weg voor wie een naam zoekt. Zonder JavaScript verborgen. -->
   <div data-zoekblok hidden class="px-2 md:px-0">
     <label for="zoek-naam" class="block font-display text-[22px] leading-tight font-bold md:text-2xl">Zoek je naam</label>
@@ -161,11 +130,8 @@ const segment =
                       <span class="block font-semibold">
                         {categorieLabel(l.cat)} · {geslachtLabel(l.geslacht)}
                       </span>
-                      <span class="block text-sm text-muted">
-                        {toonPunten(l.punten)} punten{l.partners.length > 0 && ` · met ${l.partners.join(' en ')}`}
-                      </span>
+                      <span class="block text-sm text-muted">{toonPunten(l.punten)} punten</span>
                     </span>
-                    <Beweging waarde={l.beweging} class="shrink-0" />
                     <Icon name="pijl" size={18} stroke={2} class="shrink-0 text-brand transition-transform group-hover:translate-x-0.5" />
                     <span class="sr-only">, toon in de stand</span>
                   </button>
@@ -253,7 +219,6 @@ const segment =
             );
           const podium = podiumVan(s);
           const rest = s.rijen.slice(podium.length);
-          const bew = beweging.get(key)!;
           return (
             <div data-stand={key} data-aantal={s.rijen.length} class="scroll-mt-40">
               <div class="px-2 md:px-1 max-md:group-data-js/bord:sr-only">
@@ -272,11 +237,8 @@ const segment =
                 {podium.map((r, i) => (
                   <li class:list={['flex scroll-mt-48 flex-col rounded-[20px] transition-colors data-uitgelicht:bg-accent-soft', podiumStijl[i].order]} data-rij={i} tabindex="-1">
                     <div class="px-1 pt-2 pb-2.5 text-center">
-                      {r.spelers.map((p) => (
-                        <span class="block text-[15px] leading-snug font-semibold [overflow-wrap:anywhere] md:text-base">{p.naam}</span>
-                      ))}
-                      <span class="mt-0.5 block text-[13px] leading-snug text-muted md:text-sm">{clubs(r).join(' · ')}</span>
-                      {bew[i] !== undefined && <Beweging waarde={bew[i]} class="mt-1 inline-flex" />}
+                      <span class="block text-[15px] leading-snug font-semibold [overflow-wrap:anywhere] md:text-base">{r.naam}</span>
+                      <span class="mt-0.5 block text-[13px] leading-snug text-muted md:text-sm">{r.club}</span>
                     </div>
                     <div class:list={['flex flex-col items-center rounded-t-[18px] pt-2.5 md:pt-3.5', podiumStijl[i].blok]}>
                       <span class="num font-display text-[40px] leading-none font-extrabold md:text-[52px]">
@@ -303,12 +265,6 @@ const segment =
                         <th scope="col" class="px-3 pt-3 pb-3 font-semibold md:px-5">Speler</th>
                         <th scope="col" class="hidden px-5 pt-3 pb-3 font-semibold sm:table-cell">Club</th>
                         <th scope="col" class="w-20 px-3 pt-3 pb-3 text-right font-semibold md:w-24 md:px-5">Punten</th>
-                        {metBeweging(key) && (
-                          <th scope="col" class="w-12 pt-3 pr-3 pb-3 text-right font-semibold md:w-16 md:pr-5">
-                            <span aria-hidden="true">+/−</span>
-                            <span class="sr-only">Sinds de vorige halte</span>
-                          </th>
-                        )}
                       </tr>
                     </thead>
                     <tbody>
@@ -318,22 +274,13 @@ const segment =
                           <tr class="scroll-mt-48 border-t border-wash transition-colors data-uitgelicht:bg-accent-soft" data-rij={i} tabindex="-1">
                             <td class="num px-3 py-3.5 align-baseline font-display text-2xl leading-none font-extrabold md:px-5">{r.pos}</td>
                             <td class="px-3 py-3.5 align-baseline md:px-5">
-                              {r.spelers.map((p) => (
-                                <span class="block font-semibold">
-                                  {p.naam}
-                                  <span class="block text-sm font-normal text-muted sm:hidden">{p.club}</span>
-                                </span>
-                              ))}
+                              <span class="block font-semibold">
+                                {r.naam}
+                                <span class="block text-sm font-normal text-muted sm:hidden">{r.club}</span>
+                              </span>
                             </td>
-                            <td class="hidden px-5 py-3.5 align-baseline text-muted sm:table-cell">
-                              {clubs(r).length === 1 ? clubs(r)[0] : r.spelers.map((p) => <span class="block">{p.club}</span>)}
-                            </td>
+                            <td class="hidden px-5 py-3.5 align-baseline text-muted sm:table-cell">{r.club}</td>
                             <td class="num px-3 py-3.5 text-right align-baseline font-semibold md:px-5">{toonPunten(r.punten)}</td>
-                            {metBeweging(key) && (
-                              <td class="py-3.5 pr-3 text-right align-baseline md:pr-5">
-                                <Beweging waarde={bew[i]} />
-                              </td>
-                            )}
                           </tr>
                         );
                       })}
@@ -342,14 +289,13 @@ const segment =
                 </div>
               )}
 
-              <div class="mt-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-2 text-[15px] text-muted md:px-1">
-                {metBeweging(key) && <span>Pijltjes: plaatsen gestegen of gedaald sinds {vorige.get(key)!.toernooi.club}.</span>}
-                {s.pdf && (
+              {s.pdf && (
+                <div class="mt-3 px-2 text-[15px] md:px-1">
                   <a href={u(s.pdf)} class="inline-flex min-h-11 items-center gap-2 font-semibold text-brand hover:underline">
                     <Icon name="document" size={20} /> Download als pdf
                   </a>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           );
         }),

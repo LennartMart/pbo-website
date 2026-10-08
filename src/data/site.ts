@@ -23,7 +23,6 @@ export const { mail, social, sponsors } = instellingen.data;
 export const competitieAgenda = instellingen.data.competitie.agenda;
 
 export const badmintonVlaanderen = {
-  home: 'https://www.badmintonvlaanderen.be/',
   competitie: instellingen.data.competitie.uitslagen,
   ipjo: 'https://badminton.vlaanderen/ipjo/',
 };

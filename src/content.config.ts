@@ -64,8 +64,6 @@ const rankings = defineCollection({
     geslacht: z.enum(['jongens', 'meisjes']),
     stand: z.string(),
     pdf: z.string().optional(),
-    /** Testdata: de ranking toont dan een melding. Op www.badminton-pbo.be verschijnt ze niet. */
-    voorbeeld: z.boolean().default(false),
   }),
 });
 

@@ -1,4 +1,4 @@
-import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
+import { getCollection, getEntry } from 'astro:content';
 import { dag, maand, plusDagen, vandaag } from './datum';
 import { leesStand, type Rij } from './stand';
 
@@ -96,12 +96,6 @@ export function statussen(t: Toernooi, vorige: Toernooi | undefined, nu = vandaa
   return fasen.filter((f) => !(f.tot && f.tot < nu) && !(f.van && f.tot && f.van > f.tot));
 }
 
-/**
- * De echte site (www.badminton-pbo.be) toont nooit voorbeelddata met verzonnen namen.
- * In `npm run dev` en op testversies (GitHub Pages, testsubdomein) staan ze er wel, met een melding.
- */
-const productie = !import.meta.env.DEV && new URL(import.meta.env.SITE ?? 'https://www.badminton-pbo.be').hostname === 'www.badminton-pbo.be';
-
 /** "BC De Mintons" → "bc-de-mintons". */
 const slug = (s: string) =>
   s
@@ -133,40 +127,22 @@ export async function komende(vanaf = vandaag()) {
 }
 
 export interface Stand {
-  id: string;
   toernooi: Toernooi;
   categorie: CategorieId;
   geslacht: GeslachtId;
   rijen: Rij[];
   pdf?: string;
-  voorbeeld: boolean;
 }
-
-let gewaarschuwd = false;
 
 export async function alleStanden(): Promise<Stand[]> {
   const haltes = await alleToernooien();
   const opId = new Map(haltes.map((t) => [t.id, t]));
   const opDatum = new Map(haltes.map((t) => [t.date, t]));
-  let items: CollectionEntry<'rankings'>[] = await getCollection('rankings');
-  if (productie && items.some((r) => r.data.voorbeeld)) {
-    if (!gewaarschuwd) console.warn('[jeugdcup] Voorbeeldstanden niet gepubliceerd: build voor www.badminton-pbo.be.');
-    gewaarschuwd = true;
-    items = items.filter((r) => !r.data.voorbeeld);
-  }
-  return items.map((r) => {
+  return (await getCollection('rankings')).map((r) => {
     // Op datum als terugval: een verbeterde clubnaam verandert het id van de halte.
     const toernooi = opId.get(r.data.toernooi) ?? opDatum.get(r.data.toernooi.slice(0, 10));
     if (!toernooi) throw new Error(`Stand ${r.id}: halte "${r.data.toernooi}" staat niet (meer) in de kalender (src/content/kalender/).`);
-    return {
-      id: r.id,
-      toernooi,
-      categorie: r.data.categorie,
-      geslacht: r.data.geslacht,
-      rijen: leesStand(r.data.stand),
-      pdf: r.data.pdf,
-      voorbeeld: r.data.voorbeeld,
-    };
+    return { toernooi, categorie: r.data.categorie, geslacht: r.data.geslacht, rijen: leesStand(r.data.stand), pdf: r.data.pdf };
   });
 }
 
@@ -175,44 +151,21 @@ export async function alleStanden(): Promise<Stand[]> {
  * In Excel is de tussenstand al opgeteld; de site telt niets op.
  */
 export async function rankingPerJaar() {
-  // Per jaar en per categorie-geslacht alle standen, oudste eerst.
-  const jaren = new Map<number, Map<string, Stand[]>>();
+  const jaren = new Map<number, Map<string, Stand>>();
   for (const s of await alleStanden()) {
     const jaar = Number(s.toernooi.date.slice(0, 4));
-    const per = jaren.get(jaar) ?? new Map<string, Stand[]>();
+    const per = jaren.get(jaar) ?? new Map<string, Stand>();
     const key = `${s.categorie}-${s.geslacht}`;
-    per.set(key, [...(per.get(key) ?? []), s].sort((a, b) => a.toernooi.date.localeCompare(b.toernooi.date)));
+    const eerder = per.get(key);
+    if (!eerder || s.toernooi.date > eerder.toernooi.date) per.set(key, s);
     jaren.set(jaar, per);
   }
   return [...jaren.entries()]
     .sort(([a], [b]) => b - a)
-    .map(([jaar, reeksen]) => {
-      const per = new Map([...reeksen].map(([k, lijst]) => [k, lijst.at(-1)!]));
-      const vorige = new Map([...reeksen].filter(([, lijst]) => lijst.length > 1).map(([k, lijst]) => [k, lijst.at(-2)!]));
-      const standen = [...per.values()];
-      const laatste = standen.reduce((a, b) => (b.toernooi.date > a.toernooi.date ? b : a));
-      return { jaar, per, vorige, laatste: laatste.toernooi, voorbeeld: standen.some((s) => s.voorbeeld) };
+    .map(([jaar, per]) => {
+      const laatste = [...per.values()].reduce((a, b) => (b.toernooi.date > a.toernooi.date ? b : a)).toernooi;
+      return { jaar, per, laatste };
     });
-}
-
-/** Plaatsen gestegen (positief) of gedaald (negatief) sinds de vorige stand, of 'nieuw'. */
-export type Beweging = number | 'nieuw';
-
-const rijSleutel = (r: Rij) =>
-  r.spelers
-    .map((p) => `${p.naam}@${p.club ?? ''}`.toLowerCase())
-    .sort((a, b) => a.localeCompare(b))
-    .join('|');
-
-/** Beweging per rij (zelfde volgorde als `stand.rijen`). Zonder vorige stand: geen beweging. */
-export function bewegingen(stand: Stand, vorig?: Stand): (Beweging | undefined)[] {
-  if (!vorig) return stand.rijen.map(() => undefined);
-  const eerder = new Map<string, number>();
-  for (const r of vorig.rijen) if (!eerder.has(rijSleutel(r))) eerder.set(rijSleutel(r), r.pos);
-  return stand.rijen.map((r) => {
-    const pos = eerder.get(rijSleutel(r));
-    return pos === undefined ? 'nieuw' : pos - r.pos;
-  });
 }
 
 /** Laatst gepubliceerde stand, voor de home en de jeugdcuptourpagina. */

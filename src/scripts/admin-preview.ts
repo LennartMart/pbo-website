@@ -64,8 +64,8 @@ function StandVoorbeeld({ entry }: { entry: Entry }) {
               ...rijen.map((r, i) =>
                 h('tr', { key: i },
                   h('td', { style: { ...cel, fontWeight: 800 } }, r.pos),
-                  h('td', { style: { ...cel, fontWeight: 600 } }, ...r.spelers.map((s, j) => h('div', { key: j }, s.naam))),
-                  h('td', { style: { ...cel, color: kleur.muted } }, ...r.spelers.map((s, j) => h('div', { key: j }, s.club ?? ''))),
+                  h('td', { style: { ...cel, fontWeight: 600 } }, r.naam),
+                  h('td', { style: { ...cel, color: kleur.muted } }, r.club ?? ''),
                   h('td', { style: { ...cel, textAlign: 'right', fontWeight: 600 } }, toonPunten(r.punten)),
                 ),
               ),

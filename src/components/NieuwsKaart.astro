@@ -5,24 +5,18 @@ import { lang } from '../lib/datum';
 
 interface Props {
   bericht: Bericht;
-  /** Kopniveau binnen de pagina. */
-  kop?: 'h2' | 'h3';
 }
 
-const { bericht: b, kop: Kop = 'h3' } = Astro.props;
+const { bericht: b } = Astro.props;
 ---
 
-<a
-  href={u(`/nieuws/${b.id}`)}
-  class="lift flex h-full flex-col gap-3 rounded-card bg-paper p-6 md:p-7"
-  data-cat={b.data.category}
->
+<a href={u(`/nieuws/${b.id}`)} class="lift flex h-full flex-col gap-3 rounded-card bg-paper p-6 md:p-7">
   <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
     <span class="rounded-full bg-accent-soft px-3 py-1 text-xs font-bold tracking-[0.06em] text-brand uppercase">
       {categorieNaam(b.data.category)}
     </span>
     <time datetime={b.data.date} class="text-sm text-muted">{lang(b.data.date)}</time>
   </span>
-  <Kop class="font-display text-[21px] leading-[1.2] font-bold md:text-[23px]">{b.data.title}</Kop>
+  <h3 class="font-display text-[21px] leading-[1.2] font-bold md:text-[23px]">{b.data.title}</h3>
   <p class="leading-normal text-muted">{b.data.excerpt}</p>
 </a>
