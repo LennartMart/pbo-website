@@ -32,6 +32,27 @@ const kalender = defineCollection({
   schema: z.object({ seizoen: z.string(), haltes: z.array(halte).default([]) }),
 });
 
+/** Provinciaal kampioenschap: één bestand dat beheerders elk jaar bijwerken. Met `tonen` staat het op de home. */
+const pk = defineCollection({
+  loader: glob({ pattern: 'pk.md', base: './src/content/pk' }),
+  schema: z.object({
+    tonen: z.boolean().default(false),
+    /** Zonder naam: "Provinciaal kampioenschap". Het jaar komt uit de datum. */
+    naam: z.preprocess(leeg, z.string().default('Provinciaal kampioenschap')),
+    datum: isoDatum,
+    /** Tweede speeldag; leeg bij een PK van één dag. */
+    datumTot: z.preprocess(leeg, isoDatum.optional()),
+    plaats: z.string(),
+    sporthal: z.preprocess(leeg, z.string().optional()),
+    adres: z.preprocess(leeg, z.string().optional()),
+    organisatie: z.preprocess(leeg, z.string().optional()),
+    /** Zelfde toernooipagina als bij een halte: inschrijven, wedstrijden, uitslagen. */
+    toernooilink: z.preprocess(leeg, z.url().optional()),
+    inschrijvenTot: z.preprocess(leeg, isoDatum.optional()),
+    affiche: z.preprocess(leeg, z.string().optional()),
+  }),
+});
+
 const categorie = z.enum(['minibad', 'u11', 'u13', 'u15', 'u17-u19']);
 
 const rankings = defineCollection({
@@ -95,7 +116,7 @@ const nieuws = defineCollection({
     excerpt: z.string(),
     /** Bovenaan het nieuwsoverzicht en als link in de hero van de home. */
     uitgelicht: z.boolean().default(false),
-    /** Korte tekst voor de link op de home, bv. "PK op 31 oktober en 1 november in Nevele". */
+    /** Korte tekst voor de link op de home, bv. "Nieuw reglement voor de recreantencompetitie". Het PK heeft een eigen blok. */
     kort: z.string().optional(),
     legacyUrl: z.string().optional(),
   }),
@@ -115,4 +136,4 @@ const instellingen = defineCollection({
     }),
 });
 
-export const collections = { kalender, rankings, paginas, nieuws, instellingen };
+export const collections = { kalender, rankings, paginas, pk, nieuws, instellingen };

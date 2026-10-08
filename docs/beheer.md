@@ -45,6 +45,19 @@ Een gespeelde halte met standen niet verwijderen, anders bouwt de site niet meer
 
 Bij **Jeugdcuptour** staan ook de **geboortejaren per categorie**. Ze komen in de tabel "Categorieën" en bij de filters van de ranking. Vul ze in voor één kalenderjaar, bijvoorbeeld 2026: U13 van 2014 tot en met 2015. Het jaar erna schuift de site ze zelf op (U13 in 2027: 2015 en 2016). Enkel aanpassen als de leeftijdsgrenzen veranderen. Minibad heeft geen "tot en met": leeg betekent "of later". De categorieën zelf (Minibad, U11, ...) zitten in de code, want de standen verwijzen ernaar.
 
+## Provinciaal kampioenschap (beheerders)
+
+Het PK heeft een eigen pagina (`/pk`) en een blok op de home. Je hoeft er geen nieuwsbericht voor te maken.
+
+1. Open **Vaste pagina's → PK (provinciaal kampioenschap)**.
+2. Vul de data, de plaats, de organisatie, de **toernooilink** (tournamentsoftware) en **Inschrijven tot** in. Sporthal en adres zijn optioneel; met een adres krijgt `/pk` een routeknop.
+3. Zet in **Tekst** de reeksen, het uurschema en de praktische info. Een affiche mag erbij.
+4. Zet **Tonen op de home** aan en publiceer.
+
+Hetzelfde blok dient ook voor het **PK Jeugd en Veteranen** in februari: verander de **Naam** (het jaar zet de site er zelf achter) en vul de gegevens van dat PK in. De twee PK's lopen niet tegelijk.
+
+De knop past zich aan zoals bij de jeugdcupkalender: **Inschrijven tot ...**, daarna **Wedstrijden**, na het PK **Uitslagen**. Zet **Tonen op de home** uit wanneer het PK voorbij is. De pagina `/pk` blijft bestaan met de info van het laatste PK, tot je ze het jaar erna overschrijft.
+
 ## Site-instellingen (beheerders)
 
 **Site-instellingen → Contact, sponsors en links**:

@@ -5,7 +5,7 @@ category: evenement
 excerpt: "Op 31 oktober en 1 november gaat het Provinciaal kampioenschap voor
   Oost-Vlaanderen door te Nevele als samenwerking tussen BC Landegem en PBO. De
   reeksen zijn voor deze editie opgedeeld als volgt: 1-2-3 / 4-5 / 6-7 /…"
-uitgelicht: true
+uitgelicht: false
 legacyUrl: /2026/10/07/pk-pbo-in-nevele-deinze-nieuw-formaat/
 ---
 

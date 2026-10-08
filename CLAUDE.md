@@ -28,6 +28,8 @@ src/content/
   rankings/<toernooi-id>/<categorie>-<geslacht>.yaml
                             toernooi, categorie, geslacht (jongens/meisjes), stand (geplakt uit Excel), pdf?
   paginas/<pagina>.md       vaste pagina's: title, lead, description, lijsten (bestuur, documenten, ...) + lopende tekst
+  pk/pk.md                  provinciaal kampioenschap: tonen (blok op de home), datum, datumTot?, plaats, sporthal?,
+                            adres?, organisatie?, toernooilink?, inschrijvenTot?, affiche? + tekst (reeksen, uurschema)
   instellingen/site.yaml    mailadressen, sociale media, sponsors (lijst met logo), competitielinks
                             (gelezen via src/data/site.ts; menu en Google-agenda blijven in de code)
 ```
@@ -52,7 +54,7 @@ src/content/
 /                                   home
 /nieuws, /nieuws/[slug], /nieuws/archief/[jaar]
 /jeugd, /jeugd/jeugdcuptour, /jeugd/jeugdcuptour/kalender, /jeugd/jeugdcuptour/ranking
-/bestuur, /competitie, /recreanten, /vacatures
+/bestuur, /competitie, /pk, /recreanten, /vacatures
 /admin, /admin/jeugdcup             Decap CMS (beheerders, gewone users)
 ```
 

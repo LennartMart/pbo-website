@@ -1,0 +1,64 @@
+---
+import { u } from '../lib/url';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageIntro from '../components/PageIntro.astro';
+import Icon from '../components/Icon.astro';
+import { mail } from '../data/site';
+import { pk as leesPk } from '../lib/pk';
+
+const pk = await leesPk();
+const { Content } = pk;
+const title = pk.titel;
+// Datum, plaats en organisatie staan al in de intro; hier enkel wat je ter plaatse nodig hebt.
+const waar = [pk.sporthal, pk.adres].filter(Boolean).join(', ');
+---
+
+<BaseLayout title={title} description={`${pk.titel}, badminton in Oost-Vlaanderen. ${pk.zin}`}>
+  <PageIntro title={title} lead={pk.zin} />
+
+  <section class="wrap mt-8 grid gap-10 md:mt-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,360px)] lg:gap-16">
+    <!-- Op de telefoon eerst de knop, op desktop rechts naast de tekst. -->
+    <aside class="h-fit rounded-card bg-accent-soft p-6 md:p-8 lg:order-last">
+      {
+        waar && (
+          <p class="mb-5">
+            <span class="block text-sm font-semibold text-brand">Sporthal</span>
+            <span class="text-[17px] leading-snug">{waar}</span>
+          </p>
+        )
+      }
+      <div class="flex flex-col gap-2.5">
+        {
+          pk.link && (
+            <a href={pk.link.href} class="btn bg-ink px-5 text-white" rel="noopener">
+              <Icon name={pk.link.icon} size={20} stroke={2} /> {pk.link.label}
+              <span class="sr-only"> {pk.link.sr} (andere website)</span>
+            </a>
+          )
+        }
+        {
+          pk.route && (
+            <a href={pk.route} class="btn border-[1.5px] border-ink px-5" target="_blank" rel="noopener">
+              <Icon name="route" size={20} stroke={2} /> Route
+              <span class="sr-only"> naar {pk.sporthal ?? pk.plaats} (Google Maps, nieuw venster)</span>
+            </a>
+          )
+        }
+      </div>
+      <p class="mt-5 text-[15px] leading-normal">
+        Vragen? Mail naar <a class="link [overflow-wrap:anywhere]" href={`mailto:${mail.secretariaat}`}>{mail.secretariaat}</a>.
+      </p>
+      {
+        pk.affiche && (
+          <a href={u(pk.affiche)} class="mt-6 block">
+            <img src={u(pk.affiche)} alt={`Affiche ${title}`} loading="lazy" class="w-full rounded-2xl" />
+          </a>
+        )
+      }
+    </aside>
+
+    <div class="prose-pbo px-2 md:px-0">
+      <Content />
+    </div>
+  </section>
+</BaseLayout>

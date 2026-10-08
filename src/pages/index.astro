@@ -15,6 +15,7 @@ import {
 import { alleBerichten, jaarVan } from '../lib/nieuws';
 import { dag, dag2, maand, maandKort, weekdag, lang, vandaag } from '../lib/datum';
 import { competitieAgenda, badmintonVlaanderen, mail } from '../data/site';
+import { pk as leesPk } from '../lib/pk';
 
 const nu = vandaag();
 const toernooien = await alleToernooien();
@@ -48,6 +49,9 @@ const berichten = await alleBerichten();
 const uitgelicht = berichten.find((b) => b.data.uitgelicht);
 const recentNieuws = berichten.filter((b) => b !== uitgelicht).slice(0, 4);
 const eersteJaar = berichten.length ? jaarVan(berichten.at(-1)!) : undefined;
+
+// Het PK staat op de home zolang een beheerder het aanzet (Vaste pagina's → PK).
+const pk = await leesPk(nu);
 
 const voorClubs = [
   { href: competitieAgenda, title: 'Competitieagenda', text: 'De wedstrijden van je ploeg in je eigen agenda', extern: true },
@@ -227,6 +231,33 @@ const voorClubs = [
       }
     </div>
   </section>
+
+  <!-- Provinciaal kampioenschap, zolang het aanstaat in het beheer -->
+  {
+    pk.tonen && (
+      <section class="wrap mt-3 lg:mt-5" aria-labelledby="pk-titel">
+        <div class="grid gap-5 rounded-card bg-accent-soft px-6 py-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-10 lg:px-10 lg:py-9">
+          <div class="min-w-0">
+            <h2 id="pk-titel" class="text-[28px] leading-[1.1] font-extrabold lg:text-4xl">
+              {pk.titel}
+            </h2>
+            <p class="mt-2 max-w-[60ch] text-[17px] leading-normal lg:text-lg">{pk.zin}</p>
+          </div>
+          <div class="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6">
+            {pk.link && (
+              <a class="btn bg-ink text-white" href={pk.link.href} rel="noopener">
+                <Icon name={pk.link.icon} size={20} stroke={2} /> {pk.link.label}
+                <span class="sr-only"> {pk.link.sr} (andere website)</span>
+              </a>
+            )}
+            <a href={u('/pk')} class="inline-flex min-h-11 items-center justify-center gap-2 font-semibold text-brand hover:underline">
+              Reeksen en uurschema <Icon name="pijl" size={18} stroke={2} />
+            </a>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   <div class="wrap mt-3 grid gap-3 lg:mt-5 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-5">
     <!-- Ranking: zoeken op naam of meteen naar een categorie -->
