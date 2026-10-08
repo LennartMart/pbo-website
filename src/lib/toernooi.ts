@@ -4,7 +4,10 @@
  */
 import { dagMaand, plusDagen, vandaag } from './datum';
 
-/** Toernooi met een pagina op tournamentsoftware. `datum` is de (laatste) speeldag. */
+/**
+ * Toernooi met een pagina op tournamentsoftware en twee data: `inschrijvenTot`, de laatste dag om in te schrijven, en
+ * `datum`, de (laatste) speeldag. Het schema maakt `inschrijvenTot` verplicht bij een toernooilink.
+ */
 export interface Toernooipagina {
   datum: string;
   toernooilink?: string;
@@ -12,17 +15,16 @@ export interface Toernooipagina {
 }
 
 /**
- * De toernooilink is één pagina die meegroeit: tot "inschrijven tot" om in te schrijven, daarna tot en met
- * de speeldag voor de loting en de wedstrijden, na de speeldag voor de uitslagen. `wie` is voor schermlezers.
+ * De toernooilink is één pagina die meegroeit: tot en met "inschrijven tot" om in te schrijven, daarna tot en met
+ * de speeldag voor de loting en de wedstrijden, na de speeldag voor de uitslagen. Zonder inschrijfdatum nooit
+ * "Inschrijven": de site belooft niet dat het nog kan. `wie` is voor schermlezers.
  */
 export function toernooiLink(t: Toernooipagina, wie: string, nu = vandaag()) {
   if (!t.toernooilink) return undefined;
   const href = t.toernooilink;
   if (t.datum < nu) return { href, label: 'Uitslagen', sr: `van ${wie}`, icon: 'document' } as const;
-  if (t.datum > nu && (!t.inschrijvenTot || nu <= t.inschrijvenTot)) {
-    const tot = t.inschrijvenTot ? ` tot ${dagMaand(t.inschrijvenTot)}` : '';
-    return { href, label: `Inschrijven${tot}`, sr: `voor ${wie}`, icon: 'inschrijven' } as const;
-  }
+  if (t.inschrijvenTot && nu <= t.inschrijvenTot && nu < t.datum)
+    return { href, label: `Inschrijven tot ${dagMaand(t.inschrijvenTot)}`, sr: `voor ${wie}`, icon: 'inschrijven' } as const;
   return { href, label: 'Wedstrijden', sr: `bij ${wie}`, icon: 'klok' } as const;
 }
 
