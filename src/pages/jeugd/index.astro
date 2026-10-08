@@ -3,7 +3,7 @@ import { u } from '../../lib/url';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageIntro from '../../components/PageIntro.astro';
 import LinkCard from '../../components/LinkCard.astro';
-import { badmintonVlaanderen } from '../../data/site';
+import { ipjoLink } from '../../data/site';
 import { huidigSeizoen, laatsteRanking } from '../../lib/jeugdcup';
 import { pagina } from '../../lib/paginas';
 
@@ -32,7 +32,7 @@ const { title, lead, description, trainers, Content } = await pagina('jeugd');
           href={u('/jeugd/jeugdcuptour/ranking')}
           icon="ranking"
           title={ranking ? `Ranking ${ranking.jaar}` : 'Ranking'}
-          text={ranking ? `Stand na ${ranking.na}` : 'Per categorie, jongens en meisjes'}
+          text={ranking ? `Stand na ${ranking.laatste.club}` : 'Per categorie, jongens en meisjes'}
         />
       </div>
     </div>
@@ -76,7 +76,7 @@ const { title, lead, description, trainers, Content } = await pagina('jeugd');
         <p>
           De eerste IPJO was op 14 en 15 januari 1989 in De Panne. Sinds de vijfde editie wordt er met veren shuttles gespeeld.
         </p>
-        <p><a href={badmintonVlaanderen.ipjo}>Cijfers en weetjes bij Badminton Vlaanderen</a></p>
+        <p><a href={ipjoLink}>Cijfers en weetjes bij Badminton Vlaanderen</a></p>
       </div>
     </article>
 

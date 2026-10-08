@@ -12,11 +12,11 @@
 declare(strict_types=1);
 
 $config = is_file(__DIR__ . '/config.php') ? require __DIR__ . '/config.php' : [];
-$clientId = $config['client_id'] ?? getenv('OAUTH_CLIENT_ID') ?: '';
-$clientSecret = $config['client_secret'] ?? getenv('OAUTH_CLIENT_SECRET') ?: '';
+$clientId = $config['client_id'] ?? '';
+$clientSecret = $config['client_secret'] ?? '';
 
 // Sites die het token mogen ontvangen: de echte site en de testversie op GitHub Pages.
-$origins = $config['origins'] ?? [
+$origins = [
     'https://www.badminton-pbo.be',
     'https://badminton-pbo.be',
     'https://lennartmart.github.io',

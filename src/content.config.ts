@@ -1,6 +1,8 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'astro/zod';
+import { categorieen, geslachten } from './lib/jeugdcup-labels';
+import { nieuwsCategorieen } from './lib/nieuws-labels';
 
 /** YAML leest 2026-09-26 als datum; Decap schrijft soms een string. Altijd terug naar YYYY-MM-DD. */
 const isoDatum = z
@@ -12,9 +14,9 @@ const leeg = (v: unknown) => (v === '' || v === null ? undefined : v);
 
 /** Eén halte van de jeugdcuptour. Het id (<datum>-<club>) leidt src/lib/jeugdcup.ts af. */
 const halte = z.object({
-  date: isoDatum,
+  datum: isoDatum,
   club: z.string(),
-  hall: z.preprocess(leeg, z.string().optional()),
+  sporthal: z.preprocess(leeg, z.string().optional()),
   /** Straat en gemeente, voor de routelink. Zonder adres zoekt de link op sporthal en club. */
   adres: z.preprocess(leeg, z.string().optional()),
   /** Beginuur zoals het op de site komt, bv. "9.00 uur". */
@@ -53,19 +55,15 @@ const pk = defineCollection({
   }),
 });
 
-const categorie = z.enum(['minibad', 'u11', 'u13', 'u15', 'u17-u19']);
-
 const rankings = defineCollection({
   loader: glob({ pattern: '**/*.yaml', base: './src/content/rankings' }),
   schema: z.object({
     /** Id van de halte (<datum>-<club>). Vindt de site dat id niet, dan zoekt ze op de datum. */
     toernooi: z.string(),
-    categorie,
-    geslacht: z.enum(['jongens', 'meisjes']),
+    categorie: z.enum(categorieen.map((c) => c.id)),
+    geslacht: z.enum(geslachten.map((g) => g.id)),
     stand: z.string(),
     pdf: z.string().optional(),
-    /** Testdata: de ranking toont dan een melding. Op www.badminton-pbo.be verschijnt ze niet. */
-    voorbeeld: z.boolean().default(false),
   }),
 });
 
@@ -112,7 +110,7 @@ const nieuws = defineCollection({
   schema: z.object({
     title: z.string(),
     date: isoDatum,
-    category: z.enum(['jeugd', 'selectie', 'evenement', 'competitie', 'recreanten', 'algemeen']),
+    category: z.enum(nieuwsCategorieen.map((c) => c.id)),
     excerpt: z.string(),
     /** Bovenaan het nieuwsoverzicht en de home: blok onder de volgende jeugdcuphalte, of de hero als er geen volgende halte is. */
     uitgelicht: z.boolean().default(false),

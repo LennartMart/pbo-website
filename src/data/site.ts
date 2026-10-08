@@ -17,16 +17,11 @@ export const nav = [
 const instellingen = await getEntry('instellingen', 'site');
 if (!instellingen) throw new Error('src/content/instellingen/site.yaml ontbreekt');
 
-export const { mail, social, sponsors } = instellingen.data;
+/** `competitie`: de agenda (enkel die van de PBO-competitie-app is nog in gebruik) en de uitslagen bij Badminton Vlaanderen. */
+export const { mail, social, sponsors, competitie } = instellingen.data;
 
-/** Enkel de agenda van de PBO-competitie-app is nog in gebruik. */
-export const competitieAgenda = instellingen.data.competitie.agenda;
-
-export const badmintonVlaanderen = {
-  home: 'https://www.badmintonvlaanderen.be/',
-  competitie: instellingen.data.competitie.uitslagen,
-  ipjo: 'https://badminton.vlaanderen/ipjo/',
-};
+/** Cijfers en weetjes over de IPJO, bij Badminton Vlaanderen. */
+export const ipjoLink = 'https://badminton.vlaanderen/ipjo/';
 
 /** Google Calendar met alle PBO-agenda's (zelfde bronnen als op de oude site). */
 export const pboKalenderEmbed =

@@ -7,11 +7,10 @@ De nieuwe site komt op dezelfde shared hosting als WordPress (Apache + PHP). Wer
 1. GitHub → Actions → **Nieuws migreren uit WordPress** → Run workflow (branch `main`, bron `https://testsite.badminton-pbo.be` of de echte site).
 2. Lees `scripts/uitvoer/migratie-rapport.md` na:
    - **Categorieën**: klopt de indeling? Anders `CATEGORIE_REGELS` in `scripts/migreer-wordpress.mjs` aanpassen en opnieuw draaien.
-   - **Interne links zonder nieuwe bestemming**: toevoegen aan `PAGINA_MAP` (script) en aan `PAGINAS` in `scripts/htaccess.mjs`.
+   - **Interne links zonder nieuwe bestemming**: een redirect toevoegen aan `OUDE_PAGINAS` in `scripts/oude-site.mjs` (de migratie, de `.htaccess` en de controle lezen die lijst), of een pagina die haar pad houdt aan `PAGINA_MAP` in het migratiescript.
    - **Uploads die niet te downloaden waren**: zelf opzoeken of de link in het bericht aanpassen.
    - **pbo.kwal.org**: die links zijn al vervangen door relatieve paden. Kijk na of de bestanden bestaan.
 3. Kijk een paar oude berichten na op de testversie (GitHub Pages).
-4. Vervang de voorbeeldstanden in `src/content/rankings/2026-09-26-de-mintons/` door de echte stand (via `/admin/jeugdcup/`), of verwijder ze. Een build voor `www.badminton-pbo.be` laat standen met `voorbeeld: true` sowieso weg (de build meldt dat), dus verzonnen namen komen nooit op de echte site.
 
 ## 2. Login voor /admin
 

@@ -8,33 +8,25 @@
  * Toont enkel wat misloopt, plus een samenvatting.
  */
 import { readdir, readFile } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import YAML from 'yaml';
+import { join } from 'node:path';
+import { OUDE_PAGINAS, ROOT, legacyUrls } from './oude-site.mjs';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const i = process.argv.indexOf('--site');
 const SITE = (i > -1 ? process.argv[i + 1] : 'https://www.badminton-pbo.be').replace(/\/+$/, '');
 
 const controles = [
-  ['/jeugd/jeugdcup/pbo-jeugdcuptour-ranking/', '/jeugd/jeugdcuptour/ranking'],
-  ['/jeugd/jeugdcup/pbo-jeugdcuptour-kalender/', '/jeugd/jeugdcuptour/kalender'],
+  ...Object.entries(OUDE_PAGINAS).map(([oud, nieuw]) => [`${oud}/`, nieuw]),
+  ...(await legacyUrls()).map(([slug, legacy]) => [legacy, `/nieuws/${slug}`]),
 ];
-const uploads = new Set();
 
-async function lees(map) {
+const uploads = new Set();
+for (const map of ['src/content/nieuws', 'src/content/paginas']) {
   for (const f of await readdir(join(ROOT, map), { recursive: true })) {
     if (!f.endsWith('.md')) continue;
     const tekst = await readFile(join(ROOT, map, f), 'utf8');
     for (const m of tekst.matchAll(/\/wp-content\/uploads\/[^\s)"'<>]+/g)) uploads.add(m[0]);
-    if (map.endsWith('nieuws')) {
-      const legacy = YAML.parse(tekst.match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '')?.legacyUrl;
-      if (legacy) controles.push([legacy, `/nieuws/${f.replace(/\.md$/, '')}`]);
-    }
   }
 }
-await lees('src/content/nieuws');
-await lees('src/content/paginas');
 
 let fout = 0;
 const pool = async (lijst, fn) => {
