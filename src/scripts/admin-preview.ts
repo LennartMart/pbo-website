@@ -3,7 +3,7 @@
  * met dezelfde parser als de site (src/lib/stand.ts). Zo zie je meteen of het plakken gelukt is.
  */
 import { leesStand, toonPunten } from '../lib/stand';
-import { categorieLabel, disciplineLabel } from '../lib/jeugdcup-labels';
+import { categorieLabel, geslachtLabel } from '../lib/jeugdcup-labels';
 
 type H = (tag: unknown, props?: Record<string, unknown> | null, ...children: unknown[]) => unknown;
 interface Entry {
@@ -24,14 +24,14 @@ function StandVoorbeeld({ entry }: { entry: Entry }) {
   const regels = tekst.split(/\r?\n/).filter((r) => r.trim()).length;
   const overgeslagen = regels - rijen.length;
   const cat = categorieLabel(String(entry.getIn(['data', 'categorie']) ?? ''));
-  const disc = disciplineLabel(String(entry.getIn(['data', 'discipline']) ?? ''));
+  const geslacht = geslachtLabel(String(entry.getIn(['data', 'geslacht']) ?? ''));
   const toernooi = String(entry.getIn(['data', 'toernooi']) ?? '');
 
   const cel = { padding: '10px 12px', borderTop: `1px solid ${kleur.wash}`, verticalAlign: 'top' };
   return h(
     'div',
     { style: { fontFamily: 'system-ui, sans-serif', color: kleur.ink, padding: 24 } },
-    h('h2', { style: { margin: '0 0 4px', fontSize: 24 } }, `${cat || 'Categorie?'} · ${disc || 'discipline?'}`),
+    h('h2', { style: { margin: '0 0 4px', fontSize: 24 } }, `${cat || 'Categorie?'} · ${geslacht || 'jongens of meisjes?'}`),
     h('p', { style: { margin: '0 0 16px', color: kleur.muted } }, toernooi ? `Stand na ${toernooi}` : 'Kies eerst een toernooi.'),
     rijen.length === 0
       ? h('p', { style: { background: kleur.zacht, padding: 16, borderRadius: 12 } }, 'Nog geen stand. Plak de kolommen positie, naam, club en punten uit Excel.')

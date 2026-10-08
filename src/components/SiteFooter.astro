@@ -1,9 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import markLight from '../assets/logo/pbo-mark-light.png';
-import mobiSports from '../assets/sponsors/mobi-sports.png';
 import { u } from '../lib/url';
-import { mail, social, competitieAgenda, badmintonVlaanderen, sponsor } from '../data/site';
+import { mail, social, competitieAgenda, badmintonVlaanderen, sponsors } from '../data/site';
 
 const columns = [
   {
@@ -32,25 +31,31 @@ const columns = [
   },
   {
     title: 'Volg ons',
-    links: social.map((s) => ({ href: s.href, label: s.label })),
+    links: social.map((s) => ({ href: s.link, label: s.naam })),
   },
-];
+].filter((col) => col.links.length > 0);
+
+/** Eén sponsor: groot logo. Meerdere: naast elkaar op dezelfde hoogte. */
+const logoKlasse = sponsors.length === 1 ? 'h-auto w-full max-w-[480px]' : 'h-16 w-auto md:h-20';
 ---
 
 <footer class="wrap mt-16 pb-10 md:mt-[72px]">
-  <a
-    href={sponsor.href}
-    class="lift flex flex-col items-center gap-3 rounded-card bg-paper p-5 text-center md:flex-row md:justify-center md:gap-8 md:px-8 md:py-6 md:text-left"
-  >
-    <span class="shrink-0 text-sm font-semibold text-muted">Met steun van</span>
-    <Image
-      src={mobiSports}
-      alt="Mobi-sports, badmintonsolutions, racket- en teamwear"
-      width={768}
-      densities={[1, 2]}
-      class="h-auto w-full max-w-[480px] rounded-lg"
-    />
-  </a>
+  {
+    sponsors.length > 0 && (
+      <div class="flex flex-col items-center gap-3 rounded-card bg-paper p-5 text-center md:flex-row md:justify-center md:gap-8 md:px-8 md:py-6 md:text-left">
+        <span class="shrink-0 text-sm font-semibold text-muted">Met steun van</span>
+        <ul class="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
+          {sponsors.map((s) => (
+            <li>
+              <a href={s.link} class="lift block rounded-lg">
+                <Image src={s.logo} alt={s.naam} width={768} densities={[1, 2]} class={`${logoKlasse} rounded-lg`} />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
 
   <div class="on-ink mt-3 rounded-[28px] bg-ink px-6 py-8 text-white md:rounded-panel md:px-14 md:py-12">
     <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-[minmax(0,1fr)_auto_auto_auto_auto] lg:gap-x-12">

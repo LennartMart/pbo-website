@@ -23,12 +23,14 @@ const toernooien = defineCollection({
   }),
 });
 
+const categorie = z.enum(['minibad', 'u11', 'u13', 'u15', 'u17-u19']);
+
 const rankings = defineCollection({
   loader: glob({ pattern: '**/*.yaml', base: './src/content/rankings' }),
   schema: z.object({
     toernooi: reference('toernooien'),
-    categorie: z.enum(['minibad', 'u11', 'u13', 'u15', 'u17-u19']),
-    discipline: z.enum(['enkel', 'dubbel', 'gemengd']),
+    categorie,
+    geslacht: z.enum(['jongens', 'meisjes']),
     stand: z.string(),
     pdf: z.string().optional(),
     /** Testdata: de ranking toont dan een melding. Op www.badminton-pbo.be verschijnt ze niet. */
@@ -38,6 +40,11 @@ const rankings = defineCollection({
 
 // Zonder bestand toont de site "Nog niet online".
 const document = z.object({ titel: z.string(), tekst: z.string().optional(), bestand: z.string().optional() });
+
+/** Geboortejaren van één categorie. Zonder `tot`: "of later". Decap schrijft een leeg getalveld als ''. */
+const jaren = z
+  .object({ van: z.number().int(), tot: z.preprocess((v) => (v === '' || v === null ? undefined : v), z.number().int().optional()) })
+  .refine((j) => j.tot === undefined || j.tot >= j.van, '"Tot en met" ligt voor "van"');
 
 /**
  * Vaste pagina's: titel, intro en de lopende tekst (Markdown) plus de lijsten die beheerders zelf aanpassen.
@@ -59,6 +66,10 @@ const paginas = defineCollection({
       trainers: z.array(z.object({ naam: z.string(), diploma: z.string() })).default([]),
       // jeugdcuptour
       archief: z.array(z.object({ label: z.string(), bestand: z.string() })).default([]),
+      /** Ingevuld voor één kalenderjaar; src/lib/jeugdcup.ts schuift ze op naar andere jaren. */
+      geboortejaren: z
+        .object({ jaar: z.number().int(), minibad: jaren, u11: jaren, u13: jaren, u15: jaren, 'u17-u19': jaren })
+        .optional(),
       // vacatures
       vacatures: z.array(z.object({ titel: z.string(), tekst: z.string() })).default([]),
     }),
@@ -80,4 +91,18 @@ const nieuws = defineCollection({
   }),
 });
 
-export const collections = { toernooien, rankings, paginas, nieuws };
+const https = z.url({ protocol: /^https$/ });
+
+/** Eén bestand (site.yaml): mailadressen, sociale media, sponsors en competitielinks. Gelezen via src/data/site.ts. */
+const instellingen = defineCollection({
+  loader: glob({ pattern: 'site.yaml', base: './src/content/instellingen' }),
+  schema: ({ image }) =>
+    z.object({
+      mail: z.object({ secretariaat: z.email(), jeugdcup: z.email(), recreanten: z.email(), voorzitter: z.email() }),
+      social: z.array(z.object({ naam: z.string(), link: https })).default([]),
+      sponsors: z.array(z.object({ naam: z.string(), link: https, logo: image() })).default([]),
+      competitie: z.object({ agenda: https, uitslagen: https }),
+    }),
+});
+
+export const collections = { toernooien, rankings, paginas, nieuws, instellingen };

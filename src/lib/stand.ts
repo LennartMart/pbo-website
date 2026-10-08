@@ -2,6 +2,7 @@
  * Zet een stand die uit Excel geplakt is om naar rijen.
  *
  * Verwachte kolommen (gescheiden door tabs, zoals Excel kopieert): positie, naam, club, punten.
+ * Getallen tussen club en totaal (lidnummer, punten per halte) worden genegeerd: zo mag de hele Excel-rij mee.
  * - Dubbel/gemengd per paar: "Jan Peeters / Tom Claes" in de naamkolom, of vier middenkolommen (naam, club, naam, club).
  * - Een lege positie (gedeelde plaats) neemt de positie van de vorige rij over.
  * - Regels zonder punten op het einde (koppen, lege regels) worden overgeslagen.
@@ -49,7 +50,7 @@ export function leesStand(tekst: string): Rij[] {
     const eerste = cellen[0].replace(/\.$/, '');
     const gedeeld = eerste === '' || eerste === '=';
     let pos = getal(eerste);
-    const midden = cellen.slice(pos !== undefined || gedeeld ? 1 : 0, -1).filter(Boolean);
+    const midden = cellen.slice(pos !== undefined || gedeeld ? 1 : 0, -1).filter((c) => c && getal(c) === undefined);
     if (!midden.length) continue;
     // Geen positiekolom: tel zelf. Lege positie: gedeelde plaats met de rij erboven.
     pos ??= gedeeld ? (rijen.at(-1)?.pos ?? 1) : rijen.length + 1;

@@ -24,21 +24,23 @@ src/content/
   nieuws/<slug>.md          title, date, category, excerpt, legacyUrl?
   toernooien/<datum>-<club>.yaml
                             date, club, hall?, prijsuitreiking?  (id = bestandsnaam, seizoen volgt uit de datum)
-  rankings/<toernooi-id>/<categorie>-<discipline>.yaml
-                            toernooi, categorie, discipline, stand (geplakt uit Excel), pdf?
+  rankings/<toernooi-id>/<categorie>-<geslacht>.yaml
+                            toernooi, categorie, geslacht (jongens/meisjes), stand (geplakt uit Excel), pdf?
   paginas/<pagina>.md       vaste pagina's: title, lead, description, lijsten (bestuur, documenten, ...) + lopende tekst
+  instellingen/site.yaml    mailadressen, sociale media, sponsors (lijst met logo), competitielinks
+                            (gelezen via src/data/site.ts; menu en Google-agenda blijven in de code)
 ```
 
-- Een ranking is de **tussenstand** na dat toernooi, zoals berekend in Excel. De site telt niets op: per categorie en discipline toont ze de stand van het laatste toernooi in dat kalenderjaar.
-- `stand` is tekst met tabs (rechtstreeks geplakt uit Excel): positie, naam, club, punten. Dubbel per paar mag als `naam / naam` of als vier middenkolommen (naam, club, naam, club). Parser: `src/lib/stand.ts`.
+- Een ranking is de **tussenstand** na dat toernooi, zoals berekend in Excel. De site telt niets op: per categorie, jongens en meisjes apart, toont ze de stand van het laatste toernooi in dat kalenderjaar.
+- `stand` is tekst met tabs (rechtstreeks geplakt uit Excel): positie, naam, club, punten. Getallen tussen club en totaal (lidnummer, punten per halte) negeert de parser, dus de hele Excel-rij mag mee. Parser: `src/lib/stand.ts`.
 - Optioneel een pdf van de stand (`pdf`), getoond als downloadlink naast de tabel.
 - Decap-config wordt bij de build gegenereerd uit `src/lib/cms.ts` (`/admin/config.yml`, `/admin/jeugdcup/config.yml`). Velden daar en in `src/content.config.ts` gelijk houden. Handleiding: `docs/beheer.md`.
 - Markdown draait op Sätteri (Astro 7). `src/lib/markdown-basis.mjs` zet het basispad voor interne links in Markdown.
 
 - Nieuwscategorieën: `jeugd`, `selectie`, `evenement` (+ eventueel `competitie`, `recreanten`; WordPress-categorieën nog mappen)
 - Categorieën jeugdcup: `minibad`, `u11`, `u13`, `u15`, `u17-u19`
-- Disciplines: `enkel`, `dubbel`, `gemengd`
-- Geboortejaren kalenderjaar 2026: Minibad 2017 of later, U11 2016, U13 2014–2015, U15 2012–2013, U17+U19 2008–2011
+- Ranking per categorie, apart voor `jongens` en `meisjes` (zo staat het in de Excel van de jeugdcup; geen aparte stand per discipline). Tien standen per halte.
+- Geboortejaren kalenderjaar 2026: Minibad 2017 of later, U11 2016, U13 2014–2015, U15 2012–2013, U17+U19 2008–2011. Staan in `paginas/jeugdcuptour.md` (`geboortejaren`, voor één jaar ingevuld); `src/lib/jeugdcup.ts` schuift ze op naar andere jaren.
 - Ranking loopt per **kalenderjaar**, niet per seizoen
 
 ## Routes
@@ -117,7 +119,7 @@ De ontwerpen gebruiken nog voorlopige kleuren (donkerblauw). De site gebruikt de
 ## Beslissingen (oktober 2026)
 
 - Ranking: tabel uit data, met optionele pdf per stand. Archief 2011–2025 blijft pdf.
-- Aanlevering: tussenstand uit Excel plakken (positie, naam, club, punten).
+- Aanlevering: tussenstand uit Excel plakken (positie, naam, club, punten), per categorie voor jongens en meisjes.
 - Login: GitHub-account voor iedereen. Gewone users publiceren rechtstreeks, zonder goedkeuring (geen editorial workflow). Het team is klein en niet technisch: geen complexe flows.
 - Meerdere beheerders met dezelfde rechten beheren nieuws en vaste pagina's.
 - Recreanten & G-sport: inhoud van de huidige site, herschreven.

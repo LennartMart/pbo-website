@@ -9,10 +9,10 @@ import {
   bewegingen,
   categorieen,
   categorieLabel,
-  disciplineLabel,
-  disciplines,
   geboortejaren,
   geboortejarenKort,
+  geslachtLabel,
+  geslachten,
   type Beweging as BewegingType,
   type Stand,
   type Toernooi,
@@ -24,7 +24,7 @@ import { dag, maand } from '../lib/datum';
 interface Props {
   jaar: number;
   per: Map<string, Stand>;
-  /** Stand van de halte ervoor, per categorie-discipline, voor de plaatswinst. */
+  /** Stand van de halte ervoor, per categorie-geslacht, voor de plaatswinst. */
   vorige: Map<string, Stand>;
   laatste: Toernooi;
   voorbeeld: boolean;
@@ -45,18 +45,16 @@ const anderen = [
 ];
 
 const datum = (iso: string) => `${dag(iso)} ${maand(iso)}`;
-const soort = (disc: string) => (disc === 'enkel' ? 'spelers' : 'paren');
-const isPaar = (disc: string) => disc !== 'enkel';
 
 // Eerste combinatie met data als startpunt (zonder JavaScript zie je alles onder elkaar).
-const eerste = categorieen.flatMap((c) => disciplines.map((d) => `${c.id}-${d.id}`)).find((k) => per.has(k));
+const eerste = categorieen.flatMap((c) => geslachten.map((g) => `${c.id}-${g.id}`)).find((k) => per.has(k));
 
 // Bewegingen per stand, en een kaart per speler voor het zoeken (naam + club).
 const beweging = new Map([...per].map(([k, s]) => [k, bewegingen(s, vorige.get(k))]));
 interface Lijn {
   key: string;
   cat: string;
-  disc: string;
+  geslacht: string;
   rij: number;
   pos: number;
   punten: number;
@@ -65,8 +63,8 @@ interface Lijn {
 }
 const spelers = new Map<string, { naam: string; club?: string; lijnen: Lijn[] }>();
 for (const c of categorieen) {
-  for (const d of disciplines) {
-    const key = `${c.id}-${d.id}`;
+  for (const g of geslachten) {
+    const key = `${c.id}-${g.id}`;
     const s = per.get(key);
     if (!s) continue;
     s.rijen.forEach((r, i) => {
@@ -76,7 +74,7 @@ for (const c of categorieen) {
         kaart.lijnen.push({
           key,
           cat: c.id,
-          disc: d.id,
+          geslacht: g.id,
           rij: i,
           pos: r.pos,
           punten: r.punten,
@@ -135,7 +133,7 @@ const segment =
     <p id="zoek-uitleg" class="mt-2 text-[15px] text-muted">Zoekt in alle categorieën van {jaar}.</p>
   </div>
 
-  <!-- Zoekresultaten: één kaart per speler, met elke discipline waarin die in de stand staat. -->
+  <!-- Zoekresultaten: één kaart per speler, met elke stand waarin die staat. -->
   <div data-resultaten hidden class="mt-6">
     <h2 class="sr-only">Zoekresultaten</h2>
     <div class="mb-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 px-2 md:px-0">
@@ -161,7 +159,7 @@ const segment =
                     </span>
                     <span class="min-w-0 flex-1">
                       <span class="block font-semibold">
-                        {categorieLabel(l.cat)} · {disciplineLabel(l.disc)}
+                        {categorieLabel(l.cat)} · {geslachtLabel(l.geslacht)}
                       </span>
                       <span class="block text-sm text-muted">
                         {toonPunten(l.punten)} punten{l.partners.length > 0 && ` · met ${l.partners.join(' en ')}`}
@@ -201,7 +199,7 @@ const segment =
   </div>
 </section>
 
-<!-- Stand per categorie en discipline. De filterbalk blijft bovenaan staan tijdens het scrollen. -->
+<!-- Stand per categorie, jongens en meisjes apart. De filterbalk blijft bovenaan staan tijdens het scrollen. -->
 <section class="group/bord wrap mt-6 md:mt-10" data-bord data-start={eerste}>
   <div data-filterstart aria-hidden="true"></div>
   <div
@@ -222,11 +220,11 @@ const segment =
         ))
       }
     </div>
-    <div class="grid grid-cols-3 gap-1 rounded-full bg-wash p-1 sm:max-w-[420px] lg:w-[360px] lg:shrink-0" role="group" aria-label="Discipline">
+    <div class="grid grid-cols-2 gap-1 rounded-full bg-wash p-1 sm:max-w-[420px] lg:w-[320px] lg:shrink-0" role="group" aria-label="Jongens of meisjes">
       {
-        disciplines.map((d) => (
-          <button type="button" class={segment} data-disc={d.id} aria-pressed="false">
-            <span class="text-[15px] font-semibold">{d.label}</span>
+        geslachten.map((g) => (
+          <button type="button" class={segment} data-geslacht={g.id} aria-pressed="false">
+            <span class="text-[15px] font-semibold">{g.label}</span>
             <span class="text-xs opacity-80" data-aantal-label />
           </button>
         ))
@@ -238,17 +236,17 @@ const segment =
   <div class="mt-4 flex flex-col gap-12 md:mt-6">
     {
       categorieen.map((c) =>
-        disciplines.map((d) => {
-          const key = `${c.id}-${d.id}`;
+        geslachten.map((g) => {
+          const key = `${c.id}-${g.id}`;
           const s = per.get(key);
           if (!s)
             return (
-              <div data-stand={key} data-aantal="0" data-soort={soort(d.id)} class="scroll-mt-40">
+              <div data-stand={key} data-aantal="0" class="scroll-mt-40">
                 <h2 class="px-2 text-[22px] leading-tight font-bold md:px-1 md:text-[26px]">
-                  {c.label} · {d.label}
+                  {c.label} · {g.label}
                 </h2>
                 <p class="mt-3 rounded-card bg-paper p-6 leading-normal text-muted md:p-8">
-                  Nog geen stand voor {c.label} {d.label.toLowerCase()} in {jaar}.
+                  Nog geen stand voor {c.label} {g.id} in {jaar}.
                   {volgende && ` De volgende stand komt na ${volgende.club} op ${datum(volgende.date)}.`}
                 </p>
               </div>
@@ -257,20 +255,20 @@ const segment =
           const rest = s.rijen.slice(podium.length);
           const bew = beweging.get(key)!;
           return (
-            <div data-stand={key} data-aantal={s.rijen.length} data-soort={soort(d.id)} class="scroll-mt-40">
+            <div data-stand={key} data-aantal={s.rijen.length} class="scroll-mt-40">
               <div class="px-2 md:px-1 max-md:group-data-js/bord:sr-only">
                 <h2 id={`stand-${key}`} class="text-[22px] leading-tight font-bold md:text-[26px]">
-                  {c.label} · {d.label}
+                  {c.label} · {g.label}
                 </h2>
                 <p class="mt-1 text-[15px] text-muted">
-                  Geboren in {geboortejaren(c.id, jaar)} · {s.rijen.length} {soort(d.id)}
+                  Geboren in {geboortejaren(c.id, jaar)} · {s.rijen.length} {s.rijen.length === 1 ? 'speler' : 'spelers'}
                   {/* Enkel vermelden als deze stand van een andere halte is dan de rest (bovenaan de pagina). */}
                   {s.toernooi.id !== laatste.id && ` · stand na ${s.toernooi.club}, ${datum(s.toernooi.date)}`}
                 </p>
               </div>
 
               <div class="mx-auto mt-4 max-w-[680px] md:mt-5">
-              <ol class="grid grid-cols-3 items-end gap-2 md:gap-4" aria-label={`Podium ${c.label} ${d.label.toLowerCase()}`}>
+              <ol class="grid grid-cols-3 items-end gap-2 md:gap-4" aria-label={`Podium ${c.label} ${g.id}`}>
                 {podium.map((r, i) => (
                   <li class:list={['flex scroll-mt-48 flex-col rounded-[20px] transition-colors data-uitgelicht:bg-accent-soft', podiumStijl[i].order]} data-rij={i} tabindex="-1">
                     <div class="px-1 pt-2 pb-2.5 text-center">
@@ -297,12 +295,12 @@ const segment =
                 <div class="mt-4 rounded-card bg-paper p-2 md:p-3">
                   <table class="w-full text-left">
                     <caption class="sr-only">
-                      {c.label} {d.label.toLowerCase()}, plaats {rest[0].pos} en verder, na {s.toernooi.club}, {jaar}
+                      {c.label} {g.id}, plaats {rest[0].pos} en verder, na {s.toernooi.club}, {jaar}
                     </caption>
                     <thead>
                       <tr class="label text-muted">
                         <th scope="col" class="w-12 px-3 pt-3 pb-3 font-semibold md:w-16 md:px-5">#</th>
-                        <th scope="col" class="px-3 pt-3 pb-3 font-semibold md:px-5">{isPaar(d.id) ? 'Paar' : 'Speler'}</th>
+                        <th scope="col" class="px-3 pt-3 pb-3 font-semibold md:px-5">Speler</th>
                         <th scope="col" class="hidden px-5 pt-3 pb-3 font-semibold sm:table-cell">Club</th>
                         <th scope="col" class="w-20 px-3 pt-3 pb-3 text-right font-semibold md:w-24 md:px-5">Punten</th>
                         {metBeweging(key) && (
@@ -393,76 +391,75 @@ const segment =
     const standen = [...bord.querySelectorAll<HTMLElement>('[data-stand]')];
     const kaarten = [...resultaten.querySelectorAll<HTMLElement>('[data-kaart]')];
     const catKnoppen = [...filters.querySelectorAll<HTMLButtonElement>('[data-cat]')];
-    const discKnoppen = [...filters.querySelectorAll<HTMLButtonElement>('[data-disc]')];
-    const stand = (cat: string, disc: string) => standen.find((s) => s.dataset.stand === `${cat}-${disc}`);
-    const aantal = (cat: string, disc: string) => Number(stand(cat, disc)?.dataset.aantal ?? 0);
+    const geslachtKnoppen = [...filters.querySelectorAll<HTMLButtonElement>('[data-geslacht]')];
+    const stand = (cat: string, geslacht: string) => standen.find((s) => s.dataset.stand === `${cat}-${geslacht}`);
+    const aantal = (cat: string, geslacht: string) => Number(stand(cat, geslacht)?.dataset.aantal ?? 0);
     const rustig = matchMedia('(prefers-reduced-motion: reduce)').matches;
     const SLEUTEL = 'pbo-ranking-keuze';
 
-    // Startkeuze: link (?cat=&disc=) > vorige keer op dit toestel > eerste stand met data.
+    // Startkeuze: link (?cat=&geslacht=) > vorige keer op dit toestel > eerste stand met data.
     const params = new URLSearchParams(location.search);
-    let bewaard: { cat?: string; disc?: string } = {};
+    let bewaard: { cat?: string; geslacht?: string } = {};
     try {
       bewaard = JSON.parse(localStorage.getItem(SLEUTEL) ?? '{}');
     } catch {}
-    const [startCat, startDisc] = (bord.dataset.start ?? 'u13-enkel').split(/-(?=enkel|dubbel|gemengd)/);
-    const geldig = (cat?: string | null, disc?: string | null) => !!cat && !!disc && !!stand(cat, disc);
-    let [cat, disc] = geldig(params.get('cat'), params.get('disc'))
-      ? [params.get('cat')!, params.get('disc')!]
-      : geldig(bewaard.cat, bewaard.disc)
-        ? [bewaard.cat!, bewaard.disc!]
-        : [startCat, startDisc];
+    const [startCat, startGeslacht] = (bord.dataset.start ?? 'u13-jongens').split(/-(?=jongens|meisjes)/);
+    const geldig = (cat?: string | null, geslacht?: string | null) => !!cat && !!geslacht && !!stand(cat, geslacht);
+    let [cat, geslacht] = geldig(params.get('cat'), params.get('geslacht'))
+      ? [params.get('cat')!, params.get('geslacht')!]
+      : geldig(bewaard.cat, bewaard.geslacht)
+        ? [bewaard.cat!, bewaard.geslacht!]
+        : [startCat, startGeslacht];
 
-    /** Bij een andere categorie: blijf bij dezelfde discipline als die een stand heeft, anders de eerste die er een heeft. */
+    /** Bij een andere categorie: blijf bij jongens of meisjes als daar een stand is, anders het andere. */
     function kiesCategorie(nieuw: string) {
       cat = nieuw;
-      if (aantal(cat, disc) === 0) disc = discKnoppen.map((b) => b.dataset.disc!).find((d) => aantal(cat, d) > 0) ?? disc;
+      if (aantal(cat, geslacht) === 0) geslacht = geslachtKnoppen.map((b) => b.dataset.geslacht!).find((d) => aantal(cat, d) > 0) ?? geslacht;
     }
 
     function toonBord() {
       catKnoppen.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.cat === cat)));
-      for (const b of discKnoppen) {
-        const d = b.dataset.disc!;
+      for (const b of geslachtKnoppen) {
+        const d = b.dataset.geslacht!;
         const n = aantal(cat, d);
-        const soort = stand(cat, d)?.dataset.soort ?? 'spelers';
-        b.setAttribute('aria-pressed', String(d === disc));
-        b.disabled = n === 0 && d !== disc;
-        b.querySelector('[data-aantal-label]')!.textContent = n === 0 ? 'nog geen stand' : `${n} ${n === 1 ? (soort === 'paren' ? 'paar' : 'speler') : soort}`;
+        b.setAttribute('aria-pressed', String(d === geslacht));
+        b.disabled = n === 0 && d !== geslacht;
+        b.querySelector('[data-aantal-label]')!.textContent = n === 0 ? 'nog geen stand' : `${n} ${n === 1 ? 'speler' : 'spelers'}`;
       }
-      standen.forEach((s) => (s.hidden = s.dataset.stand !== `${cat}-${disc}`));
+      standen.forEach((s) => (s.hidden = s.dataset.stand !== `${cat}-${geslacht}`));
       standen.forEach((s) => s.querySelectorAll('[data-uitgelicht]').forEach((el) => el.removeAttribute('data-uitgelicht')));
     }
 
     function bewaar() {
       const url = new URL(location.href);
       url.searchParams.set('cat', cat);
-      url.searchParams.set('disc', disc);
+      url.searchParams.set('geslacht', geslacht);
       url.searchParams.delete('q');
       history.replaceState(null, '', url);
       try {
-        localStorage.setItem(SLEUTEL, JSON.stringify({ cat, disc }));
+        localStorage.setItem(SLEUTEL, JSON.stringify({ cat, geslacht }));
       } catch {}
     }
 
     /** Na een keuze: staat de stand niet (helemaal) in beeld, scroll dan tot net onder de filterbalk. */
     function brengInBeeld() {
       const vast = filterstart!.getBoundingClientRect().top < 0;
-      const bordTop = stand(cat, disc)?.getBoundingClientRect().top ?? 0;
+      const bordTop = stand(cat, geslacht)?.getBoundingClientRect().top ?? 0;
       if (vast || bordTop > innerHeight - 160) filterstart!.scrollIntoView({ behavior: rustig ? 'auto' : 'smooth', block: 'start' });
     }
 
     function kondig() {
-      const s = stand(cat, disc);
+      const s = stand(cat, geslacht);
       const n = Number(s?.dataset.aantal ?? 0);
-      const naam = `${catKnoppen.find((b) => b.dataset.cat === cat)?.querySelector('span')?.textContent} ${disc}`;
-      bordstatus!.textContent = n === 0 ? `${naam}: nog geen stand.` : `${naam}: ${n} ${s?.dataset.soort}.`;
+      const naam = `${catKnoppen.find((b) => b.dataset.cat === cat)?.querySelector('span')?.textContent} ${geslacht}`;
+      bordstatus!.textContent = n === 0 ? `${naam}: nog geen stand.` : `${naam}: ${n} ${n === 1 ? 'speler' : 'spelers'}.`;
     }
 
     filters.addEventListener('click', (e) => {
       const b = (e.target as HTMLElement).closest<HTMLButtonElement>('button');
       if (!b || b.disabled) return;
       if (b.dataset.cat) kiesCategorie(b.dataset.cat);
-      if (b.dataset.disc) disc = b.dataset.disc;
+      if (b.dataset.geslacht) geslacht = b.dataset.geslacht;
       toonBord();
       bewaar();
       kondig();
@@ -493,7 +490,7 @@ const segment =
       niets!.hidden = gevonden > 0;
       status!.textContent = gevonden === 0 ? `Niemand gevonden voor "${q}".` : `${gevonden} ${gevonden === 1 ? 'speler' : 'spelers'} gevonden voor "${q}"`;
       const onderwerp = mailKnop!.dataset.onderwerp ?? '';
-      mailKnop!.href = `mailto:${mailKnop!.href.replace(/^mailto:/, '').split('?')[0]}?subject=${encodeURIComponent(onderwerp)}&body=${encodeURIComponent(`Naam: ${q}\nClub:\nCategorie en discipline:\nGespeeld op (halte):\n`)}`;
+      mailKnop!.href = `mailto:${mailKnop!.href.replace(/^mailto:/, '').split('?')[0]}?subject=${encodeURIComponent(onderwerp)}&body=${encodeURIComponent(`Naam: ${q}\nClub:\nCategorie:\nGespeeld op (halte):\n`)}`;
     }
 
     let wacht: number | undefined;
@@ -525,13 +522,13 @@ const segment =
     resultaten.addEventListener('click', (e) => {
       const b = (e.target as HTMLElement).closest<HTMLButtonElement>('[data-naar]');
       if (!b) return;
-      [cat, disc] = b.dataset.naar!.split(/-(?=enkel|dubbel|gemengd)/);
+      [cat, geslacht] = b.dataset.naar!.split(/-(?=jongens|meisjes)/);
       zoek.value = '';
       zoekNu();
       toonBord();
       bewaar();
       kondig();
-      const rij = stand(cat, disc)?.querySelector<HTMLElement>(`[data-rij="${b.dataset.rij}"]`);
+      const rij = stand(cat, geslacht)?.querySelector<HTMLElement>(`[data-rij="${b.dataset.rij}"]`);
       if (rij) {
         rij.setAttribute('data-uitgelicht', '');
         rij.scrollIntoView({ behavior: rustig ? 'auto' : 'smooth', block: 'center' });

@@ -1,3 +1,5 @@
+import { getEntry } from 'astro:content';
+
 /** Hoofdmenu. Vacatures staat onder Bestuur en in de footer. */
 export const nav = [
   { href: '/jeugd/jeugdcuptour', label: 'Jeugdcuptour' },
@@ -8,29 +10,23 @@ export const nav = [
   { href: '/bestuur', label: 'Bestuur' },
 ];
 
-export const mail = {
-  secretariaat: 'secretariaat@badminton-pbo.be',
-  jeugdcup: 'jeugdcup@badminton-pbo.be',
-  recreanten: 'recreanten@badminton-pbo.be',
-  voorzitter: 'voorzitter@badminton-pbo.be',
-};
+/**
+ * Mailadressen, sociale media, sponsors en competitielinks. Beheerders passen ze aan in /admin → Site-instellingen
+ * (src/content/instellingen/site.yaml).
+ */
+const instellingen = await getEntry('instellingen', 'site');
+if (!instellingen) throw new Error('src/content/instellingen/site.yaml ontbreekt');
 
-export const social = [
-  { href: 'https://www.facebook.com/PBO.Badminton', label: 'Facebook', short: 'Facebook' },
-  { href: 'https://www.instagram.com/pbobadminton/', label: 'Instagram', short: 'Instagram' },
-  { href: 'https://twitter.com/pbo_badm', label: 'X / Twitter', short: 'X' },
-];
+export const { mail, social, sponsors } = instellingen.data;
 
 /** Enkel de agenda van de PBO-competitie-app is nog in gebruik. */
-export const competitieAgenda = 'https://competitie.badminton-pbo.be/agenda/';
+export const competitieAgenda = instellingen.data.competitie.agenda;
 
 export const badmintonVlaanderen = {
   home: 'https://www.badmintonvlaanderen.be/',
-  competitie: 'https://www.badmintonvlaanderen.be/sport/league?id=C3B7B9D5-902B-40B8-939B-30A14C01F5AC',
+  competitie: instellingen.data.competitie.uitslagen,
   ipjo: 'https://badminton.vlaanderen/ipjo/',
 };
-
-export const sponsor = { name: 'Mobi-sports', href: 'https://mobi-sports.be/' };
 
 /** Google Calendar met alle PBO-agenda's (zelfde bronnen als op de oude site). */
 export const pboKalenderEmbed =

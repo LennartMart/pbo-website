@@ -7,7 +7,7 @@ De site haalt alles uit bestanden in deze GitHub-repo. Wie iets aanpast in `/adm
 | Wie | Adres | Wat |
 |---|---|---|
 | Gewone user (jeugdcup) | `https://www.badminton-pbo.be/admin/jeugdcup/` | Enkel standen van de jeugdcuptour toevoegen en aanpassen |
-| Beheerder | `https://www.badminton-pbo.be/admin/` | Rankings, jeugdcupkalender, nieuws, vaste pagina's |
+| Beheerder | `https://www.badminton-pbo.be/admin/` | Rankings, jeugdcupkalender, nieuws, vaste pagina's, site-instellingen |
 
 Iedereen logt in met een eigen GitHub-account. Dat account heeft schrijfrechten op de repo nodig: een beheerder nodigt het uit via GitHub → `LennartMart/pbo-website` → Settings → Collaborators → Add people (rol **Write**).
 
@@ -17,15 +17,15 @@ Let op: GitHub kent geen rechten per map. Een gewone user ziet in `/admin/jeugdc
 
 1. Ga naar `/admin/jeugdcup/` en log in met GitHub.
 2. Klik op **+ stand**.
-3. Kies het toernooi, de categorie en de discipline.
-4. Selecteer in Excel de kolommen **positie, naam, club, punten** (de kopregel mag mee). Kopieer en plak ze in **Stand plakken**.
-   - Dubbel of gemengd: zet het paar in één naamkolom als `Jan Peeters / Tom Claes`, of gebruik vier kolommen (naam, club, naam, club).
+3. Kies het toernooi, de categorie en jongens of meisjes.
+4. Selecteer in Excel de rijen van de stand, van de eerste tot de laatste speler (de kopregel mag mee). Kopieer en plak ze in **Stand plakken**.
+   - Lidnummers en punten per halte mogen mee: de site neemt positie, naam, club en het totaal in de laatste kolom.
    - Een gedeelde plaats: laat de positie leeg, dan krijgt de speler de positie van de rij erboven.
 5. Rechts zie je meteen de tabel zoals ze op de site komt. Klopt het aantal rijen?
 6. Optioneel: voeg de pdf toe.
-7. Klik **Publiceer → Publiceer nu**. Herhaal voor de andere categorieën en disciplines (tip: **Publiceer en dupliceer item** houdt het toernooi al ingevuld).
+7. Klik **Publiceer → Publiceer nu**. Herhaal voor de andere categorieën, jongens en meisjes: tien standen per halte (tip: **Publiceer en dupliceer item** houdt het toernooi al ingevuld).
 
-De site toont per categorie en discipline altijd de stand van het laatste toernooi in dat kalenderjaar. Een fout verbeteren: open de stand, pas aan en publiceer opnieuw.
+De site toont per categorie, jongens en meisjes apart, altijd de stand van het laatste toernooi in dat kalenderjaar. Een fout verbeteren: open de stand, pas aan en publiceer opnieuw.
 
 ## Jeugdcupkalender (beheerders)
 
@@ -36,6 +36,19 @@ Een halte die al standen heeft niet verwijderen of hernoemen: de standen verwijz
 ## Vaste pagina's (beheerders)
 
 **Vaste pagina's** bevat per pagina de titel, de intro, de lopende tekst en de lijsten: bestuursleden met foto, medewerkers, provinciale bijdrage, documenten, trainers, vacatures, reglement en archief van de jeugdcuptour. De opmaak eromheen (kaarten, knoppen, kalender) zit in de code.
+
+Bij **Jeugdcuptour** staan ook de **geboortejaren per categorie**. Ze komen in de tabel "Categorieën" en bij de filters van de ranking. Vul ze in voor één kalenderjaar, bijvoorbeeld 2026: U13 van 2014 tot en met 2015. Het jaar erna schuift de site ze zelf op (U13 in 2027: 2015 en 2016). Enkel aanpassen als de leeftijdsgrenzen veranderen. Minibad heeft geen "tot en met": leeg betekent "of later". De categorieën zelf (Minibad, U11, ...) zitten in de code, want de standen verwijzen ernaar.
+
+## Site-instellingen (beheerders)
+
+**Site-instellingen → Contact, sponsors en links**:
+
+- **Mailadressen** van secretariaat, jeugdcup, recreanten en voorzitter. Ze staan in de footer en op elke pagina die naar contact verwijst (ranking, kalender, competitie, ...).
+- **Sociale media** onder "Volg ons" in de footer.
+- **Sponsors** boven de footer: naam, website en logo. Eén sponsor krijgt een groot logo, meerdere staan naast elkaar. Zonder sponsors verdwijnt het blok.
+- **Competitie**: de links naar de competitieagenda en naar uitslagen en standen bij Badminton Vlaanderen.
+
+Links beginnen altijd met `https://`. Het hoofdmenu, de vaste footerlinks (Bestuur, Vacatures, PBO-kalender) en de Google-agenda zitten in de code.
 
 ## Eenmalig instellen: login met GitHub
 

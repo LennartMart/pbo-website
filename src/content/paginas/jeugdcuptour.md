@@ -54,6 +54,22 @@ archief:
     bestand: /wp-content/uploads/2013/05/Jeugdcupranking-2012-2013-na-Pluimplukkers-dubbel-en-gemengd.pdf
   - label: Eindstand 2011-2012
     bestand: /pbo/wp/wp-content/uploads/2012/05/Ranking-Jeugdcup-2011-2012-na-Pluimplukkers.pdf
+geboortejaren:
+  jaar: 2026
+  minibad:
+    van: 2017
+  u11:
+    van: 2016
+    tot: 2016
+  u13:
+    van: 2014
+    tot: 2015
+  u15:
+    van: 2012
+    tot: 2013
+  u17-u19:
+    van: 2008
+    tot: 2011
 ---
 
 ## Zo werkt het
@@ -65,7 +81,7 @@ De jeugdcuptour is een reeks recreatieve jeugdtoernooien in Oost-Vlaanderen, van
 - PBO organiseert de toernooien samen met de clubs, in enkel, dubbel en gemengd.
 - Welke disciplines er zijn, lees je bij de inschrijving. Zijn er meer dan twee, dan schrijf je je voor maximaal twee in.
 - Is de inschrijving voor een halte open, dan staat de link bij die halte in de [kalender](/jeugd/jeugdcuptour/kalender).
-- De ranking loopt per kalenderjaar. Zo is er per reeks een winnaar.
+- De ranking loopt per kalenderjaar, per categorie apart voor jongens en meisjes. Zo is er per reeks een winnaar.
 
 ## Vragen of een fout gezien?
 

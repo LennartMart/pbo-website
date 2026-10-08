@@ -41,10 +41,11 @@ const catZin = `${catNamen.slice(0, -1).join(', ')} of ${catNamen.at(-1)}`;
           uitgelicht && (
             <a
               href={u(`/nieuws/${uitgelicht.id}`)}
-              class="mb-5 inline-flex min-h-11 items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-[13px] font-medium transition-colors hover:bg-white/15 md:mb-6 md:text-sm"
+              class="group mb-5 inline-flex min-h-11 items-center gap-3 rounded-full border border-white/20 bg-white/10 py-1.5 pr-4 pl-1.5 text-sm font-semibold transition-colors hover:border-white/35 hover:bg-white/15 md:mb-6 md:text-[15px]"
             >
-              {uitgelicht.data.kort ?? uitgelicht.data.title}
-              <Icon name="pijl" size={16} stroke={2} class="shrink-0" />
+              <span class="shrink-0 rounded-full bg-accent px-3 py-1 text-xs font-bold tracking-[0.06em] text-ink uppercase">Nieuws</span>
+              <span class="min-w-0">{uitgelicht.data.kort ?? uitgelicht.data.title}</span>
+              <Icon name="pijl" size={16} stroke={2} class="shrink-0 transition-transform group-hover:translate-x-0.5" />
             </a>
           )
         }

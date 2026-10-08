@@ -7,7 +7,7 @@
  *
  * Velden moeten overeenkomen met src/content.config.ts.
  */
-import { categorieen, disciplines } from './jeugdcup-labels';
+import { categorieen, geslachten } from './jeugdcup-labels';
 import { nieuwsCategorieen } from './nieuws-labels';
 import { alleToernooien, type Toernooi } from './jeugdcup';
 import { lang, vandaag } from './datum';
@@ -67,7 +67,7 @@ export const rankingsCollectie = async () => ({
   label: 'Jeugdcup-rankings',
   label_singular: 'stand',
   description:
-    'Na elke jeugdcup: kies het toernooi, de categorie en de discipline, plak de stand uit Excel en klik op Publiceren. Een paar minuten later staat ze op de site.',
+    'Na elke jeugdcup: kies het toernooi, de categorie en jongens of meisjes, plak de stand uit Excel en klik op Publiceren. Een paar minuten later staat ze op de site.',
   folder: 'src/content/rankings',
   extension: 'yaml',
   format: 'yaml',
@@ -75,9 +75,9 @@ export const rankingsCollectie = async () => ({
   delete: true,
   identifier_field: 'toernooi',
   // Zonder 'fields.': Decap maakt van elke punt in path een streepje.
-  path: '{{toernooi}}/{{categorie}}-{{discipline}}',
-  summary: '{{toernooi}} · {{categorie}} {{discipline}}',
-  sortable_fields: ['toernooi', 'categorie', 'discipline'],
+  path: '{{toernooi}}/{{categorie}}-{{geslacht}}',
+  summary: '{{toernooi}} · {{categorie}} {{geslacht}}',
+  sortable_fields: ['toernooi', 'categorie', 'geslacht'],
   view_groups: [{ label: 'Toernooi', field: 'toernooi' }],
   view_filters: categorieen.map((c) => ({ label: c.label, field: 'categorie', pattern: c.id })),
   fields: [
@@ -89,12 +89,12 @@ export const rankingsCollectie = async () => ({
       hint: 'De stand na dit toernooi. Staat het er niet bij? Dan staat het nog niet op de kalender: vraag het aan een beheerder.',
     },
     { label: '2. Categorie', name: 'categorie', widget: 'select', options: opties(categorieen) },
-    { label: '3. Discipline', name: 'discipline', widget: 'select', options: opties(disciplines) },
+    { label: '3. Jongens of meisjes', name: 'geslacht', widget: 'select', options: opties(geslachten) },
     {
       label: '4. Stand plakken',
       name: 'stand',
       widget: 'text',
-      hint: 'Selecteer in Excel de kolommen positie, naam, club en punten. Kopieer en plak ze hier. Bij dubbel: "naam / naam" in één kolom, of naam, club, naam, club. Rechts zie je hoe het op de site komt.',
+      hint: 'Selecteer in Excel de rijen van de stand, van de eerste tot de laatste speler, en plak ze hier. Lidnummers en punten per halte mogen mee: de site neemt positie, naam, club en het totaal in de laatste kolom. Rechts zie je hoe het op de site komt.',
     },
     {
       label: 'Pdf van de stand',
@@ -229,6 +229,24 @@ const paginasCollectie = {
           hint: 'Nieuwste eerst, bv. "Eindstand 2025".',
           fields: [{ label: 'Naam', name: 'label', widget: 'string' }, { ...bestand('Pdf'), required: true }],
         },
+        {
+          label: 'Geboortejaren per categorie',
+          name: 'geboortejaren',
+          widget: 'object',
+          hint: 'Voor de tabel "Categorieën" en de filters bij de ranking. Vul ze in voor één kalenderjaar: de jaren erna schuift de site zelf op.',
+          fields: [
+            { label: 'Kalenderjaar', name: 'jaar', widget: 'number', value_type: 'int', hint: 'Het jaar waarin de geboortejaren hieronder gelden, bv. 2026.' },
+            ...categorieen.map((c) => ({
+              label: c.label,
+              name: c.id,
+              widget: 'object',
+              fields: [
+                { label: 'Geboren van', name: 'van', widget: 'number', value_type: 'int' },
+                { label: 'Tot en met', name: 'tot', widget: 'number', value_type: 'int', required: false, hint: 'Leeg = "of later" (Minibad). Eén jaar: twee keer hetzelfde.' },
+              ],
+            })),
+          ],
+        },
       ],
     },
     {
@@ -278,7 +296,7 @@ const nieuwsCollectie = {
   delete: true,
   slug: '{{title}}',
   summary: '{{date}} · {{title}}',
-  sortable_fields: ['date', 'title'],
+  sortable_fields: [{ field: 'date', default_sort: 'desc' }, 'title'],
   view_filters: nieuwsCategorieen.map((c) => ({ label: c.label, field: 'category', pattern: c.id })),
   view_groups: [{ label: 'Jaar', field: 'date', pattern: '\\d{4}' }],
   media_folder: '/public/uploads/nieuws',
@@ -295,8 +313,94 @@ const nieuwsCollectie = {
   ],
 };
 
+const https = { pattern: ['^https://\\S+$', 'Volledige link, beginnend met https://'] };
+const mailadres = (label: string, name: string) => ({
+  label,
+  name,
+  widget: 'string',
+  pattern: ['^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$', 'Geen geldig mailadres'],
+});
+
+/** Mailadressen, sociale media, sponsors en competitielinks. src/data/site.ts geeft ze door aan de pagina's. */
+const instellingenCollectie = {
+  name: 'instellingen',
+  label: 'Site-instellingen',
+  description: 'Mailadressen, sociale media, sponsors en competitielinks. Ze staan in de footer en op meerdere pagina\'s.',
+  editor: { preview: false },
+  files: [
+    {
+      label: 'Contact, sponsors en links',
+      name: 'site',
+      file: 'src/content/instellingen/site.yaml',
+      fields: [
+        {
+          label: 'Mailadressen',
+          name: 'mail',
+          widget: 'object',
+          hint: 'In de footer en op de pagina\'s waar we naar contact verwijzen.',
+          fields: [
+            mailadres('Secretariaat', 'secretariaat'),
+            mailadres('Jeugdcup', 'jeugdcup'),
+            mailadres('Recreanten & G-sport', 'recreanten'),
+            mailadres('Voorzitter', 'voorzitter'),
+          ],
+        },
+        {
+          label: 'Sociale media',
+          name: 'social',
+          widget: 'list',
+          required: false,
+          summary: '{{fields.naam}}',
+          hint: 'In de footer onder "Volg ons".',
+          fields: [
+            { label: 'Naam', name: 'naam', widget: 'string', hint: 'Zoals het in de footer komt, bv. "Instagram".' },
+            { label: 'Link', name: 'link', widget: 'string', ...https },
+          ],
+        },
+        {
+          label: 'Sponsors',
+          label_singular: 'sponsor',
+          name: 'sponsors',
+          widget: 'list',
+          required: false,
+          summary: '{{fields.naam}}',
+          hint: 'Boven de footer, onder "Met steun van". Eén sponsor krijgt een groot logo. Leeg = geen sponsorblok.',
+          fields: [
+            { label: 'Naam', name: 'naam', widget: 'string' },
+            { label: 'Website', name: 'link', widget: 'string', ...https },
+            {
+              label: 'Logo',
+              name: 'logo',
+              widget: 'image',
+              media_folder: '/src/assets/sponsors',
+              public_folder: '../../assets/sponsors',
+              choose_url: false,
+              hint: 'Png of jpg, minstens 800 px breed.',
+            },
+          ],
+        },
+        {
+          label: 'Competitie',
+          name: 'competitie',
+          widget: 'object',
+          fields: [
+            { label: 'Competitieagenda', name: 'agenda', widget: 'string', ...https },
+            { label: 'Uitslagen en standen bij Badminton Vlaanderen', name: 'uitslagen', widget: 'string', ...https },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 /** Collecties die enkel beheerders zien. */
-export const beheerCollecties = async (): Promise<object[]> => [nieuwsCollectie, await rankingsCollectie(), toernooienCollectie, paginasCollectie];
+export const beheerCollecties = async (): Promise<object[]> => [
+  nieuwsCollectie,
+  await rankingsCollectie(),
+  toernooienCollectie,
+  paginasCollectie,
+  instellingenCollectie,
+];
 
 export function cmsConfig({ site, collections }: { site: URL; collections: object[] }) {
   return {

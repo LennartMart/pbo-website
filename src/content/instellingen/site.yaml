@@ -1,0 +1,19 @@
+mail:
+  secretariaat: secretariaat@badminton-pbo.be
+  jeugdcup: jeugdcup@badminton-pbo.be
+  recreanten: recreanten@badminton-pbo.be
+  voorzitter: voorzitter@badminton-pbo.be
+social:
+  - naam: Facebook
+    link: https://www.facebook.com/PBO.Badminton
+  - naam: Instagram
+    link: https://www.instagram.com/pbobadminton/
+  - naam: X / Twitter
+    link: https://twitter.com/pbo_badm
+sponsors:
+  - naam: Mobi-sports
+    link: https://mobi-sports.be/
+    logo: ../../assets/sponsors/mobi-sports.png
+competitie:
+  agenda: https://competitie.badminton-pbo.be/agenda/
+  uitslagen: https://www.badmintonvlaanderen.be/sport/league?id=C3B7B9D5-902B-40B8-939B-30A14C01F5AC

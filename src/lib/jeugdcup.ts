@@ -1,9 +1,35 @@
-import { getCollection, type CollectionEntry } from 'astro:content';
+import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
 import { vandaag } from './datum';
 import { leesStand, type Rij } from './stand';
 
 export * from './jeugdcup-labels';
-import type { CategorieId, DisciplineId } from './jeugdcup-labels';
+import type { CategorieId, GeslachtId } from './jeugdcup-labels';
+
+/** Geboortejaren uit Vaste pagina's → Jeugdcuptour, ingevuld voor één kalenderjaar. */
+const indeling = (await getEntry('paginas', 'jeugdcuptour'))?.data.geboortejaren;
+if (!indeling) throw new Error('Geboortejaren ontbreken in src/content/paginas/jeugdcuptour.md');
+
+/** Andere jaren schuiven mee: U11 is in 2026 geboren in 2016, in 2027 in 2017. */
+const jarenIn = (id: CategorieId, jaar: number) => {
+  const { van, tot } = indeling[id];
+  const verschil = jaar - indeling.jaar;
+  return { van: van + verschil, tot: tot === undefined ? undefined : tot + verschil };
+};
+
+/** "2017 of later", "2016", "2014 en 2015", "2008 tot en met 2011". */
+export function geboortejaren(id: CategorieId, jaar: number) {
+  const { van, tot } = jarenIn(id, jaar);
+  if (tot === undefined) return `${van} of later`;
+  if (tot === van) return `${van}`;
+  return tot === van + 1 ? `${van} en ${tot}` : `${van} tot en met ${tot}`;
+}
+
+/** Korte vorm voor op een knop: "2017+", "2016", "2014–15", "2008–11". */
+export function geboortejarenKort(id: CategorieId, jaar: number) {
+  const { van, tot } = jarenIn(id, jaar);
+  if (tot === undefined) return `${van}+`;
+  return tot === van ? `${van}` : `${van}–${String(tot).slice(2)}`;
+}
 
 /** Seizoen loopt van augustus tot juli: 2026-09-26 hoort bij 2026-2027. */
 export const seizoenVan = (iso: string) => {
@@ -55,7 +81,7 @@ export interface Stand {
   id: string;
   toernooi: Toernooi;
   categorie: CategorieId;
-  discipline: DisciplineId;
+  geslacht: GeslachtId;
   rijen: Rij[];
   pdf?: string;
   voorbeeld: boolean;
@@ -78,7 +104,7 @@ export async function alleStanden(): Promise<Stand[]> {
       id: r.id,
       toernooi,
       categorie: r.data.categorie,
-      discipline: r.data.discipline,
+      geslacht: r.data.geslacht,
       rijen: leesStand(r.data.stand),
       pdf: r.data.pdf,
       voorbeeld: r.data.voorbeeld,
@@ -87,16 +113,16 @@ export async function alleStanden(): Promise<Stand[]> {
 }
 
 /**
- * Stand per kalenderjaar: per categorie en discipline de stand van het laatste toernooi in dat jaar.
+ * Stand per kalenderjaar: per categorie, jongens en meisjes apart, de stand van het laatste toernooi in dat jaar.
  * In Excel is de tussenstand al opgeteld; de site telt niets op.
  */
 export async function rankingPerJaar() {
-  // Per jaar en per categorie-discipline alle standen, oudste eerst.
+  // Per jaar en per categorie-geslacht alle standen, oudste eerst.
   const jaren = new Map<number, Map<string, Stand[]>>();
   for (const s of await alleStanden()) {
     const jaar = Number(s.toernooi.date.slice(0, 4));
     const per = jaren.get(jaar) ?? new Map<string, Stand[]>();
-    const key = `${s.categorie}-${s.discipline}`;
+    const key = `${s.categorie}-${s.geslacht}`;
     per.set(key, [...(per.get(key) ?? []), s].sort((a, b) => a.toernooi.date.localeCompare(b.toernooi.date)));
     jaren.set(jaar, per);
   }
