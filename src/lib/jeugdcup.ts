@@ -1,5 +1,5 @@
 import { getCollection, getEntry, type CollectionEntry } from 'astro:content';
-import { dag, maand, vandaag } from './datum';
+import { dag, maand, plusDagen, vandaag } from './datum';
 import { leesStand, type Rij } from './stand';
 
 export * from './jeugdcup-labels';
@@ -68,6 +68,32 @@ export function toernooiLink(t: Toernooi, nu = vandaag()) {
     return { href, label: `Inschrijven${tot}`, sr: `voor ${t.club}`, icon: 'inschrijven' } as const;
   }
   return { href, label: 'Wedstrijden', sr: `bij ${t.club}`, icon: 'klok' } as const;
+}
+
+/** Elke knop die toernooiLink vanaf vandaag nog geeft, met de dagen waarop hij klopt (voor Periode). */
+export function toernooiLinks(t: Toernooi, nu = vandaag()) {
+  if (!t.toernooilink) return [];
+  const wissels = [t.inschrijvenTot && plusDagen(t.inschrijvenTot, 1), t.date, plusDagen(t.date, 1)]
+    .filter((d): d is string => !!d && d > nu)
+    .sort((a, b) => a.localeCompare(b));
+  const fasen = [undefined, ...wissels]
+    .map((van) => ({ van, link: toernooiLink(t, van ?? nu)! }))
+    .filter((f, i, alle) => i === 0 || f.link.label !== alle[i - 1].link.label);
+  return fasen.map((f, i) => ({ ...f, tot: fasen[i + 1] && plusDagen(fasen[i + 1].van!, -1) }));
+}
+
+/**
+ * Een halte op de lijn door de tijd: later tot en met de vorige halte, dan de volgende tot en met haar speeldag,
+ * daarna gespeeld. Enkel wat vanaf vandaag nog kan, met de dagen voor Periode.
+ */
+export function statussen(t: Toernooi, vorige: Toernooi | undefined, nu = vandaag()) {
+  const fasen: { status: 'later' | 'volgende' | 'gespeeld'; van?: string; tot?: string }[] = [
+    ...(vorige ? [{ status: 'later', tot: vorige.date } as const] : []),
+    { status: 'volgende', van: vorige && plusDagen(vorige.date, 1), tot: t.date },
+    { status: 'gespeeld', van: plusDagen(t.date, 1) },
+  ];
+  // Twee haltes op dezelfde dag: de tweede is nooit de volgende.
+  return fasen.filter((f) => !(f.tot && f.tot < nu) && !(f.van && f.tot && f.van > f.tot));
 }
 
 /**

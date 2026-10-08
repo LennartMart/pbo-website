@@ -14,5 +14,12 @@ export const maandKort = (iso: string) => maand(iso).slice(0, 3);
 export const weekdag = (iso: string) => cap(fmt({ weekday: 'long' }).format(parse(iso)));
 export const lang = (iso: string) => fmt({ day: 'numeric', month: 'long', year: 'numeric' }).format(parse(iso));
 
-/** Vandaag in Brussel als YYYY-MM-DD (bij een statische site: het moment van de build). */
+/** Vandaag in Brussel als YYYY-MM-DD (bij een statische site: het moment van de build, zie Periode). */
 export const vandaag = () => new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date());
+
+/** ISO-datum `n` dagen later (of vroeger, met een negatief getal). */
+export const plusDagen = (iso: string, n: number) => {
+  const d = parse(iso);
+  d.setUTCDate(d.getUTCDate() + n);
+  return d.toISOString().slice(0, 10);
+};

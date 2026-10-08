@@ -2,6 +2,8 @@
 import { u } from '../lib/url';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
+import Periode from '../components/Periode.astro';
+import ToernooiKnop from '../components/ToernooiKnop.astro';
 import {
   alleToernooien,
   laatsteRanking,
@@ -9,50 +11,67 @@ import {
   geboortejarenKort,
   routeUrl,
   seizoenVan,
-  toernooiLink,
+  statussen,
   type Toernooi,
 } from '../lib/jeugdcup';
 import { alleBerichten, categorieNaam, jaarVan } from '../lib/nieuws';
-import { dag, dag2, maand, maandKort, weekdag, lang, vandaag } from '../lib/datum';
+import { dag, dag2, maand, maandKort, weekdag, lang, plusDagen, vandaag } from '../lib/datum';
 import { competitieAgenda, badmintonVlaanderen, mail } from '../data/site';
 import { pk as leesPk } from '../lib/pk';
 
 const nu = vandaag();
 const toernooien = await alleToernooien();
-const volgende = toernooien.find((t) => t.date >= nu);
-// Het seizoen van de volgende halte; na de laatste halte het seizoen dat net gespeeld is.
-const seizoen = volgende ? seizoenVan(volgende.date) : toernooien.length ? seizoenVan(toernooien.at(-1)!.date) : undefined;
-const haltes = seizoen ? toernooien.filter((t) => seizoenVan(t.date) === seizoen) : [];
-const nummer = volgende ? haltes.indexOf(volgende) + 1 : haltes.length;
-const daarna = volgende ? haltes.slice(nummer, nummer + 4) : [];
-
-const status = (t: Toernooi) => (t.date < nu ? 'gespeeld' : t === volgende ? 'volgende' : 'later');
-const nieuwJaar = (lijst: Toernooi[], i: number) => i > 0 && lijst[i].date.slice(0, 4) !== lijst[i - 1].date.slice(0, 4);
-const halte = (t: Toernooi) => u(`/jeugd/jeugdcuptour/kalender#halte-${t.id}`);
-const route = volgende && routeUrl(volgende);
-// Inschrijven, wedstrijden of uitslagen: dezelfde toernooipagina, het label volgt de datum.
-const link = volgende && toernooiLink(volgende, nu);
-
-const ranking = await laatsteRanking();
-const rankingJaar = ranking?.jaar ?? Number(nu.slice(0, 4));
-const datum = (iso: string) => `${dag(iso)} ${maand(iso)}`;
-const volgendeStand =
-  ranking && volgende
-    ? Number(volgende.date.slice(0, 4)) === ranking.jaar
-      ? `De volgende stand komt na ${volgende.club} op ${datum(volgende.date)}.`
-      : `De ranking ${volgende.date.slice(0, 4)} begint bij ${volgende.club} op ${datum(volgende.date)}.`
-    : '';
 
 const berichten = await alleBerichten();
 // Een bericht dat een beheerder uitlicht, staat bovenaan: in de hero als de jeugdcup geen volgende halte heeft,
 // anders als blok eronder. Het staat dan niet nog eens in de lijst.
 const uitgelicht = berichten.find((b) => b.data.uitgelicht);
-const nieuwsInHero = !volgende && !!uitgelicht;
 const recentNieuws = berichten.filter((b) => b !== uitgelicht).slice(0, 4);
 const eersteJaar = berichten.length ? jaarVan(berichten.at(-1)!) : undefined;
 
+// De home is statisch, maar moet ook kloppen als er een tijd geen build is. Elke halte is de volgende vanaf de dag na
+// de vorige halte tot en met haar speeldag; na de laatste is er geen. Wat daarvan afhangt, staat er voor elke halte
+// die nog komt, en Periode toont het stuk van vandaag.
+const komend = toernooien.filter((t) => t.date >= nu);
+const momenten = [...komend, undefined].map((volgende, i) => {
+  // Het seizoen van de volgende halte; na de laatste halte het seizoen dat net gespeeld is.
+  const seizoen = volgende ? seizoenVan(volgende.date) : toernooien.length ? seizoenVan(toernooien.at(-1)!.date) : undefined;
+  const haltes = seizoen ? toernooien.filter((t) => seizoenVan(t.date) === seizoen) : [];
+  const nummer = volgende ? haltes.indexOf(volgende) + 1 : haltes.length;
+  return {
+    van: i > 0 ? plusDagen(komend[i - 1].date, 1) : undefined,
+    tot: volgende?.date,
+    volgende,
+    seizoen,
+    haltes,
+    daarna: volgende ? haltes.slice(nummer, nummer + 4) : [],
+    route: volgende && routeUrl(volgende),
+    nieuwsInHero: !volgende && !!uitgelicht,
+  };
+});
+// Het lijnplan wisselt per seizoen; binnen een seizoen wisselt per halte enkel de stip (statussen).
+const metLijn = momenten.filter((m) => m.haltes.length > 1 && !m.nieuwsInHero);
+const lijnplannen = [...new Set(metLijn.map((m) => m.seizoen))].map((seizoen) => {
+  const lijst = metLijn.filter((m) => m.seizoen === seizoen);
+  return { seizoen, haltes: lijst[0].haltes, van: lijst[0].van, tot: lijst.at(-1)!.tot };
+});
+
+const nieuwJaar = (lijst: Toernooi[], i: number) => i > 0 && lijst[i].date.slice(0, 4) !== lijst[i - 1].date.slice(0, 4);
+const vorige = (t: Toernooi) => toernooien[toernooien.indexOf(t) - 1];
+const halte = (t: Toernooi) => u(`/jeugd/jeugdcuptour/kalender#halte-${t.id}`);
+
+const ranking = await laatsteRanking();
+const rankingJaar = ranking?.jaar ?? Number(nu.slice(0, 4));
+const datum = (iso: string) => `${dag(iso)} ${maand(iso)}`;
+const volgendeStand = (t: Toernooi) =>
+  ranking
+    ? Number(t.date.slice(0, 4)) === ranking.jaar
+      ? `De volgende stand komt na ${t.club} op ${datum(t.date)}.`
+      : `De ranking ${t.date.slice(0, 4)} begint bij ${t.club} op ${datum(t.date)}.`
+    : `De eerste stand komt na ${t.club} op ${datum(t.date)}.`;
+
 // Het PK staat op de home zolang een beheerder het aanzet (Vaste pagina's → PK).
-const pk = await leesPk(nu);
+const pk = await leesPk();
 
 const voorClubs = [
   { href: competitieAgenda, title: 'Competitieagenda', text: 'De wedstrijden van je ploeg in je eigen agenda', extern: true },
@@ -64,114 +83,108 @@ const voorClubs = [
 
 <BaseLayout>
   <!-- Volgende halte van de jeugdcuptour, met het hele seizoen als lijn. Zonder volgende halte: het uitgelichte bericht. -->
-  <section class="wrap" aria-labelledby="volgende-titel">
+  <section class="wrap">
     <div class="on-ink overflow-hidden rounded-[28px] bg-ink text-white lg:rounded-panel">
       {
-        volgende ? (
-          <div class="px-6 pt-8 pb-7 md:px-10 md:pt-11 lg:px-16 lg:pt-14 lg:pb-12">
-            <div class="min-w-0">
-              {/* Eerst wanneer, dan wat: de datum in limoen, net als de volgende halte op de lijn eronder. */}
-              <h1 id="volgende-titel" class="font-display">
-                <time
-                  datetime={volgende.date}
-                  class="num block text-[44px] leading-[0.95] font-extrabold tracking-[-0.03em] text-accent md:text-[64px] lg:text-[80px]"
-                >
-                  {weekdag(volgende.date)} <span class="whitespace-nowrap">{dag(volgende.date)} {maand(volgende.date)}</span>
-                </time>
-                <span class="sr-only">: </span>
-                <span class="mt-2 block text-[26px] leading-[1.12] font-bold tracking-[-0.01em] md:mt-3 md:text-[34px] lg:text-[40px]">
-                  Victor Jeugdcuptour by&nbsp;PBO
-                </span>
-              </h1>
-              <p class="mt-3 max-w-[60ch] text-base leading-normal text-mist md:mt-4 md:text-lg">
-                <span class="font-semibold text-white">{volgende.club}</span>
-                {[volgende.hall, volgende.start && `vanaf ${volgende.start}`, volgende.prijsuitreiking && 'met prijsuitreiking']
-                  .filter(Boolean)
-                  .map((x) => ` · ${x}`)
-                  .join('')}
-              </p>
-              {(link || route) && (
-                <div class="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 md:mt-7">
-                  {link && (
-                    <a class="btn bg-accent text-ink" href={link.href} rel="noopener">
-                      <Icon name={link.icon} size={20} stroke={2} /> {link.label}
-                      <span class="sr-only"> {link.sr} (andere website)</span>
-                    </a>
-                  )}
-                  {route && (
-                    <a
-                      class:list={[
-                        'btn',
-                        link ? 'border-[1.5px] border-white/40 text-white hover:bg-white/5' : 'bg-accent text-ink',
-                      ]}
-                      href={route}
-                      target="_blank"
-                      rel="noopener"
-                    >
-                      <Icon name="route" size={20} stroke={2} />
-                      <span>
-                        Route<span class="sr-only"> naar {volgende.hall ?? volgende.club}</span>
-                      </span>
-                      <span class="sr-only"> (Google Maps, nieuw venster)</span>
-                    </a>
-                  )}
+        momenten.map(({ van, tot, volgende, seizoen, route }) => (
+          <Periode as="div" van={van} tot={tot} class="px-6 pt-8 pb-7 md:px-10 md:pt-11 lg:px-16 lg:pt-14 lg:pb-12">
+            {volgende ? (
+              <div class="min-w-0">
+                {/* Eerst wanneer, dan wat: de datum in limoen, net als de volgende halte op de lijn eronder. */}
+                <h1 class="font-display">
+                  <time
+                    datetime={volgende.date}
+                    class="num block text-[44px] leading-[0.95] font-extrabold tracking-[-0.03em] text-accent md:text-[64px] lg:text-[80px]"
+                  >
+                    {weekdag(volgende.date)} <span class="whitespace-nowrap">{dag(volgende.date)} {maand(volgende.date)}</span>
+                  </time>
+                  <span class="sr-only">: </span>
+                  <span class="mt-2 block text-[26px] leading-[1.12] font-bold tracking-[-0.01em] md:mt-3 md:text-[34px] lg:text-[40px]">
+                    Victor Jeugdcuptour by&nbsp;PBO
+                  </span>
+                </h1>
+                <p class="mt-3 max-w-[60ch] text-base leading-normal text-mist md:mt-4 md:text-lg">
+                  <span class="font-semibold text-white">{volgende.club}</span>
+                  {[volgende.hall, volgende.start && `vanaf ${volgende.start}`, volgende.prijsuitreiking && 'met prijsuitreiking']
+                    .filter(Boolean)
+                    .map((x) => ` · ${x}`)
+                    .join('')}
+                </p>
+                {(volgende.toernooilink || route) && (
+                  <div class="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 md:mt-7">
+                    {/* Inschrijven, wedstrijden of uitslagen: dezelfde toernooipagina, het label volgt de datum. */}
+                    <ToernooiKnop toernooi={volgende} class="btn bg-accent text-ink" />
+                    {route && (
+                      <a
+                        class:list={[
+                          'btn',
+                          volgende.toernooilink ? 'border-[1.5px] border-white/40 text-white hover:bg-white/5' : 'bg-accent text-ink',
+                        ]}
+                        href={route}
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        <Icon name="route" size={20} stroke={2} />
+                        <span>
+                          Route<span class="sr-only"> naar {volgende.hall ?? volgende.club}</span>
+                        </span>
+                        <span class="sr-only"> (Google Maps, nieuw venster)</span>
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : uitgelicht ? (
+              <>
+                <p class="flex flex-wrap items-center gap-3">
+                  <span class="rounded-full bg-accent px-3.5 py-1.5 text-[13px] font-bold tracking-[0.06em] text-ink uppercase">
+                    {categorieNaam(uitgelicht.data.category)}
+                  </span>
+                  <time datetime={uitgelicht.data.date} class="text-[15px] text-mist">
+                    {lang(uitgelicht.data.date)}
+                  </time>
+                </p>
+                <h1 class="mt-4 max-w-[24ch] font-display text-[32px] leading-[1.05] font-extrabold tracking-[-0.01em] md:text-[48px] lg:text-[56px]">
+                  {uitgelicht.data.kort ?? uitgelicht.data.title}
+                </h1>
+                <p class="mt-3 max-w-[60ch] text-base leading-normal text-mist md:mt-4 md:text-lg">{uitgelicht.data.excerpt}</p>
+                <div class="mt-6 flex flex-col sm:flex-row md:mt-7">
+                  <a class="btn bg-accent text-ink" href={u(`/nieuws/${uitgelicht.id}`)}>
+                    Lees het bericht <Icon name="pijl" size={20} stroke={2} />
+                  </a>
                 </div>
-              )}
-            </div>
-          </div>
-        ) : uitgelicht ? (
-          <div class="px-6 pt-8 pb-7 md:px-10 md:pt-11 lg:px-16 lg:pt-14 lg:pb-12">
-            <p class="flex flex-wrap items-center gap-3">
-              <span class="rounded-full bg-accent px-3.5 py-1.5 text-[13px] font-bold tracking-[0.06em] text-ink uppercase">
-                {categorieNaam(uitgelicht.data.category)}
-              </span>
-              <time datetime={uitgelicht.data.date} class="text-[15px] text-mist">
-                {lang(uitgelicht.data.date)}
-              </time>
-            </p>
-            <h1
-              id="volgende-titel"
-              class="mt-4 max-w-[24ch] font-display text-[32px] leading-[1.05] font-extrabold tracking-[-0.01em] md:text-[48px] lg:text-[56px]"
-            >
-              {uitgelicht.data.kort ?? uitgelicht.data.title}
-            </h1>
-            <p class="mt-3 max-w-[60ch] text-base leading-normal text-mist md:mt-4 md:text-lg">{uitgelicht.data.excerpt}</p>
-            <div class="mt-6 flex flex-col sm:flex-row md:mt-7">
-              <a class="btn bg-accent text-ink" href={u(`/nieuws/${uitgelicht.id}`)}>
-                Lees het bericht <Icon name="pijl" size={20} stroke={2} />
-              </a>
-            </div>
-          </div>
-        ) : (
-          <div class="px-6 pt-8 pb-7 md:px-10 md:pt-11 lg:px-16 lg:pt-14 lg:pb-12">
-            <h1 id="volgende-titel" class="font-display">
-              <span class="num block text-[44px] leading-[0.95] font-extrabold tracking-[-0.03em] text-accent md:text-[64px] lg:text-[80px]">
-                {seizoen ? `Seizoen ${seizoen}` : 'Jeugdcuptour'}
-              </span>
-              <span class="sr-only">: </span>
-              <span class="mt-2 block text-[26px] leading-[1.12] font-bold tracking-[-0.01em] md:mt-3 md:text-[34px] lg:text-[40px]">
-                Victor Jeugdcuptour by&nbsp;PBO
-              </span>
-            </h1>
-            <p class="mt-4 max-w-[54ch] text-base leading-normal text-mist md:text-lg">
-              {seizoen && 'Alle haltes zijn gespeeld. '}De kalender van het volgende seizoen staat hier zodra de data vastliggen.
-            </p>
-          </div>
-        )
+              </>
+            ) : (
+              <>
+                <h1 class="font-display">
+                  <span class="num block text-[44px] leading-[0.95] font-extrabold tracking-[-0.03em] text-accent md:text-[64px] lg:text-[80px]">
+                    {seizoen ? `Seizoen ${seizoen}` : 'Jeugdcuptour'}
+                  </span>
+                  <span class="sr-only">: </span>
+                  <span class="mt-2 block text-[26px] leading-[1.12] font-bold tracking-[-0.01em] md:mt-3 md:text-[34px] lg:text-[40px]">
+                    Victor Jeugdcuptour by&nbsp;PBO
+                  </span>
+                </h1>
+                <p class="mt-4 max-w-[54ch] text-base leading-normal text-mist md:text-lg">
+                  {seizoen && 'Alle haltes zijn gespeeld. '}De kalender van het volgende seizoen staat hier zodra de data vastliggen.
+                </p>
+              </>
+            )}
+          </Periode>
+        ))
       }
 
       <!-- Lijnplan met alle haltes, namen afwisselend boven en onder de lijn. Enkel op desktop: op de telefoon staan de haltes in "Daarna". -->
       {
-        haltes.length > 1 && !nieuwsInHero && (
-          <div class="hidden border-t border-white/10 px-16 pt-4 pb-6 lg:block">
+        lijnplannen.map(({ seizoen, haltes, van, tot }) => (
+          <Periode as="div" van={van} tot={tot} class="hidden border-t border-white/10 px-16 pt-4 pb-6 lg:block">
             <h2 class="sr-only">Alle haltes van seizoen {seizoen}</h2>
             <ol class="grid" style={`grid-template-columns: repeat(${haltes.length}, minmax(0, 1fr))`}>
               {haltes.map((t, i) => {
-                const s = status(t);
                 const boven = i % 2 === 0;
-                const gereden = (x?: Toernooi) => !!x && status(x) !== 'later';
-                return (
-                  <li>
+                // Per halte een li per status (later, volgende, gespeeld); Periode toont die van vandaag.
+                return statussen(t, vorige(t)).map(({ status: s, van, tot }) => (
+                  <Periode as="li" van={van} tot={tot}>
                     <a
                       href={halte(t)}
                       class="group grid h-full grid-cols-[minmax(0,1fr)] grid-rows-[3.5rem_2rem_3.5rem] justify-items-center rounded-lg text-center"
@@ -204,16 +217,20 @@ const voorClubs = [
                         {t.prijsuitreiking && <span class="text-xs font-semibold text-accent">prijsuitreiking</span>}
                       </span>
                       <span class="relative row-start-2 flex w-full items-center justify-center justify-self-stretch">
+                        {/* Gereden stuk in limoen: links zodra deze halte aan de beurt is, rechts zodra ze gespeeld is. */}
                         {i > 0 && (
                           <span
-                            class:list={['absolute top-1/2 right-1/2 left-0 h-1 -translate-y-1/2', gereden(t) ? 'bg-accent' : 'bg-white/20']}
+                            class:list={[
+                              'absolute top-1/2 right-1/2 left-0 h-1 -translate-y-1/2',
+                              s !== 'later' ? 'bg-accent' : 'bg-white/20',
+                            ]}
                           />
                         )}
                         {i < haltes.length - 1 && (
                           <span
                             class:list={[
                               'absolute top-1/2 right-0 left-1/2 h-1 -translate-y-1/2',
-                              gereden(haltes[i + 1]) ? 'bg-accent' : 'bg-white/20',
+                              s === 'gespeeld' ? 'bg-accent' : 'bg-white/20',
                             ]}
                           />
                         )}
@@ -232,20 +249,20 @@ const voorClubs = [
                         />
                       </span>
                     </a>
-                  </li>
-                );
+                  </Periode>
+                ));
               })}
             </ol>
-          </div>
-        )
+          </Periode>
+        ))
       }
     </div>
   </section>
 
-  <!-- Uitgelicht bericht, zolang een beheerder het uitlicht (als het niet al in de hero staat) -->
+  <!-- Uitgelicht bericht, zolang een beheerder het uitlicht (in de hero na de laatste halte) -->
   {
-    uitgelicht && !nieuwsInHero && (
-      <section class="wrap mt-3 lg:mt-5" aria-labelledby="uitgelicht-titel">
+    uitgelicht && komend.length > 0 && (
+      <Periode as="section" tot={komend.at(-1)!.date} class="wrap mt-3 lg:mt-5" aria-labelledby="uitgelicht-titel">
         <div class="grid gap-5 rounded-card bg-paper px-6 py-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-10 lg:px-10 lg:py-9">
           <div class="min-w-0">
             <p class="text-[15px] font-semibold text-brand">
@@ -260,7 +277,7 @@ const voorClubs = [
             Lees het bericht <Icon name="pijl" size={20} stroke={2} />
           </a>
         </div>
-      </section>
+      </Periode>
     )
   }
 
@@ -276,12 +293,7 @@ const voorClubs = [
             <p class="mt-2 max-w-[60ch] text-[17px] leading-normal lg:text-lg">{pk.zin}</p>
           </div>
           <div class="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6">
-            {pk.link && (
-              <a class="btn bg-ink text-white" href={pk.link.href} rel="noopener">
-                <Icon name={pk.link.icon} size={20} stroke={2} /> {pk.link.label}
-                <span class="sr-only"> {pk.link.sr} (andere website)</span>
-              </a>
-            )}
+            <ToernooiKnop toernooi={pk.toernooi} class="btn bg-ink text-white" />
             <a href={u('/pk')} class="inline-flex min-h-11 items-center justify-center gap-2 font-semibold text-brand hover:underline">
               Reeksen en uurschema <Icon name="pijl" size={18} stroke={2} />
             </a>
@@ -300,11 +312,19 @@ const voorClubs = [
       <p class="mt-2 max-w-[48ch] leading-normal text-ink/80">
         {
           ranking ? (
-            <>
-              Stand na {ranking.na}, {weekdag(ranking.datum).toLowerCase()} {datum(ranking.datum)}. {volgendeStand}
-            </>
+            <>Stand na {ranking.na}, {weekdag(ranking.datum).toLowerCase()} {datum(ranking.datum)}.</>
           ) : (
-            <>Er staat nog geen stand online. {volgende && `De eerste stand komt na ${volgende.club} op ${datum(volgende.date)}.`}</>
+            <>Er staat nog geen stand online.</>
+          )
+        }{' '}
+        {
+          momenten.map(
+            ({ van, tot, volgende }) =>
+              volgende && (
+                <Periode as="span" van={van} tot={tot}>
+                  {volgendeStand(volgende)}
+                </Periode>
+              ),
           )
         }
       </p>
@@ -358,55 +378,63 @@ const voorClubs = [
 
     <!-- Telefoon: de haltes na de volgende, als lijn onder elkaar -->
     {
-      daarna.length > 0 && (
-        <section class="rounded-card bg-paper px-6 pt-7 pb-1 lg:hidden" aria-labelledby="daarna-titel">
-          <h2 id="daarna-titel" class="text-[28px] leading-[1.1] font-extrabold">
-            Daarna
-          </h2>
-          <ol class="mt-2">
-            {daarna.map((t, i) => {
-              const lijst = [volgende!, ...daarna];
-              const jaar = nieuwJaar(lijst, i + 1);
-              return (
-                <li>
-                  {jaar && (
-                    <p class="grid min-h-12 grid-cols-[1rem_3rem_minmax(0,1fr)] items-center gap-x-3">
-                      <span class="relative self-stretch" aria-hidden="true">
-                        <span class="absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-line" />
-                      </span>
-                      <span class="num text-center font-display text-lg font-extrabold">{t.date.slice(0, 4)}</span>
-                      <span class="text-sm text-muted">Vanaf hier telt de ranking {t.date.slice(0, 4)}</span>
-                    </p>
-                  )}
-                  <a href={halte(t)} class="grid min-h-[68px] grid-cols-[1rem_3rem_minmax(0,1fr)] items-center gap-x-3">
-                    <span class="relative flex items-center justify-center self-stretch" aria-hidden="true">
-                      <span class="absolute top-0 bottom-1/2 left-1/2 w-0.5 -translate-x-1/2 bg-line" />
-                      {i < daarna.length - 1 && <span class="absolute top-1/2 bottom-0 left-1/2 w-0.5 -translate-x-1/2 bg-line" />}
-                      <span class="relative size-3 rounded-full border-2 border-ink bg-paper" />
-                    </span>
-                    <time datetime={t.date} class="text-center">
-                      <span class="num block font-display text-[26px] leading-none font-extrabold">{dag2(t.date)}</span>
-                      <span class="block text-xs font-bold text-muted uppercase">{maandKort(t.date)}</span>
-                    </time>
-                    <span class="min-w-0 py-3">
-                      <span class="block font-semibold">{t.club}</span>
-                      <span class="block text-sm text-muted">
-                        {[weekdag(t.date), t.hall, t.prijsuitreiking && 'prijsuitreiking'].filter(Boolean).join(' · ')}
-                      </span>
-                    </span>
-                  </a>
-                </li>
-              );
-            })}
-          </ol>
-          <a
-            href={u('/jeugd/jeugdcuptour/kalender')}
-            class="flex min-h-[56px] items-center justify-between gap-3 border-t border-wash font-semibold"
+      momenten
+        .filter((m) => m.daarna.length > 0)
+        .map(({ van, tot, volgende, daarna }) => (
+          <Periode
+            as="section"
+            van={van}
+            tot={tot}
+            class="rounded-card bg-paper px-6 pt-7 pb-1 lg:hidden"
+            aria-labelledby={`daarna-${volgende!.id}`}
           >
-            Hele kalender <Icon name="pijl" size={18} stroke={2} />
-          </a>
-        </section>
-      )
+            <h2 id={`daarna-${volgende!.id}`} class="text-[28px] leading-[1.1] font-extrabold">
+              Daarna
+            </h2>
+            <ol class="mt-2">
+              {daarna.map((t, i) => {
+                const lijst = [volgende!, ...daarna];
+                const jaar = nieuwJaar(lijst, i + 1);
+                return (
+                  <li>
+                    {jaar && (
+                      <p class="grid min-h-12 grid-cols-[1rem_3rem_minmax(0,1fr)] items-center gap-x-3">
+                        <span class="relative self-stretch" aria-hidden="true">
+                          <span class="absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-line" />
+                        </span>
+                        <span class="num text-center font-display text-lg font-extrabold">{t.date.slice(0, 4)}</span>
+                        <span class="text-sm text-muted">Vanaf hier telt de ranking {t.date.slice(0, 4)}</span>
+                      </p>
+                    )}
+                    <a href={halte(t)} class="grid min-h-[68px] grid-cols-[1rem_3rem_minmax(0,1fr)] items-center gap-x-3">
+                      <span class="relative flex items-center justify-center self-stretch" aria-hidden="true">
+                        <span class="absolute top-0 bottom-1/2 left-1/2 w-0.5 -translate-x-1/2 bg-line" />
+                        {i < daarna.length - 1 && <span class="absolute top-1/2 bottom-0 left-1/2 w-0.5 -translate-x-1/2 bg-line" />}
+                        <span class="relative size-3 rounded-full border-2 border-ink bg-paper" />
+                      </span>
+                      <time datetime={t.date} class="text-center">
+                        <span class="num block font-display text-[26px] leading-none font-extrabold">{dag2(t.date)}</span>
+                        <span class="block text-xs font-bold text-muted uppercase">{maandKort(t.date)}</span>
+                      </time>
+                      <span class="min-w-0 py-3">
+                        <span class="block font-semibold">{t.club}</span>
+                        <span class="block text-sm text-muted">
+                          {[weekdag(t.date), t.hall, t.prijsuitreiking && 'prijsuitreiking'].filter(Boolean).join(' · ')}
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ol>
+            <a
+              href={u('/jeugd/jeugdcuptour/kalender')}
+              class="flex min-h-[56px] items-center justify-between gap-3 border-t border-wash font-semibold"
+            >
+              Hele kalender <Icon name="pijl" size={18} stroke={2} />
+            </a>
+          </Periode>
+        ))
     }
 
     <!-- Wat clubs en competitiespelers het vaakst zoeken -->

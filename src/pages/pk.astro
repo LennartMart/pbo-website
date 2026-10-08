@@ -3,6 +3,7 @@ import { u } from '../lib/url';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/PageIntro.astro';
 import Icon from '../components/Icon.astro';
+import ToernooiKnop from '../components/ToernooiKnop.astro';
 import { mail } from '../data/site';
 import { pk as leesPk } from '../lib/pk';
 
@@ -28,14 +29,7 @@ const waar = [pk.sporthal, pk.adres].filter(Boolean).join(', ');
         )
       }
       <div class="flex flex-col gap-2.5">
-        {
-          pk.link && (
-            <a href={pk.link.href} class="btn bg-ink px-5 text-white" rel="noopener">
-              <Icon name={pk.link.icon} size={20} stroke={2} /> {pk.link.label}
-              <span class="sr-only"> {pk.link.sr} (andere website)</span>
-            </a>
-          )
-        }
+        <ToernooiKnop toernooi={pk.toernooi} class="btn bg-ink px-5 text-white" />
         {
           pk.route && (
             <a href={pk.route} class="btn border-[1.5px] border-ink px-5" target="_blank" rel="noopener">

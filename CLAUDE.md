@@ -39,6 +39,7 @@ src/content/
 - Optioneel een pdf van de stand (`pdf`), getoond als downloadlink naast de tabel.
 - Een stand vindt haar halte op id, en anders op datum (een verbeterde clubnaam verandert het id).
 - `toernooilink` is de tournamentsoftware-pagina van een halte. De knop op de kalender heet "Inschrijven" (tot `inschrijvenTot`), dan "Wedstrijden" tot en met de speeldag, en daarna "Uitslagen" (`toernooiLink()` in `src/lib/jeugdcup.ts`).
+- Wat van de datum afhangt, moet ook kloppen als er dagen geen build is. De build zet elke toestand die nog komt in de HTML met `<Periode van tot>` (`src/components/Periode.astro`), en een inline script in `BaseLayout` toont in de browser die van vandaag. Zo werken de hero, het lijnplan, "Daarna" en de rankingzin op de home, en `ToernooiKnop` (home, /pk). De kalenderpagina volgt nog de builddatum.
 - Decap-config wordt bij de build gegenereerd uit `src/lib/cms.ts` (`/admin/config.yml`, `/admin/jeugdcup/config.yml`). Velden daar en in `src/content.config.ts` gelijk houden. Handleiding: `docs/beheer.md`.
 - Markdown draait op Sätteri (Astro 7). `src/lib/markdown-basis.mjs` zet het basispad voor interne links in Markdown.
 

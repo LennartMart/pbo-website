@@ -55,5 +55,14 @@ const indexeren = Astro.site?.hostname === 'www.badminton-pbo.be';
       <slot />
     </main>
     <SiteFooter />
+    <!-- Periode (src/components/Periode.astro): de build koos met haar eigen datum, de browser kiest met vandaag. -->
+    <script is:inline>
+      {
+        const nu = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(new Date());
+        for (const el of document.querySelectorAll('[data-van], [data-tot]')) {
+          el.hidden = nu < (el.dataset.van ?? '') || nu > (el.dataset.tot ?? '9999');
+        }
+      }
+    </script>
   </body>
 </html>

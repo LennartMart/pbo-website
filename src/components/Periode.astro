@@ -1,0 +1,16 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { vandaag } from '../lib/datum';
+
+/**
+ * Inhoud die maar een tijd klopt: van `van` tot en met `tot` (YYYY-MM-DD, allebei optioneel).
+ * De build verbergt wat niet bij haar eigen datum past; het script in BaseLayout doet hetzelfde in de browser met de
+ * datum van vandaag. Zo blijft een statische pagina juist, ook als er een tijd geen build is.
+ */
+type Props<Tag extends HTMLTag> = Polymorphic<{ as: Tag }> & { van?: string; tot?: string };
+
+const { as: Tag, van, tot, ...rest } = Astro.props;
+const nu = vandaag();
+---
+
+<Tag data-van={van} data-tot={tot} hidden={(!!van && nu < van) || (!!tot && nu > tot)} {...rest}><slot /></Tag>

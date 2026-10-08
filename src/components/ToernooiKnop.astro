@@ -1,0 +1,22 @@
+---
+import Icon from './Icon.astro';
+import Periode from './Periode.astro';
+import { toernooiLinks, type Toernooi } from '../lib/jeugdcup';
+
+/** Knop naar tournamentsoftware: inschrijven, wedstrijden of uitslagen, mee met de datum. Niets zonder toernooilink. */
+interface Props {
+  toernooi: Toernooi;
+  class: string;
+}
+
+const { toernooi, class: klasse } = Astro.props;
+---
+
+{
+  toernooiLinks(toernooi).map(({ link, van, tot }) => (
+    <Periode as="a" van={van} tot={tot} class={klasse} href={link.href} rel="noopener">
+      <Icon name={link.icon} size={20} stroke={2} /> {link.label}
+      <span class="sr-only"> {link.sr} (andere website)</span>
+    </Periode>
+  ))
+}
