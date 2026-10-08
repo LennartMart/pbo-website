@@ -19,7 +19,7 @@ import {
 } from '../lib/jeugdcup';
 import { routeUrl } from '../lib/toernooi';
 import { alleBerichten, categorieNaam } from '../lib/nieuws';
-import { dag, dag2, maand, maandKort, weekdag, lang, vandaag } from '../lib/datum';
+import { dag, dag2, dagMaand, maand, maandKort, plusDagen, weekdag, weekdagDagMaand, lang, vandaag } from '../lib/datum';
 import { competitie, mail } from '../data/site';
 import { pk as leesPk } from '../lib/pk';
 
@@ -42,6 +42,13 @@ const lijnplannen = [...new Set(metLijn.map((m) => m.seizoen))].map((seizoen) =>
   const lijst = metLijn.filter((m) => m.seizoen === seizoen);
   return { seizoen, haltes: lijst[0].haltes, van: lijst[0].van, tot: lijst.at(-1)!.tot };
 });
+// Haltes waarvoor je nu kan inschrijven, onder de volgende halte. De strook verdwijnt als de laatste inschrijving sluit.
+const inschrijfstroken = momenten
+  .filter((m) => m.inschrijven.length > 0)
+  .map((m) => {
+    const laatste = m.inschrijven.map((t) => t.inschrijvenTot).reduce((a, b) => (b > a ? b : a));
+    return { ...m, tot: m.tot && m.tot < laatste ? m.tot : laatste };
+  });
 // Telefoon: de vier haltes na de volgende.
 const daarnaBlokken = momenten.filter((m) => m.daarna.length > 0).map((m) => ({ ...m, daarna: m.daarna.slice(0, 4) }));
 
@@ -91,6 +98,13 @@ const voorClubs = [
                     .filter(Boolean)
                     .map((x) => ` · ${x}`)
                     .join('')}
+                  {/* Zolang inschrijven kan, zegt de knop het; daarna staat het hier. */}
+                  {volgende.toernooilink && volgende.inschrijvenTot && (
+                    <Periode as="span" van={plusDagen(volgende.inschrijvenTot, 1)}>
+                      {' '}
+                      · inschrijvingen afgesloten
+                    </Periode>
+                  )}
                 </p>
                 {(volgende.toernooilink || route) && (
                   <div class="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 md:mt-7">
@@ -152,6 +166,59 @@ const voorClubs = [
                 </p>
               </>
             )}
+          </Periode>
+        ))
+      }
+
+      <!-- Latere haltes waarvoor je nu kan inschrijven. Elke halte staat er tot en met haar laatste inschrijfdag. -->
+      {
+        inschrijfstroken.map(({ van, tot, inschrijven, volgende }) => (
+          <Periode
+            as="section"
+            van={van}
+            tot={tot}
+            class="border-t border-white/10 px-6 pt-5 pb-4 md:px-10 lg:flex lg:items-center lg:gap-12 lg:px-16 lg:py-5"
+            aria-labelledby={`inschrijven-${volgende!.id}`}
+          >
+            {/* Zolang je ook voor de volgende halte nog kan inschrijven (haar eigen knop), staat er "Ook". */}
+            <h2 id={`inschrijven-${volgende!.id}`} class="font-display text-lg font-bold lg:shrink-0">
+              {volgende!.toernooilink && volgende!.inschrijvenTot ? (
+                <>
+                  <Periode as="span" tot={volgende!.inschrijvenTot}>
+                    Ook inschrijvingen open
+                  </Periode>
+                  <Periode as="span" van={plusDagen(volgende!.inschrijvenTot, 1)}>
+                    Inschrijvingen open
+                  </Periode>
+                </>
+              ) : (
+                'Inschrijvingen open'
+              )}
+            </h2>
+            <ul class="mt-1 divide-y divide-white/10 lg:mt-0 lg:flex lg:flex-wrap lg:gap-x-10 lg:divide-y-0">
+              {inschrijven.map((t) => (
+                <Periode as="li" tot={t.inschrijvenTot}>
+                  <a href={t.toernooilink} rel="noopener" class="group flex min-h-16 items-center gap-3.5 py-3">
+                    <span class="grid size-10 shrink-0 place-items-center rounded-full border-[1.5px] border-accent/60 text-accent transition-colors group-hover:border-accent group-hover:bg-accent group-hover:text-ink">
+                      <Icon name="inschrijven" size={18} stroke={2} />
+                    </span>
+                    <span class="min-w-0">
+                      <span class="block leading-snug">
+                        <span class="font-semibold text-white group-hover:underline max-lg:block">{t.club}</span>
+                        <span class="text-mist">
+                          <span class="max-lg:hidden"> · </span>
+                          {weekdagDagMaand(t.datum)}
+                        </span>
+                      </span>
+                      <span class="block text-[15px] leading-snug text-accent">
+                        Inschrijven tot {weekdagDagMaand(t.inschrijvenTot)}
+                      </span>
+                    </span>
+                    <span class="sr-only"> (andere website)</span>
+                  </a>
+                </Periode>
+              ))}
+            </ul>
           </Periode>
         ))
       }
@@ -402,6 +469,11 @@ const voorClubs = [
                         <span class="block text-sm text-muted">
                           {[weekdag(t.datum), t.sporthal, t.prijsuitreiking && 'prijsuitreiking'].filter(Boolean).join(' · ')}
                         </span>
+                        {t.toernooilink && t.inschrijvenTot && (
+                          <Periode as="span" tot={t.inschrijvenTot} class="mt-1 flex items-center gap-1.5 text-sm font-semibold text-brand">
+                            <Icon name="inschrijven" size={15} stroke={2.2} /> Inschrijven tot {dagMaand(t.inschrijvenTot)}
+                          </Periode>
+                        )}
                       </span>
                     </a>
                   </li>

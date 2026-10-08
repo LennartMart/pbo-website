@@ -33,8 +33,10 @@ De kalender heeft één item per seizoen (augustus tot juli), met een lijst halt
 
 - **Nieuw seizoen:** **Jeugdcup-kalender → + seizoen**, vul het seizoen in (bv. `2027-2028`) en klik bij **Haltes** zo vaak als nodig op **+ halte**. Publiceer één keer.
 - **Haltes toevoegen of schrappen:** open het seizoen, voeg toe of verwijder met het kruisje bij de halte, en publiceer. De volgorde maakt niet uit: de site zet ze op datum.
-- **Per halte:** datum, club, sporthal, adres en beginuur (voor de routelink), prijsuitreiking, en de **toernooilink** naar tournamentsoftware.
-- **Toernooilink:** één link per halte, die je nooit hoeft te vervangen. De knop op de kalender past zich aan: **Inschrijven** tot de datum bij **Inschrijven tot**, daarna **Wedstrijden** tot en met de speeldag, en na de halte **Uitslagen**. Zonder "Inschrijven tot" blijft het "Inschrijven" tot de speeldag.
+- **Per halte:** datum, club, sporthal, adres en beginuur (voor de routelink), prijsuitreiking, en zodra het toernooi op tournamentsoftware staat de **toernooilink** en **Inschrijven tot**.
+- **Twee data per toernooi:** de **datum** is de speeldag, **Inschrijven tot** de laatste dag om in te schrijven. Bij een toernooilink is "Inschrijven tot" verplicht: zonder die datum bouwt de site niet en blijft de vorige versie online.
+- **Toernooilink:** één link per halte, die je nooit hoeft te vervangen. De knop op de home en de kalender past zich aan: **Inschrijven tot ...** tot en met de datum bij **Inschrijven tot**, daarna **Wedstrijden** tot en met de speeldag, en na de halte **Uitslagen**.
+- **Inschrijvingen open:** op de home staan onder de volgende halte alle latere haltes waarvoor je nu kan inschrijven, elk tot de laatste inschrijfdag. Bij de volgende halte zelf staat "inschrijvingen afgesloten" zodra die datum voorbij is. Een halte komt er vanzelf bij zodra ze een toernooilink en "Inschrijven tot" heeft.
 - Een nieuwe halte verschijnt in de keuzelijst bij de rankings na de volgende build, binnen een paar minuten.
 
 Een gespeelde halte met standen niet verwijderen, anders bouwt de site niet meer. De datum, de club of de sporthal verbeteren mag wel. Een seizoen verwijderen kan niet in het beheer.
@@ -59,7 +61,7 @@ Is de titel lang, vul dan **Korte titel voor de home** in. Er staat altijd maar 
 Het PK heeft een eigen pagina (`/pk`) en een blok op de home. Je hoeft er geen nieuwsbericht voor te maken.
 
 1. Open **Vaste pagina's → PK (provinciaal kampioenschap)**.
-2. Vul de data, de plaats, de organisatie, de **toernooilink** (tournamentsoftware) en **Inschrijven tot** in. Sporthal en adres zijn optioneel; met een adres krijgt `/pk` een routeknop.
+2. Vul de data, de plaats, de organisatie, de **toernooilink** (tournamentsoftware) en **Inschrijven tot** in (verplicht bij een toernooilink). Sporthal en adres zijn optioneel; met een adres krijgt `/pk` een routeknop.
 3. Zet in **Tekst** de reeksen, het uurschema en de praktische info. Een affiche mag erbij.
 4. Zet **Tonen op de home** aan en publiceer.
 

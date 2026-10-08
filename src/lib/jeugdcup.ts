@@ -48,8 +48,8 @@ export type Toernooi = CollectionEntry<'kalender'>['data']['haltes'][number] & {
 export const rankingJaar = (t: Toernooi) => Number(t.datum.slice(0, 4));
 
 /**
- * Een halte op de lijn door de tijd: later tot en met de vorige halte, dan de volgende tot en met haar speeldag,
- * daarna gespeeld. Enkel wat vanaf vandaag nog kan, met de dagen voor Periode.
+ * Een halte door de tijd (lijnplan op de home, kalender): later tot en met de vorige halte, dan de volgende tot en met
+ * haar speeldag, daarna gespeeld. Enkel wat vanaf vandaag nog kan, met de dagen voor Periode.
  */
 export function statussen(t: Toernooi, alle: Toernooi[], nu = vandaag()) {
   const vorige = alle[alle.indexOf(t) - 1];
@@ -62,25 +62,33 @@ export function statussen(t: Toernooi, alle: Toernooi[], nu = vandaag()) {
   return fasen.filter((f) => !(f.tot && f.tot < nu) && !(f.van && f.tot && f.van > f.tot));
 }
 
+/** Halte met een toernooilink en een inschrijfdatum: inschrijven kan tot en met `inschrijvenTot`. */
+export type MetInschrijving = Toernooi & { toernooilink: string; inschrijvenTot: string };
+export const metInschrijving = (t: Toernooi): t is MetInschrijving => !!t.toernooilink && !!t.inschrijvenTot;
+
 /**
  * De tijdlijn voor een statische pagina die ook moet kloppen als er een tijd geen build is. Elke halte is de volgende
  * vanaf de dag na de vorige halte tot en met haar speeldag; na de laatste is er geen. Per moment (van, tot: voor Periode)
  * de volgende halte, haar seizoen met alle haltes en de haltes die daarna nog komen. Na de laatste halte: het seizoen
- * dat net gespeeld is.
+ * dat net gespeeld is. `inschrijven`: de latere haltes waarvoor je in dat moment nog kan inschrijven (elk tot haar
+ * `inschrijvenTot`); de volgende halte zelf heeft haar eigen knop.
  */
 export function tijdlijn(toernooien: Toernooi[], nu = vandaag()) {
   const komend = toernooien.filter((t) => t.datum >= nu);
   return [...komend, undefined].map((volgende, i) => {
+    const van = i > 0 ? plusDagen(komend[i - 1].datum, 1) : undefined;
     const ijkpunt = volgende ?? toernooien.at(-1);
     const seizoen = ijkpunt && seizoenVan(ijkpunt.datum);
     const haltes = toernooien.filter((t) => seizoenVan(t.datum) === seizoen);
+    const later = volgende ? toernooien.filter((t) => t !== volgende && t.datum >= volgende.datum) : [];
     return {
-      van: i > 0 ? plusDagen(komend[i - 1].datum, 1) : undefined,
+      van,
       tot: volgende?.datum,
       volgende,
       seizoen,
       haltes,
       daarna: volgende ? haltes.slice(haltes.indexOf(volgende) + 1) : [],
+      inschrijven: later.filter(metInschrijving).filter((t) => t.inschrijvenTot >= (van ?? nu)),
     };
   });
 }

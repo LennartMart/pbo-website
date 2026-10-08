@@ -12,21 +12,33 @@ const isoDatum = z
 /** Decap schrijft een leeggemaakt veld als ''. */
 const leeg = (v: unknown) => (v === '' || v === null ? undefined : v);
 
+/**
+ * Een toernooi heeft twee data: de speeldag (`datum`) en de laatste dag om in te schrijven (`inschrijvenTot`).
+ * Met een toernooilink is die laatste verplicht: zonder weet de site niet tot wanneer de knop "Inschrijven" klopt.
+ */
+function inschrijving(wie: string, t: { datum: string; toernooilink?: string; inschrijvenTot?: string }, ctx: z.RefinementCtx) {
+  const fout = (message: string) => ctx.addIssue({ code: 'custom', path: ['inschrijvenTot'], message: `${wie}: ${message}` });
+  if (t.toernooilink && !t.inschrijvenTot) fout('vul "Inschrijven tot" in bij de toernooilink.');
+  if (t.inschrijvenTot && t.inschrijvenTot >= t.datum) fout(`"Inschrijven tot" (${t.inschrijvenTot}) moet voor de speeldag (${t.datum}) liggen.`);
+}
+
 /** Eén halte van de jeugdcuptour. Het id (<datum>-<club>) leidt src/lib/jeugdcup.ts af. */
-const halte = z.object({
-  datum: isoDatum,
-  club: z.string(),
-  sporthal: z.preprocess(leeg, z.string().optional()),
-  /** Straat en gemeente, voor de routelink. Zonder adres zoekt de link op sporthal en club. */
-  adres: z.preprocess(leeg, z.string().optional()),
-  /** Beginuur zoals het op de site komt, bv. "9.00 uur". */
-  start: z.preprocess(leeg, z.string().optional()),
-  /** Toernooipagina (tournamentsoftware): eerst inschrijven, dan wedstrijden, na de halte uitslagen. */
-  toernooilink: z.preprocess(leeg, z.url().optional()),
-  /** Laatste dag om in te schrijven. Daarna heet de toernooilink "Wedstrijden". */
-  inschrijvenTot: z.preprocess(leeg, isoDatum.optional()),
-  prijsuitreiking: z.boolean().optional(),
-});
+const halte = z
+  .object({
+    datum: isoDatum,
+    club: z.string(),
+    sporthal: z.preprocess(leeg, z.string().optional()),
+    /** Straat en gemeente, voor de routelink. Zonder adres zoekt de link op sporthal en club. */
+    adres: z.preprocess(leeg, z.string().optional()),
+    /** Beginuur zoals het op de site komt, bv. "9.00 uur". */
+    start: z.preprocess(leeg, z.string().optional()),
+    /** Toernooipagina (tournamentsoftware): eerst inschrijven, dan wedstrijden, na de halte uitslagen. */
+    toernooilink: z.preprocess(leeg, z.url().optional()),
+    /** Laatste dag om in te schrijven, verplicht bij een toernooilink. Daarna heet de toernooilink "Wedstrijden". */
+    inschrijvenTot: z.preprocess(leeg, isoDatum.optional()),
+    prijsuitreiking: z.boolean().optional(),
+  })
+  .superRefine((h, ctx) => inschrijving(`Halte ${h.club} (${h.datum})`, h, ctx));
 
 /** Eén bestand per seizoen met een lijst haltes, zodat beheerders ze in bulk toevoegen en schrappen. */
 const kalender = defineCollection({
@@ -37,22 +49,25 @@ const kalender = defineCollection({
 /** Provinciaal kampioenschap: één bestand dat beheerders elk jaar bijwerken. Met `tonen` staat het op de home. */
 const pk = defineCollection({
   loader: glob({ pattern: 'pk.md', base: './src/content/pk' }),
-  schema: z.object({
-    tonen: z.boolean().default(false),
-    /** Zonder naam: "Provinciaal kampioenschap". Het jaar komt uit de datum. */
-    naam: z.preprocess(leeg, z.string().default('Provinciaal kampioenschap')),
-    datum: isoDatum,
-    /** Tweede speeldag; leeg bij een PK van één dag. */
-    datumTot: z.preprocess(leeg, isoDatum.optional()),
-    plaats: z.string(),
-    sporthal: z.preprocess(leeg, z.string().optional()),
-    adres: z.preprocess(leeg, z.string().optional()),
-    organisatie: z.preprocess(leeg, z.string().optional()),
-    /** Zelfde toernooipagina als bij een halte: inschrijven, wedstrijden, uitslagen. */
-    toernooilink: z.preprocess(leeg, z.url().optional()),
-    inschrijvenTot: z.preprocess(leeg, isoDatum.optional()),
-    affiche: z.preprocess(leeg, z.string().optional()),
-  }),
+  schema: z
+    .object({
+      tonen: z.boolean().default(false),
+      /** Zonder naam: "Provinciaal kampioenschap". Het jaar komt uit de datum. */
+      naam: z.preprocess(leeg, z.string().default('Provinciaal kampioenschap')),
+      datum: isoDatum,
+      /** Tweede speeldag; leeg bij een PK van één dag. */
+      datumTot: z.preprocess(leeg, isoDatum.optional()),
+      plaats: z.string(),
+      sporthal: z.preprocess(leeg, z.string().optional()),
+      adres: z.preprocess(leeg, z.string().optional()),
+      organisatie: z.preprocess(leeg, z.string().optional()),
+      /** Zelfde toernooipagina als bij een halte: inschrijven, wedstrijden, uitslagen. */
+      toernooilink: z.preprocess(leeg, z.url().optional()),
+      /** Laatste dag om in te schrijven, verplicht bij een toernooilink. Voor de eerste speeldag. */
+      inschrijvenTot: z.preprocess(leeg, isoDatum.optional()),
+      affiche: z.preprocess(leeg, z.string().optional()),
+    })
+    .superRefine((p, ctx) => inschrijving('PK', p, ctx)),
 });
 
 const rankings = defineCollection({
