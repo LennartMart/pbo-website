@@ -9,7 +9,7 @@ web
 ## Users
 
 - Jeugdspelers en hun ouders die een datum, sporthal of hun plaats in de jeugdcuptour-ranking zoeken, meestal op de telefoon.
-- Oost-Vlaamse clubs en competitiespelers die de competitie-app, reglementen en contactadressen nodig hebben.
+- Oost-Vlaamse clubs en competitiespelers die de competitieagenda, standen, reglementen en contactadressen nodig hebben.
 - Recreanten en G-sporters, en wie zich als vrijwilliger bij PBO wil aansluiten.
 - Een gewone user voegt enkel uitslagen/rankings van de jeugdcuptour toe; een beheerder beheert de rest.
 
@@ -24,7 +24,7 @@ De enige plek met de officiële kalender en ranking van de Victor Jeugdcuptour b
 ## Operating Context
 
 - Jeugdcups lopen per seizoen, de ranking per kalenderjaar. Na elk toernooi komt een nieuwe stand online.
-- Competitiezaken lopen via `competitie.badminton-pbo.be` en de app van Badminton Vlaanderen.
+- Competitiezaken lopen via Badminton Vlaanderen (Badman-app, uitslagen en standen). Van de PBO-competitie-app blijft enkel de agenda (`competitie.badminton-pbo.be/agenda/`) in gebruik.
 - Google Calendar van `secretariaat@badminton-pbo.be` bevat de PBO-kalender.
 
 ## Capabilities and Constraints

@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import markLight from '../assets/logo/pbo-mark-light.png';
 import mobiSports from '../assets/sponsors/mobi-sports.png';
-import { mail, social, competitieApp, sponsor } from '../data/site';
+import { mail, social, competitieAgenda, badmintonVlaanderen, sponsor } from '../data/site';
 
 const columns = [
   {
@@ -15,8 +15,8 @@ const columns = [
   {
     title: 'Competitie',
     links: [
-      { href: competitieApp.home, label: 'Competitie-app' },
-      { href: competitieApp.agenda, label: 'Competitieagenda' },
+      { href: competitieAgenda, label: 'Competitieagenda' },
+      { href: badmintonVlaanderen.competitie, label: 'Uitslagen en standen' },
     ],
   },
   {

@@ -20,10 +20,8 @@ export const social = [
   { href: 'https://twitter.com/pbo_badm', label: 'X / Twitter', short: 'X' },
 ];
 
-export const competitieApp = {
-  home: 'https://competitie.badminton-pbo.be/',
-  agenda: 'https://competitie.badminton-pbo.be/agenda',
-};
+/** Enkel de agenda van de PBO-competitie-app is nog in gebruik. */
+export const competitieAgenda = 'https://competitie.badminton-pbo.be/agenda/';
 
 export const badmintonVlaanderen = {
   home: 'https://www.badmintonvlaanderen.be/',

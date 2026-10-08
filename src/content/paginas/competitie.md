@@ -1,14 +1,12 @@
 ---
 title: Competitie
 lead: PBO organiseert de provinciale badmintoncompetitie van Oost-Vlaanderen, met reeksen voor dames, heren en gemengd.
-description: "De provinciale badmintoncompetitie van Oost-Vlaanderen: competitie-app, agenda en het provinciaal addendum bij de C320."
+description: "De provinciale badmintoncompetitie van Oost-Vlaanderen: agenda, uitslagen en het provinciaal addendum bij de C320."
 ---
 
 ## Opstelling en verplaatsingen
 
 Een ontmoeting verplaatsen of je ploegopstelling maken doe je in de Badman-app van Badminton Vlaanderen. Uitslagen en standen van alle reeksen staan op [badmintonvlaanderen.be](https://www.badmintonvlaanderen.be/).
-
-De PBO-app gebruik je nog om de competitieagenda te koppelen.
 
 ## Provinciaal addendum C320
 

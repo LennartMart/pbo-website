@@ -64,7 +64,7 @@ src/content/
 
 ## Externe links (behouden)
 
-- Competitie-app: `https://competitie.badminton-pbo.be/` (`/opstelling`, `/agenda`)
+- Competitieagenda: `https://competitie.badminton-pbo.be/agenda/`. De rest van de PBO-competitie-app (o.a. `/opstelling`) is buiten gebruik: niet meer linken. Uitslagen en standen staan bij Badminton Vlaanderen.
 - Google Calendar-embed van `secretariaat@badminton-pbo.be` (zelfde agenda's als nu)
 - Mail: `secretariaat@badminton-pbo.be`, `jeugdcup@badminton-pbo.be`
 - Facebook `PBO.Badminton`, Instagram `pbobadminton`, X `pbo_badm`
