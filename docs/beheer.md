@@ -36,6 +36,7 @@ De kalender heeft één item per seizoen (augustus tot juli), met een lijst halt
 - **Per halte:** datum, club, sporthal, adres en beginuur (voor de routelink), prijsuitreiking, en zodra het toernooi op tournamentsoftware staat de **toernooilink** en **Inschrijven tot**.
 - **Twee data per toernooi:** de **datum** is de speeldag, **Inschrijven tot** de laatste dag om in te schrijven. Bij een toernooilink is "Inschrijven tot" verplicht: zonder die datum bouwt de site niet en blijft de vorige versie online.
 - **Toernooilink:** één link per halte, die je nooit hoeft te vervangen. De knop op de home en de kalender past zich aan: **Inschrijven tot ...** tot en met de datum bij **Inschrijven tot**, daarna **Wedstrijden** tot en met de speeldag, en na de halte **Uitslagen**.
+- **Inschrijvingen open:** op de home staan onder de volgende halte alle latere haltes waarvoor je nu kan inschrijven, elk tot de laatste inschrijfdag. Bij de volgende halte zelf staat "inschrijvingen afgesloten" zodra die datum voorbij is. Een halte komt er vanzelf bij zodra ze een toernooilink en "Inschrijven tot" heeft.
 - Een nieuwe halte verschijnt in de keuzelijst bij de rankings na de volgende build, binnen een paar minuten.
 
 Een gespeelde halte met standen niet verwijderen, anders bouwt de site niet meer. De datum, de club of de sporthal verbeteren mag wel. Een seizoen verwijderen kan niet in het beheer.

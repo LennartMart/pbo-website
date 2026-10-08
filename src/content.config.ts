@@ -19,7 +19,7 @@ const leeg = (v: unknown) => (v === '' || v === null ? undefined : v);
 function inschrijving(wie: string, t: { datum: string; toernooilink?: string; inschrijvenTot?: string }, ctx: z.RefinementCtx) {
   const fout = (message: string) => ctx.addIssue({ code: 'custom', path: ['inschrijvenTot'], message: `${wie}: ${message}` });
   if (t.toernooilink && !t.inschrijvenTot) fout('vul "Inschrijven tot" in bij de toernooilink.');
-  if (t.inschrijvenTot && t.inschrijvenTot > t.datum) fout(`"Inschrijven tot" (${t.inschrijvenTot}) ligt na de speeldag (${t.datum}).`);
+  if (t.inschrijvenTot && t.inschrijvenTot >= t.datum) fout(`"Inschrijven tot" (${t.inschrijvenTot}) moet voor de speeldag (${t.datum}) liggen.`);
 }
 
 /** Eén halte van de jeugdcuptour. Het id (<datum>-<club>) leidt src/lib/jeugdcup.ts af. */
@@ -63,7 +63,7 @@ const pk = defineCollection({
       organisatie: z.preprocess(leeg, z.string().optional()),
       /** Zelfde toernooipagina als bij een halte: inschrijven, wedstrijden, uitslagen. */
       toernooilink: z.preprocess(leeg, z.url().optional()),
-      /** Laatste dag om in te schrijven, verplicht bij een toernooilink. Uiterlijk de eerste speeldag. */
+      /** Laatste dag om in te schrijven, verplicht bij een toernooilink. Voor de eerste speeldag. */
       inschrijvenTot: z.preprocess(leeg, isoDatum.optional()),
       affiche: z.preprocess(leeg, z.string().optional()),
     })

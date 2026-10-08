@@ -3,6 +3,7 @@ import { u } from '../../../lib/url';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PageIntro from '../../../components/PageIntro.astro';
 import Icon from '../../../components/Icon.astro';
+import ToernooiKnop from '../../../components/ToernooiKnop.astro';
 import { mail } from '../../../data/site';
 import {
   alleToernooien,
@@ -13,7 +14,7 @@ import {
   volgendeHalteZin,
   type Toernooi,
 } from '../../../lib/jeugdcup';
-import { routeUrl, toernooiLink } from '../../../lib/toernooi';
+import { routeUrl } from '../../../lib/toernooi';
 import { dag2, maandKort, vandaag, weekdag } from '../../../lib/datum';
 
 const nu = vandaag();
@@ -74,7 +75,6 @@ const actie = 'inline-flex min-h-11 items-center gap-1.5 rounded-full font-semib
                   const gespeeld = t.datum < nu;
                   const isVolgende = t.id === volgende?.id;
                   const route = !gespeeld && routeUrl({ ...t, bij: t.club });
-                  const link = toernooiLink(t, t.club, nu);
                   return (
                     <li
                       id={`halte-${t.id}`}
@@ -102,7 +102,7 @@ const actie = 'inline-flex min-h-11 items-center gap-1.5 rounded-full font-semib
                           {t.adres && !gespeeld && <span class="block">{t.adres}</span>}
                         </p>
                       </div>
-                      {(gespeeld || route || link) && (
+                      {(gespeeld || route || t.toernooilink) && (
                         <div class="col-start-2 mt-1 flex flex-wrap gap-x-5 md:col-start-3 md:mt-0 md:justify-end">
                           {gespeeld &&
                             (t.id === laatsteStand ? (
@@ -110,14 +110,10 @@ const actie = 'inline-flex min-h-11 items-center gap-1.5 rounded-full font-semib
                                 Stand na deze halte <Icon name="pijl" size={18} stroke={2} />
                               </a>
                             ) : (
-                              !link && <span class="inline-flex min-h-11 items-center text-sm text-muted">Gespeeld</span>
+                              !t.toernooilink && <span class="inline-flex min-h-11 items-center text-sm text-muted">Gespeeld</span>
                             ))}
-                          {link && (
-                            <a href={link.href} class={actie}>
-                              <Icon name={link.icon} size={18} stroke={2} /> {link.label}
-                              <span class="sr-only"> {link.sr} (andere website)</span>
-                            </a>
-                          )}
+                          {/* Inschrijven, wedstrijden of uitslagen: volgt de datum van vandaag, ook zonder nieuwe build. */}
+                          <ToernooiKnop toernooi={t} wie={t.club} class={actie} icoon={18} />
                           {route && (
                             <a href={route} class={actie} target="_blank" rel="noopener">
                               <Icon name="route" size={18} stroke={2} /> Route

@@ -6,7 +6,7 @@ import { dagMaand, plusDagen, vandaag } from './datum';
 
 /**
  * Toernooi met een pagina op tournamentsoftware en twee data: `inschrijvenTot`, de laatste dag om in te schrijven, en
- * `datum`, de (laatste) speeldag. Het schema maakt `inschrijvenTot` verplicht bij een toernooilink.
+ * `datum`, de (laatste) speeldag. Het schema maakt `inschrijvenTot` verplicht bij een toernooilink, en vroeger dan `datum`.
  */
 export interface Toernooipagina {
   datum: string;
@@ -23,7 +23,7 @@ export function toernooiLink(t: Toernooipagina, wie: string, nu = vandaag()) {
   if (!t.toernooilink) return undefined;
   const href = t.toernooilink;
   if (t.datum < nu) return { href, label: 'Uitslagen', sr: `van ${wie}`, icon: 'document' } as const;
-  if (t.inschrijvenTot && nu <= t.inschrijvenTot && nu < t.datum)
+  if (t.inschrijvenTot && nu <= t.inschrijvenTot)
     return { href, label: `Inschrijven tot ${dagMaand(t.inschrijvenTot)}`, sr: `voor ${wie}`, icon: 'inschrijven' } as const;
   return { href, label: 'Wedstrijden', sr: `bij ${wie}`, icon: 'klok' } as const;
 }
