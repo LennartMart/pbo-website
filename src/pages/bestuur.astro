@@ -4,40 +4,15 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/PageIntro.astro';
 import LinkCard from '../components/LinkCard.astro';
 import PersonCard from '../components/PersonCard.astro';
-import { mail, badmintonVlaanderen, pboKalenderEmbed } from '../data/site';
-import thierry from '../assets/bestuur/thierry-de-decker.jpg';
-import koen from '../assets/bestuur/koen-tourne.png';
-import johan from '../assets/bestuur/johan-muller.jpg';
-import toon from '../assets/bestuur/toon-bouchier.jpg';
-import stefaan from '../assets/bestuur/stefaan-van-moeseke.jpg';
+import Icon from '../components/Icon.astro';
+import { mail, pboKalenderEmbed } from '../data/site';
+import { pagina } from '../lib/paginas';
 
-const bestuurders = [
-  { naam: 'Thierry De Decker', rol: 'Voorzitter', foto: thierry },
-  { naam: 'Koen Tourné', rol: 'Penningmeester', foto: koen },
-  { naam: 'Johan Muller', rol: 'Secretaris', foto: johan },
-  { naam: 'Toon Bouchier', rol: 'Competitie', foto: toon },
-  { naam: 'Stefaan Van Moeseke', rol: 'Evenementen en website', foto: stefaan },
-];
-
-const medewerkers = [
-  { naam: 'Koen Kesteleyn', rol: 'Wedstrijdfunctionarissen' },
-  { naam: 'Vacant', rol: 'Tucht en klacht', vacant: true },
-];
-
-const bijdragen = [
-  { type: 'Recreantenclub', perSpeler: '€ 0,68', minimum: '€ 45' },
-  { type: 'Competitieclub', perSpeler: '€ 1,35', minimum: '€ 65' },
-];
+const { title, lead, description, bestuurders, medewerkers, bijdragen, documenten, Content } = await pagina('bestuur');
 ---
 
-<BaseLayout
-  title="Bestuur"
-  description="Het bestuur en de medewerkers van PBO vzw, lidmaatschap voor clubs, statuten en de PBO-kalender."
->
-  <PageIntro
-    title="Bestuur"
-    lead="PBO vzw, voluit Provinciale Badmintonraad Oost-Vlaanderen vzw, ondersteunt badminton in de provincie: recreatief en competitief, met de jeugdwerking en de competitie voorop."
-  />
+<BaseLayout title={title} description={description}>
+  <PageIntro title={title} lead={lead} />
 
   <section class="wrap mt-10 md:mt-14" aria-labelledby="bestuurders">
     <h2 id="bestuurders" class="mb-4 px-2 text-[28px] leading-tight font-extrabold md:mb-6 md:px-0 md:text-4xl">Bestuurders</h2>
@@ -73,14 +48,7 @@ const bijdragen = [
   <section class="wrap mt-14 grid gap-10 md:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,420px)] lg:gap-16">
     <div>
       <div class="prose-pbo px-2 md:px-0">
-        <h2 class="!mt-0" id="werking">Werking en lidmaatschap</h2>
-        <p>
-          Elke Oost-Vlaamse club die lid is van <a href={badmintonVlaanderen.home}>Badminton Vlaanderen</a> kan aansluiten bij
-          PBO vzw. Dat geldt voor recreantenclubs en competitieclubs.
-        </p>
-        <p>Een club zoeken in je buurt? Alle aangesloten clubs staan op de website van Badminton Vlaanderen.</p>
-        <h3>Provinciale bijdrage</h3>
-        <p>Per speler per jaar. Het eerste seizoen is gratis.</p>
+        <Content />
       </div>
       <table class="mt-4 w-full max-w-[680px] overflow-hidden rounded-card bg-paper text-left">
         <caption class="sr-only">Provinciale bijdrage per speler per jaar</caption>
@@ -107,24 +75,7 @@ const bijdragen = [
 
     <div class="flex flex-col gap-3 lg:pt-1">
       <h2 class="sr-only">Documenten</h2>
-      <LinkCard
-        href={u('/wp-content/uploads/2017/09/Statuten-PBO-vzw-20170924.pdf')}
-        icon="document"
-        title="Statuten PBO vzw"
-        text="Versie van 24 september 2017 (pdf)"
-      />
-      <LinkCard
-        href={u('/wp-content/uploads/2017/07/Organogram-bestuur-2017.pdf')}
-        icon="document"
-        title="Organigram"
-        text="Structuur van het bestuur, 2017 (pdf)"
-      />
-      <LinkCard
-        href={u('/wp-content/uploads/2017/07/Taakomschrijving-PBO-bestuur.pdf')}
-        icon="document"
-        title="Taakomschrijving bestuur"
-        text="Wie doet wat binnen PBO (pdf)"
-      />
+      {documenten.map((d) => <LinkCard href={u(d.bestand)} icon="document" title={d.titel} text={d.tekst} />)}
       <p class="px-2 pt-1 text-[15px] leading-normal text-muted">
         Het intern reglement staat niet online. Leden vragen het op bij het secretariaat.
       </p>
@@ -137,6 +88,10 @@ const bijdragen = [
       <p class="mt-2 max-w-[60ch] text-muted">
         Trainingen van de PBO-selectie, vergaderingen en evenementen. De kalender verandert vaak, kijk dus even na voor je vertrekt.
       </p>
+      <a href={pboKalenderEmbed} target="_blank" rel="noopener" class="mt-3 inline-flex min-h-11 items-center gap-2 font-semibold text-brand hover:underline">
+        <Icon name="extern" size={18} stroke={2} /> Open in Google Agenda
+        <span class="sr-only">(nieuw venster)</span>
+      </a>
     </div>
     <div class="overflow-hidden rounded-card bg-paper p-2 md:p-3">
       <iframe

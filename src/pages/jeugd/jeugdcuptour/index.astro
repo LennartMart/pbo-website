@@ -4,21 +4,22 @@ import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PageIntro from '../../../components/PageIntro.astro';
 import LinkCard from '../../../components/LinkCard.astro';
 import { mail } from '../../../data/site';
-import { seizoen, categorieen, laatsteRanking, komende, documenten } from '../../../data/jeugdcuptour';
+import { pagina } from '../../../lib/paginas';
+import { categorieen, geboortejaren, huidigSeizoen, komende, laatsteRanking } from '../../../lib/jeugdcup';
+import { vandaag } from '../../../lib/datum';
 import { dag, maand } from '../../../lib/datum';
 
-const volgende = komende()[0];
+const [volgende] = await komende();
+const seizoen = await huidigSeizoen();
+const ranking = await laatsteRanking();
+const jaar = Number(vandaag().slice(0, 4));
+const { title, lead, description, documenten, Content } = await pagina('jeugdcuptour');
 ---
 
-<BaseLayout
-  title="Victor Jeugdcuptour by PBO"
-  description={`Hoe de Victor Jeugdcuptour by PBO werkt: wie mag meedoen, leeftijdscategorieën ${laatsteRanking.jaar}, kalender ${seizoen} en ranking.`}
->
+<BaseLayout title={title} description={description}>
   <PageIntro
-    title="Victor Jeugdcuptour by PBO"
-    lead={volgende
-      ? `Volgende halte: ${volgende.club} op ${dag(volgende.date)} ${maand(volgende.date)}.`
-      : 'Open toernooicircuit voor jeugdspelers van Oost-Vlaamse clubs.'}
+    title={title}
+    lead={volgende ? `Volgende halte: ${volgende.club} op ${dag(volgende.date)} ${maand(volgende.date)}.` : lead}
     crumbs={[{ href: u('/jeugd'), label: 'Jeugd' }, { label: 'Jeugdcuptour' }]}
   />
 
@@ -27,39 +28,21 @@ const volgende = komende()[0];
     <LinkCard
       href={u('/jeugd/jeugdcuptour/ranking')}
       icon="ranking"
-      title={`Ranking ${laatsteRanking.jaar}`}
-      text={`Stand na ${laatsteRanking.na}. Zoek je naam per categorie.`}
+      title={`Ranking ${ranking?.jaar ?? jaar}`}
+      text={ranking ? `Stand na ${ranking.na}. Zoek je naam per categorie.` : 'Zoek je naam per categorie.'}
     />
   </section>
 
   <section class="wrap mt-14 grid gap-10 md:mt-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:gap-16">
     <div class="prose-pbo px-2 md:px-0">
-      <h2 class="!mt-0">Zo werkt het</h2>
-      <p>
-        De jeugdcuptour is een reeks recreatieve jeugdtoernooien in Oost-Vlaanderen, van Minibad tot U19. Zo maak je op een
-        laagdrempelige manier kennis met toernooien en competitie.
-      </p>
-      <ul>
-        <li>Meedoen kan als je speelt bij een Oost-Vlaamse club die lid is van Badminton Vlaanderen.</li>
-        <li>Je speelt minstens drie wedstrijden tegen spelers uit je eigen leeftijdscategorie.</li>
-        <li>PBO organiseert de toernooien samen met de clubs, in enkel, dubbel en gemengd.</li>
-        <li>
-          Welke disciplines er zijn, lees je bij de inschrijving. Zijn er meer dan twee, dan schrijf je je voor maximaal twee in.
-        </li>
-        <li>De ranking loopt per kalenderjaar. Zo is er per reeks een winnaar.</li>
-      </ul>
-      <h2>Vragen of een fout gezien?</h2>
-      <p>
-        Mail naar <a href={`mailto:${mail.jeugdcup}`}>{mail.jeugdcup}</a>. Klopt er iets niet in de ranking, dan passen we het zo snel
-        mogelijk aan.
-      </p>
+      <Content />
     </div>
 
     <div>
-      <h2 class="mb-1 px-2 text-[28px] leading-tight font-extrabold md:px-0">Categorieën {laatsteRanking.jaar}</h2>
+      <h2 class="mb-1 px-2 text-[28px] leading-tight font-extrabold md:px-0">Categorieën {jaar}</h2>
       <p class="mb-4 px-2 text-muted md:px-0">Op basis van je geboortejaar.</p>
       <table class="w-full overflow-hidden rounded-card bg-paper text-left">
-        <caption class="sr-only">Leeftijdscategorieën en geboortejaren voor kalenderjaar {laatsteRanking.jaar}</caption>
+        <caption class="sr-only">Leeftijdscategorieën en geboortejaren voor kalenderjaar {jaar}</caption>
         <thead>
           <tr class="label text-muted">
             <th scope="col" class="px-6 pt-5 pb-3 font-semibold">Categorie</th>
@@ -71,7 +54,7 @@ const volgende = komende()[0];
             categorieen.map((c) => (
               <tr class="border-t border-wash">
                 <th scope="row" class="px-6 py-4 font-display text-lg font-bold">{c.label}</th>
-                <td class="num px-6 py-4">{c.jaren}</td>
+                <td class="num px-6 py-4">{geboortejaren(c.id, jaar)}</td>
               </tr>
             ))
           }
@@ -81,8 +64,15 @@ const volgende = komende()[0];
       <h2 class="mt-10 mb-1 px-2 text-[28px] leading-tight font-extrabold md:px-0">Reglement</h2>
       <p class="mb-4 px-2 text-muted md:px-0">Hoe de toernooien verlopen en hoe de punten verdeeld worden.</p>
       <div class="flex flex-col gap-3">
-        {documenten.map((d) => <LinkCard href={u(d.href)} icon="document" title={d.title} text={d.text} />)}
+        {documenten.map((d) => <LinkCard href={u(d.bestand)} icon="document" title={d.titel} text={d.tekst} />)}
       </div>
+      {
+        documenten.some((d) => !d.bestand) && (
+          <p class="mt-3 px-2 text-[15px] leading-normal text-muted md:px-0">
+            Nog niet online? Vraag het via <a class="link" href={`mailto:${mail.jeugdcup}?subject=${encodeURIComponent('Reglement jeugdcuptour')}`}>{mail.jeugdcup}</a>.
+          </p>
+        )
+      }
     </div>
   </section>
 </BaseLayout>

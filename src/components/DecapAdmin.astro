@@ -1,0 +1,32 @@
+---
+/**
+ * Lege pagina waarin Decap CMS opstart. De config komt uit src/lib/cms.ts.
+ * Decap staat vast op een versie; bij een update eerst lokaal testen.
+ */
+import { u } from '../lib/url';
+
+interface Props {
+  config: string;
+  title: string;
+}
+
+const { config, title } = Astro.props;
+---
+
+<!doctype html>
+<html lang="nl-BE">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>{title}</title>
+    <link rel="icon" type="image/png" href={u('/favicon.png')} />
+    <link href={u(config)} type="text/yaml" rel="cms-config-url" />
+  </head>
+  <body>
+    <script is:inline src="https://unpkg.com/decap-cms@3.16.3/dist/decap-cms.js"></script>
+    <script>
+      import '../scripts/admin-preview';
+    </script>
+  </body>
+</html>

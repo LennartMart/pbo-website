@@ -1,0 +1,37 @@
+---
+import Icon from './Icon.astro';
+import type { Beweging } from '../lib/jeugdcup';
+
+interface Props {
+  waarde?: Beweging;
+  class?: string;
+}
+
+const { waarde, class: className } = Astro.props;
+const plaatsen = (n: number) => `${n} ${n === 1 ? 'plaats' : 'plaatsen'}`;
+---
+
+{
+  waarde === 'nieuw' ? (
+    <span class:list={['inline-block rounded-full bg-accent-soft px-2 py-0.5 text-xs font-bold whitespace-nowrap text-brand', className]}>
+      nieuw<span class="sr-only"> in de stand</span>
+    </span>
+  ) : waarde === undefined ? null : waarde > 0 ? (
+    <span class:list={['num inline-flex items-center gap-0.5 text-sm font-semibold text-brand', className]}>
+      <Icon name="omhoog" size={16} stroke={2.4} />
+      {waarde}
+      <span class="sr-only"> {plaatsen(waarde)} gestegen</span>
+    </span>
+  ) : waarde < 0 ? (
+    <span class:list={['num inline-flex items-center gap-0.5 text-sm font-semibold text-muted', className]}>
+      <Icon name="omlaag" size={16} stroke={2.4} />
+      {-waarde}
+      <span class="sr-only"> {plaatsen(-waarde)} gedaald</span>
+    </span>
+  ) : (
+    <span class:list={['text-sm text-muted', className]}>
+      <span aria-hidden="true">–</span>
+      <span class="sr-only">zelfde plaats</span>
+    </span>
+  )
+}

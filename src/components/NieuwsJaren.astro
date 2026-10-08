@@ -1,0 +1,29 @@
+---
+import { u } from '../lib/url';
+
+interface Props {
+  jaren: number[];
+  huidig?: number;
+}
+
+const { jaren, huidig } = Astro.props;
+---
+
+<section class="mt-14 md:mt-16" aria-labelledby="archief-titel">
+  <h2 id="archief-titel" class="mb-5 px-2 text-[28px] leading-tight font-extrabold md:px-0 md:text-[32px]">Archief per jaar</h2>
+  <ul class="flex flex-wrap gap-2.5 px-2 md:px-0">
+    {
+      jaren.map((j) => (
+        <li>
+          <a
+            href={u(`/nieuws/archief/${j}`)}
+            aria-current={j === huidig ? 'page' : undefined}
+            class="num inline-flex min-h-11 min-w-[84px] items-center justify-center rounded-[14px] bg-paper px-4 font-semibold hover:bg-wash aria-[current=page]:bg-ink aria-[current=page]:text-white"
+          >
+            {j}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>

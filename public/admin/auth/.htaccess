@@ -1,0 +1,5 @@
+# config.php bevat het OAuth-geheim: nooit rechtstreeks opvragen.
+<Files "config.php">
+  Require all denied
+</Files>
+DirectoryIndex index.php

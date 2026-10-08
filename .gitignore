@@ -29,3 +29,6 @@ Thumbs.db
 # local-only Impeccable settings
 .impeccable/config.local.json
 .impeccable/live/
+
+# OAuth-geheim voor de Decap-login (wordt bij deploy geschreven)
+public/admin/auth/config.php

@@ -1,0 +1,59 @@
+name: Deploy naar de hosting
+
+# Bouwt de site en zet ze via FTP(S) op de shared hosting van badminton-pbo.be.
+# Staat uit tot de repo-variabele FTP_SERVER ingevuld is (Settings → Secrets and variables → Actions).
+# Zie docs/domeinswitch.md voor de volgorde: eerst een submap of subdomein, pas daarna de root.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hosting
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: ${{ vars.FTP_SERVER != '' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+        env:
+          # Leeg = https://www.badminton-pbo.be. Voor een testsubdomein bv. https://nieuw.badminton-pbo.be
+          SITE_URL: ${{ vars.SITE_URL }}
+          CMS_AUTH_URL: ${{ vars.CMS_AUTH_URL || vars.SITE_URL }}
+
+      - name: Login voor /admin instellen
+        env:
+          OAUTH_CLIENT_ID: ${{ secrets.OAUTH_CLIENT_ID }}
+          OAUTH_CLIENT_SECRET: ${{ secrets.OAUTH_CLIENT_SECRET }}
+        run: |
+          php -r '
+            $c = ["client_id" => getenv("OAUTH_CLIENT_ID"), "client_secret" => getenv("OAUTH_CLIENT_SECRET")];
+            file_put_contents("dist/admin/auth/config.php", "<?php\nreturn " . var_export($c, true) . ";\n");
+          '
+
+      - uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+        with:
+          server: ${{ vars.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ${{ vars.FTP_PROTOCOL || 'ftps' }}
+          local-dir: dist/
+          # Map op de server, met / op het einde. Bv. nieuw.badminton-pbo.be/ of public_html/
+          server-dir: ${{ vars.FTP_SERVER_DIR }}
+          # Enkel bestanden die deze workflow zelf eerder uploadde worden overschreven of verwijderd.
+          # WordPress-bestanden en wp-content/uploads op de server blijven staan.

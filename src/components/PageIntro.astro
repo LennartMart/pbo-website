@@ -18,16 +18,16 @@ const { title, lead, crumbs } = Astro.props;
     {
       crumbs && (
         <nav aria-label="Kruimelpad" class="mb-4 text-sm text-muted">
-          <ol class="flex flex-wrap items-center gap-x-2">
+          <ol class="-ml-1 flex flex-wrap items-center gap-x-1">
             {crumbs.map((c, i) => (
-              <li class="flex items-center gap-x-2">
+              <li class="flex items-center gap-x-1">
                 {i > 0 && <span aria-hidden="true">/</span>}
                 {c.href ? (
-                  <a href={c.href} class="inline-flex min-h-11 items-center hover:text-brand">
+                  <a href={c.href} class="inline-flex min-h-11 min-w-11 items-center justify-center px-1 hover:text-brand">
                     {c.label}
                   </a>
                 ) : (
-                  <span aria-current="page" class="font-semibold text-ink">
+                  <span aria-current="page" class="px-1 font-semibold text-ink">
                     {c.label}
                   </span>
                 )}

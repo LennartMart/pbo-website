@@ -1,0 +1,203 @@
+---
+import { u } from '../../lib/url';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import NieuwsKaart from '../../components/NieuwsKaart.astro';
+import NieuwsJaren from '../../components/NieuwsJaren.astro';
+import { alleBerichten, categorieNaam, jaarVan, kiesUitgelicht, nieuwsCategorieen } from '../../lib/nieuws';
+import { lang } from '../../lib/datum';
+
+const AANTAL = 24;
+
+const berichten = await alleBerichten();
+const uitgelicht = kiesUitgelicht(berichten);
+const lijst = berichten.filter((b) => b !== uitgelicht).slice(0, AANTAL);
+const jaren = [...new Set(berichten.map(jaarVan))];
+// "Oudere berichten": het jaar van het oudste bericht in de lijst (de rest van dat jaar staat in het archief).
+const ouderJaar = berichten.length > AANTAL + 1 ? jaarVan(lijst.at(-1)!) : undefined;
+const chips = nieuwsCategorieen.filter((c) => lijst.some((b) => b.data.category === c.id));
+const pill =
+  'inline-flex min-h-11 items-center rounded-full border-[1.5px] border-edge bg-paper px-5 text-[15px] font-semibold transition-colors hover:border-ink aria-pressed:border-ink aria-pressed:bg-ink aria-pressed:text-white';
+---
+
+<BaseLayout title="Nieuws" description="Nieuws van PBO vzw: jeugdcuptour, PBO-selectie, provinciaal kampioenschap en competitie in Oost-Vlaanderen.">
+  <section class="wrap pt-4 md:pt-6">
+    <div class="mb-8 flex flex-wrap items-end justify-between gap-6 px-2 md:px-0">
+      <div>
+        <h1 class="text-[40px] leading-[1.05] font-extrabold tracking-[-0.02em] md:text-[52px] lg:text-[60px]">Nieuws</h1>
+        <p class="mt-3 text-lg text-muted">Uitslagen, inschrijvingen en aankondigingen van PBO.</p>
+      </div>
+      <div class="flex w-full min-w-0 flex-col gap-1.5 md:w-[360px]" data-zoek hidden>
+        <label for="zoek-nieuws" class="text-sm font-semibold">Zoeken in nieuws</label>
+        <input
+          id="zoek-nieuws"
+          type="search"
+          autocomplete="off"
+          placeholder="Toernooi, club of seizoen"
+          class="min-h-[52px] rounded-full border-[1.5px] border-edge bg-paper px-5 text-base placeholder:text-muted focus:border-ink"
+        />
+      </div>
+    </div>
+
+    <div data-resultaten hidden>
+      <p data-resultaten-status class="mb-4 px-2 font-semibold md:px-0" aria-live="polite"></p>
+      <ul data-resultaten-lijst class="grid gap-3 md:grid-cols-2 lg:grid-cols-3 lg:gap-5"></ul>
+      <div data-resultaten-niets hidden class="rounded-card bg-paper p-6 leading-normal md:p-8">
+        <p>Probeer een clubnaam, een toernooi of een jaartal, bijvoorbeeld "Mintons", "PK" of "2024".</p>
+        <p class="mt-2 text-muted">Oudere berichten vind je ook per jaar, hieronder.</p>
+      </div>
+    </div>
+
+    <div data-overzicht>
+      {
+        uitgelicht && (
+          <a
+            href={u(`/nieuws/${uitgelicht.id}`)}
+            class="on-ink lift flex flex-col gap-8 rounded-[28px] bg-ink p-7 text-white md:rounded-panel md:p-14 lg:flex-row lg:items-end lg:gap-10"
+          >
+            <span class="flex min-w-0 flex-1 flex-col gap-4">
+              <span class="flex flex-wrap items-center gap-3">
+                <span class="rounded-full bg-accent px-3.5 py-1.5 text-[13px] font-bold tracking-[0.06em] text-ink uppercase">
+                  {categorieNaam(uitgelicht.data.category)}
+                </span>
+                <time datetime={uitgelicht.data.date} class="text-[15px] text-mist">
+                  {lang(uitgelicht.data.date)}
+                </time>
+              </span>
+              <span class="font-display text-[32px] leading-[1.05] font-extrabold tracking-[-0.01em] md:text-[48px]">
+                {uitgelicht.data.title}
+              </span>
+              <span class="max-w-[640px] text-[17px] leading-[1.55] text-mist md:text-lg">{uitgelicht.data.excerpt}</span>
+            </span>
+            <span class="btn shrink-0 self-start bg-paper text-ink lg:self-end">
+              Lees bericht <Icon name="pijl" size={18} stroke={2} />
+            </span>
+          </a>
+        )
+      }
+
+      {
+        chips.length > 1 && (
+          <div class="mt-10 mb-6 flex flex-wrap gap-3 px-2 md:px-0" role="group" aria-label="Filter op categorie" data-chips hidden>
+            <button type="button" class={pill} data-filter="" aria-pressed="true">
+              Alles
+            </button>
+            {chips.map((c) => (
+              <button type="button" class={pill} data-filter={c.id} aria-pressed="false">
+                {c.label}
+              </button>
+            ))}
+          </div>
+        )
+      }
+
+      <h2 class="sr-only">Recente berichten</h2>
+      <ul class="mt-6 grid gap-3 md:grid-cols-2 lg:grid-cols-3 lg:gap-5" data-raster>
+        {
+          lijst.map((b) => (
+            <li data-cat={b.data.category}>
+              <NieuwsKaart bericht={b} />
+            </li>
+          ))
+        }
+      </ul>
+      <p data-leeg hidden class="rounded-card bg-paper p-6 text-muted md:p-8">
+        Geen recente berichten in deze categorie. Kijk in het archief hieronder.
+      </p>
+
+      {
+        ouderJaar && (
+          <div class="mt-8 flex justify-center">
+            <a href={u(`/nieuws/archief/${ouderJaar}`)} class="btn border-[1.5px] border-line bg-paper text-ink hover:border-ink">
+              Oudere berichten
+            </a>
+          </div>
+        )
+      }
+    </div>
+
+    <NieuwsJaren jaren={jaren} />
+  </section>
+</BaseLayout>
+
+<script>
+  import { u } from '../../lib/url';
+
+  // Filter op categorie
+  const raster = document.querySelector<HTMLElement>('[data-raster]');
+  const chips = document.querySelector<HTMLElement>('[data-chips]');
+  const leeg = document.querySelector<HTMLElement>('[data-leeg]');
+  if (raster && chips && leeg) {
+    chips.hidden = false;
+    chips.addEventListener('click', (e) => {
+      const knop = (e.target as HTMLElement).closest<HTMLButtonElement>('button[data-filter]');
+      if (!knop) return;
+      const cat = knop.dataset.filter;
+      chips.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(b === knop)));
+      let zichtbaar = 0;
+      raster.querySelectorAll<HTMLElement>('li').forEach((li) => {
+        li.hidden = !!cat && li.dataset.cat !== cat;
+        if (!li.hidden) zichtbaar++;
+      });
+      leeg.hidden = zichtbaar > 0;
+    });
+  }
+
+  // Zoeken met Pagefind (index wordt na de build gemaakt; in `npm run dev` bestaat ze niet).
+  type Resultaat = { url: string; excerpt: string; meta: { title?: string; datum?: string }; filters?: { categorie?: string[] } };
+  type Pagefind = {
+    options(o: { baseUrl: string }): Promise<void>;
+    debouncedSearch(q: string): Promise<{ results: { data(): Promise<Resultaat> }[] } | null>;
+  };
+
+  const zoekVak = document.querySelector<HTMLElement>('[data-zoek]');
+  const invoer = document.querySelector<HTMLInputElement>('#zoek-nieuws');
+  const overzicht = document.querySelector<HTMLElement>('[data-overzicht]');
+  const resultaten = document.querySelector<HTMLElement>('[data-resultaten]');
+  const status = document.querySelector<HTMLElement>('[data-resultaten-status]');
+  const lijst = document.querySelector<HTMLElement>('[data-resultaten-lijst]');
+  const niets = document.querySelector<HTMLElement>('[data-resultaten-niets]');
+
+  const pad = u('/pagefind/pagefind.js');
+  const laad = import(/* @vite-ignore */ pad).catch(() => null) as Promise<Pagefind | null>;
+
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
+
+  laad.then(async (pagefind) => {
+    if (!pagefind || !zoekVak || !invoer || !overzicht || !resultaten || !status || !lijst || !niets) return;
+    // Pagefind kent het basispad niet (GitHub Pages: /pbo-website/).
+    await pagefind.options({ baseUrl: u('/') });
+    zoekVak.hidden = false;
+
+    invoer.addEventListener('input', async () => {
+      const q = invoer.value.trim();
+      if (q.length < 2) {
+        overzicht.hidden = false;
+        resultaten.hidden = true;
+        return;
+      }
+      const zoek = await pagefind.debouncedSearch(q);
+      if (!zoek || invoer.value.trim() !== q) return;
+      const data = await Promise.all(zoek.results.slice(0, 30).map((r) => r.data()));
+      overzicht.hidden = true;
+      resultaten.hidden = false;
+      status.textContent =
+        data.length === 0 ? `Niets gevonden voor "${q}".` : `${zoek.results.length} ${zoek.results.length === 1 ? 'bericht' : 'berichten'} voor "${q}"`;
+      niets.hidden = data.length > 0;
+      // Zelfde opbouw als NieuwsKaart. Excerpt van Pagefind bevat enkel <mark>; de rest escapen.
+      lijst.innerHTML = data
+        .map((r) => {
+          const cat = r.filters?.categorie?.[0];
+          return `<li><a href="${esc(r.url)}" class="lift flex h-full flex-col gap-3 rounded-card bg-paper p-6 md:p-7">
+            <span class="flex flex-wrap items-center gap-x-3 gap-y-1">
+              ${cat ? `<span class="rounded-full bg-accent-soft px-3 py-1 text-xs font-bold tracking-[0.06em] text-brand uppercase">${esc(cat)}</span>` : ''}
+              ${r.meta.datum ? `<span class="text-sm text-muted">${esc(r.meta.datum)}</span>` : ''}
+            </span>
+            <span class="font-display text-[21px] leading-[1.2] font-bold md:text-[23px]">${esc(r.meta.title ?? '')}</span>
+            <span class="leading-normal text-muted [&_mark]:rounded-sm [&_mark]:bg-accent-soft [&_mark]:px-0.5 [&_mark]:text-ink">${r.excerpt}</span>
+          </a></li>`;
+        })
+        .join('');
+    });
+  });
+</script>
