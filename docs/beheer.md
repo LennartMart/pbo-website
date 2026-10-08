@@ -45,6 +45,15 @@ Een gespeelde halte met standen niet verwijderen, anders bouwt de site niet meer
 
 Bij **Jeugdcuptour** staan ook de **geboortejaren per categorie**. Ze komen in de tabel "Categorieën" en bij de filters van de ranking. Vul ze in voor één kalenderjaar, bijvoorbeeld 2026: U13 van 2014 tot en met 2015. Het jaar erna schuift de site ze zelf op (U13 in 2027: 2015 en 2016). Enkel aanpassen als de leeftijdsgrenzen veranderen. Minibad heeft geen "tot en met": leeg betekent "of later". De categorieën zelf (Minibad, U11, ...) zitten in de code, want de standen verwijzen ernaar.
 
+## Nieuws bovenaan de home (beheerders)
+
+Open het bericht, zet **Uitgelicht** aan en publiceer. Het bericht staat dan bovenaan het nieuwsoverzicht en bovenaan de home:
+
+- zolang de jeugdcup een volgende halte heeft, als blok net onder die halte (en boven het PK-blok);
+- als alle haltes gespeeld zijn en de nieuwe kalender nog niet online staat, in de plaats van de halte, groot bovenaan.
+
+Is de titel lang, vul dan **Korte titel voor de home** in. Er staat altijd maar één bericht bovenaan: het nieuwste dat uitgelicht is. Zet **Uitgelicht** weer uit als het niet meer actueel is.
+
 ## Provinciaal kampioenschap (beheerders)
 
 Het PK heeft een eigen pagina (`/pk`) en een blok op de home. Je hoeft er geen nieuwsbericht voor te maken.

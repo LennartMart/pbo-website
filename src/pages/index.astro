@@ -12,7 +12,7 @@ import {
   toernooiLink,
   type Toernooi,
 } from '../lib/jeugdcup';
-import { alleBerichten, jaarVan } from '../lib/nieuws';
+import { alleBerichten, categorieNaam, jaarVan } from '../lib/nieuws';
 import { dag, dag2, maand, maandKort, weekdag, lang, vandaag } from '../lib/datum';
 import { competitieAgenda, badmintonVlaanderen, mail } from '../data/site';
 import { pk as leesPk } from '../lib/pk';
@@ -28,7 +28,6 @@ const daarna = volgende ? haltes.slice(nummer, nummer + 4) : [];
 
 const status = (t: Toernooi) => (t.date < nu ? 'gespeeld' : t === volgende ? 'volgende' : 'later');
 const nieuwJaar = (lijst: Toernooi[], i: number) => i > 0 && lijst[i].date.slice(0, 4) !== lijst[i - 1].date.slice(0, 4);
-const isPk = (t: Toernooi) => /^PK\b/.test(t.club);
 const halte = (t: Toernooi) => u(`/jeugd/jeugdcuptour/kalender#halte-${t.id}`);
 const route = volgende && routeUrl(volgende);
 // Inschrijven, wedstrijden of uitslagen: dezelfde toernooipagina, het label volgt de datum.
@@ -45,8 +44,10 @@ const volgendeStand =
     : '';
 
 const berichten = await alleBerichten();
-// Enkel een bericht dat een beheerder uitlicht, krijgt een regel bovenaan; het staat dan niet nog eens in de lijst.
+// Een bericht dat een beheerder uitlicht, staat bovenaan: in de hero als de jeugdcup geen volgende halte heeft,
+// anders als blok eronder. Het staat dan niet nog eens in de lijst.
 const uitgelicht = berichten.find((b) => b.data.uitgelicht);
+const nieuwsInHero = !volgende && !!uitgelicht;
 const recentNieuws = berichten.filter((b) => b !== uitgelicht).slice(0, 4);
 const eersteJaar = berichten.length ? jaarVan(berichten.at(-1)!) : undefined;
 
@@ -62,21 +63,7 @@ const voorClubs = [
 ---
 
 <BaseLayout>
-  {
-    uitgelicht && (
-      <p class="wrap mb-3 px-5 md:px-8">
-        <a href={u(`/nieuws/${uitgelicht.id}`)} class="link inline-flex min-h-11 items-center gap-2">
-          <span>
-            <time datetime={uitgelicht.data.date} class="font-normal text-muted">{lang(uitgelicht.data.date)}:</time>{' '}
-            {uitgelicht.data.kort ?? uitgelicht.data.title}
-          </span>
-          <Icon name="pijl" size={16} stroke={2} class="shrink-0" />
-        </a>
-      </p>
-    )
-  }
-
-  <!-- Volgende halte van de jeugdcuptour, met het hele seizoen als lijn -->
+  <!-- Volgende halte van de jeugdcuptour, met het hele seizoen als lijn. Zonder volgende halte: het uitgelichte bericht. -->
   <section class="wrap" aria-labelledby="volgende-titel">
     <div class="on-ink overflow-hidden rounded-[28px] bg-ink text-white lg:rounded-panel">
       {
@@ -93,15 +80,15 @@ const voorClubs = [
                 </time>
                 <span class="sr-only">: </span>
                 <span class="mt-2 block text-[26px] leading-[1.12] font-bold tracking-[-0.01em] md:mt-3 md:text-[34px] lg:text-[40px]">
-                  {isPk(volgende) ? `Volgende halte: ${volgende.club}` : `Volgende jeugdcup bij ${volgende.club}`}
+                  Victor Jeugdcuptour by&nbsp;PBO
                 </span>
               </h1>
               <p class="mt-3 max-w-[60ch] text-base leading-normal text-mist md:mt-4 md:text-lg">
+                <span class="font-semibold text-white">{volgende.club}</span>
                 {[volgende.hall, volgende.start && `vanaf ${volgende.start}`, volgende.prijsuitreiking && 'met prijsuitreiking']
                   .filter(Boolean)
-                  .join(' · ')}
-                {(volgende.hall || volgende.start || volgende.prijsuitreiking) && <br />}
-                Halte {nummer} van {haltes.length} in de Victor Jeugdcuptour by&nbsp;PBO.
+                  .map((x) => ` · ${x}`)
+                  .join('')}
               </p>
               {(link || route) && (
                 <div class="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 md:mt-7">
@@ -123,13 +110,36 @@ const voorClubs = [
                     >
                       <Icon name="route" size={20} stroke={2} />
                       <span>
-                        Route<span class="max-sm:sr-only"> naar {volgende.hall ?? volgende.club}</span>
+                        Route<span class="sr-only"> naar {volgende.hall ?? volgende.club}</span>
                       </span>
                       <span class="sr-only"> (Google Maps, nieuw venster)</span>
                     </a>
                   )}
                 </div>
               )}
+            </div>
+          </div>
+        ) : uitgelicht ? (
+          <div class="px-6 pt-8 pb-7 md:px-10 md:pt-11 lg:px-16 lg:pt-14 lg:pb-12">
+            <p class="flex flex-wrap items-center gap-3">
+              <span class="rounded-full bg-accent px-3.5 py-1.5 text-[13px] font-bold tracking-[0.06em] text-ink uppercase">
+                {categorieNaam(uitgelicht.data.category)}
+              </span>
+              <time datetime={uitgelicht.data.date} class="text-[15px] text-mist">
+                {lang(uitgelicht.data.date)}
+              </time>
+            </p>
+            <h1
+              id="volgende-titel"
+              class="mt-4 max-w-[24ch] font-display text-[32px] leading-[1.05] font-extrabold tracking-[-0.01em] md:text-[48px] lg:text-[56px]"
+            >
+              {uitgelicht.data.kort ?? uitgelicht.data.title}
+            </h1>
+            <p class="mt-3 max-w-[60ch] text-base leading-normal text-mist md:mt-4 md:text-lg">{uitgelicht.data.excerpt}</p>
+            <div class="mt-6 flex flex-col sm:flex-row md:mt-7">
+              <a class="btn bg-accent text-ink" href={u(`/nieuws/${uitgelicht.id}`)}>
+                Lees het bericht <Icon name="pijl" size={20} stroke={2} />
+              </a>
             </div>
           </div>
         ) : (
@@ -140,11 +150,11 @@ const voorClubs = [
               </span>
               <span class="sr-only">: </span>
               <span class="mt-2 block text-[26px] leading-[1.12] font-bold tracking-[-0.01em] md:mt-3 md:text-[34px] lg:text-[40px]">
-                {seizoen ? 'Alle haltes van de Victor Jeugdcuptour by PBO zijn gespeeld' : 'Victor Jeugdcuptour by PBO'}
+                Victor Jeugdcuptour by&nbsp;PBO
               </span>
             </h1>
             <p class="mt-4 max-w-[54ch] text-base leading-normal text-mist md:text-lg">
-              De kalender van het volgende seizoen staat hier zodra de data vastliggen.
+              {seizoen && 'Alle haltes zijn gespeeld. '}De kalender van het volgende seizoen staat hier zodra de data vastliggen.
             </p>
           </div>
         )
@@ -152,7 +162,7 @@ const voorClubs = [
 
       <!-- Lijnplan met alle haltes, namen afwisselend boven en onder de lijn. Enkel op desktop: op de telefoon staan de haltes in "Daarna". -->
       {
-        haltes.length > 1 && (
+        haltes.length > 1 && !nieuwsInHero && (
           <div class="hidden border-t border-white/10 px-16 pt-4 pb-6 lg:block">
             <h2 class="sr-only">Alle haltes van seizoen {seizoen}</h2>
             <ol class="grid" style={`grid-template-columns: repeat(${haltes.length}, minmax(0, 1fr))`}>
@@ -231,6 +241,28 @@ const voorClubs = [
       }
     </div>
   </section>
+
+  <!-- Uitgelicht bericht, zolang een beheerder het uitlicht (als het niet al in de hero staat) -->
+  {
+    uitgelicht && !nieuwsInHero && (
+      <section class="wrap mt-3 lg:mt-5" aria-labelledby="uitgelicht-titel">
+        <div class="grid gap-5 rounded-card bg-paper px-6 py-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-10 lg:px-10 lg:py-9">
+          <div class="min-w-0">
+            <p class="text-[15px] font-semibold text-brand">
+              {categorieNaam(uitgelicht.data.category)} · <time datetime={uitgelicht.data.date}>{lang(uitgelicht.data.date)}</time>
+            </p>
+            <h2 id="uitgelicht-titel" class="mt-1 text-[28px] leading-[1.1] font-extrabold lg:text-4xl">
+              {uitgelicht.data.kort ?? uitgelicht.data.title}
+            </h2>
+            <p class="mt-2 max-w-[60ch] text-[17px] leading-normal text-muted lg:text-lg">{uitgelicht.data.excerpt}</p>
+          </div>
+          <a class="btn bg-ink text-white" href={u(`/nieuws/${uitgelicht.id}`)}>
+            Lees het bericht <Icon name="pijl" size={20} stroke={2} />
+          </a>
+        </div>
+      </section>
+    )
+  }
 
   <!-- Provinciaal kampioenschap, zolang het aanstaat in het beheer -->
   {
@@ -371,7 +403,7 @@ const voorClubs = [
             href={u('/jeugd/jeugdcuptour/kalender')}
             class="flex min-h-[56px] items-center justify-between gap-3 border-t border-wash font-semibold"
           >
-            Hele kalender, {haltes.length} haltes <Icon name="pijl" size={18} stroke={2} />
+            Hele kalender <Icon name="pijl" size={18} stroke={2} />
           </a>
         </section>
       )
@@ -433,7 +465,7 @@ const voorClubs = [
         href={u('/nieuws')}
         class="flex min-h-[56px] items-center justify-between gap-3 rounded-2xl px-4 font-semibold hover:bg-ground lg:px-6"
       >
-        {eersteJaar ? `Alle berichten sinds ${eersteJaar}` : 'Alle berichten'}
+        Alle berichten
         <Icon name="pijl" size={18} stroke={2} />
       </a>
     </div>

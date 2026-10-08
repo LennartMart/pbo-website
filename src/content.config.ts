@@ -114,9 +114,9 @@ const nieuws = defineCollection({
     date: isoDatum,
     category: z.enum(['jeugd', 'selectie', 'evenement', 'competitie', 'recreanten', 'algemeen']),
     excerpt: z.string(),
-    /** Bovenaan het nieuwsoverzicht en als link in de hero van de home. */
+    /** Bovenaan het nieuwsoverzicht en de home: blok onder de volgende jeugdcuphalte, of de hero als er geen volgende halte is. */
     uitgelicht: z.boolean().default(false),
-    /** Korte tekst voor de link op de home, bv. "Nieuw reglement voor de recreantencompetitie". Het PK heeft een eigen blok. */
+    /** Kortere titel voor de home, bv. "Nieuw reglement voor de recreantencompetitie". Het PK heeft een eigen blok. */
     kort: z.string().optional(),
     legacyUrl: z.string().optional(),
   }),

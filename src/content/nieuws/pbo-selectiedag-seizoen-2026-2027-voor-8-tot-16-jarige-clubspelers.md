@@ -2,7 +2,11 @@
 title: PBO selectiedag seizoen 2026-2027 voor 8- tot 16-jarige clubspelers
 date: 2026-05-03
 category: jeugd
-excerpt: Zin in een toffe en leerrijke ervaring ? Wil je eens een badmintontraining meemaken met enkele van de PBO-selectie-trainers en laten zien wat je kan ? Op een speelse manier maken we je warm voor onze trainingen. Enkele…
+excerpt: Zin in een toffe en leerrijke ervaring ? Wil je eens een
+  badmintontraining meemaken met enkele van de PBO-selectie-trainers en laten
+  zien wat je kan ? Op een speelse manier maken we je warm voor onze trainingen.
+  Enkele…
+uitgelicht: false
 legacyUrl: /2026/05/03/pbo-selectiedag-seizoen-2026-2027-voor-8-tot-16-jarige-clubspelers/
 ---
 
