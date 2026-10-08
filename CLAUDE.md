@@ -22,7 +22,7 @@ Een **gewone user** mag enkel **uitslagen/rankings van de jeugdcuptour** toevoeg
 ```
 src/content/
   nieuws/<slug>.md          title, date, category, excerpt, legacyUrl?
-  kalender/<seizoen>.yaml   seizoen, haltes: date, club, hall?, adres?, start?, toernooilink?, inschrijvenTot?, prijsuitreiking?
+  kalender/<seizoen>.yaml   seizoen, haltes: datum, club, sporthal?, adres?, start?, toernooilink?, inschrijvenTot?, prijsuitreiking?
                             (één bestand per seizoen, zodat beheerders haltes in bulk toevoegen en schrappen;
                             id van een halte = <datum>-<club> in slug-vorm, seizoen volgt uit de datum)
   rankings/<toernooi-id>/<categorie>-<geslacht>.yaml
@@ -35,10 +35,11 @@ src/content/
 ```
 
 - Een ranking is de **tussenstand** na dat toernooi, zoals berekend in Excel. De site telt niets op: per categorie, jongens en meisjes apart, toont ze de stand van het laatste toernooi in dat kalenderjaar.
-- `stand` is tekst met tabs (rechtstreeks geplakt uit Excel): positie, naam, club, punten. Getallen tussen club en totaal (lidnummer, punten per halte) negeert de parser, dus de hele Excel-rij mag mee. Parser: `src/lib/stand.ts`.
+- `stand` is tekst met tabs (rechtstreeks geplakt uit Excel): positie, naam, club, punten. Getallen tussen club en totaal (lidnummer, punten per halte) negeert de parser, dus de hele Excel-rij mag mee. Eén speler per rij (geen dubbels). Parser: `src/lib/stand.ts`.
 - Optioneel een pdf van de stand (`pdf`), getoond als downloadlink naast de tabel.
 - Een stand vindt haar halte op id, en anders op datum (een verbeterde clubnaam verandert het id).
-- `toernooilink` is de tournamentsoftware-pagina van een halte. De knop op de kalender heet "Inschrijven" (tot `inschrijvenTot`), dan "Wedstrijden" tot en met de speeldag, en daarna "Uitslagen" (`toernooiLink()` in `src/lib/jeugdcup.ts`).
+- `toernooilink` is de tournamentsoftware-pagina van een halte of het PK. De knop heet "Inschrijven" (tot `inschrijvenTot`), dan "Wedstrijden" tot en met de speeldag, en daarna "Uitslagen" (`toernooiLink()` in `src/lib/toernooi.ts`, gedeeld door jeugdcup en PK; het PK hangt niet af van `jeugdcup.ts`).
+- Regels en zinnen van de jeugdcup die op meerdere pagina's staan (volgende halte, volgende stand, rankingjaar, `tijdlijn()` voor de home) staan in `src/lib/jeugdcup.ts`, niet in de pagina's.
 - Wat van de datum afhangt, moet ook kloppen als er dagen geen build is. De build zet elke toestand die nog komt in de HTML met `<Periode van tot>` (`src/components/Periode.astro`), en een inline script in `BaseLayout` toont in de browser die van vandaag. Zo werken de hero, het lijnplan, "Daarna" en de rankingzin op de home, en `ToernooiKnop` (home, /pk). De kalenderpagina volgt nog de builddatum.
 - Decap-config wordt bij de build gegenereerd uit `src/lib/cms.ts` (`/admin/config.yml`, `/admin/jeugdcup/config.yml`). Velden daar en in `src/content.config.ts` gelijk houden. Handleiding: `docs/beheer.md`.
 - Markdown draait op Sätteri (Astro 7). `src/lib/markdown-basis.mjs` zet het basispad voor interne links in Markdown.

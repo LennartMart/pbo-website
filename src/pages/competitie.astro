@@ -2,7 +2,7 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageIntro from '../components/PageIntro.astro';
 import LinkCard from '../components/LinkCard.astro';
-import { badmintonVlaanderen, competitieAgenda, mail } from '../data/site';
+import { competitie, mail } from '../data/site';
 import { pagina } from '../lib/paginas';
 
 const { title, lead, description, Content } = await pagina('competitie');
@@ -13,14 +13,14 @@ const { title, lead, description, Content } = await pagina('competitie');
 
   <section class="wrap mt-8 grid gap-3 md:mt-10 md:grid-cols-2 lg:gap-5">
     <LinkCard
-      href={competitieAgenda}
+      href={competitie.agenda}
       icon="kalender"
       title="Competitieagenda"
       text="Koppel de wedstrijden van je ploeg aan je eigen agenda"
       external
     />
     <LinkCard
-      href={badmintonVlaanderen.competitie}
+      href={competitie.uitslagen}
       icon="competitie"
       title="Uitslagen en standen"
       text="Alle reeksen van de provinciale competitie bij Badminton Vlaanderen"

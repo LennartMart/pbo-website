@@ -6,76 +6,58 @@ import Periode from '../components/Periode.astro';
 import ToernooiKnop from '../components/ToernooiKnop.astro';
 import {
   alleToernooien,
-  laatsteRanking,
   categorieen,
   geboortejarenKort,
-  routeUrl,
-  seizoenVan,
+  komende,
+  laatsteRanking,
+  rankingJaar,
+  standNaZin,
   statussen,
+  tijdlijn,
+  volgendeStandZin,
   type Toernooi,
 } from '../lib/jeugdcup';
-import { alleBerichten, categorieNaam, jaarVan } from '../lib/nieuws';
-import { dag, dag2, maand, maandKort, weekdag, lang, plusDagen, vandaag } from '../lib/datum';
-import { competitieAgenda, badmintonVlaanderen, mail } from '../data/site';
+import { routeUrl } from '../lib/toernooi';
+import { alleBerichten, categorieNaam } from '../lib/nieuws';
+import { dag, dag2, maand, maandKort, weekdag, lang, vandaag } from '../lib/datum';
+import { competitie, mail } from '../data/site';
 import { pk as leesPk } from '../lib/pk';
 
-const nu = vandaag();
 const toernooien = await alleToernooien();
+const komend = await komende();
 
 const berichten = await alleBerichten();
 // Een bericht dat een beheerder uitlicht, staat bovenaan: in de hero als de jeugdcup geen volgende halte heeft,
 // anders als blok eronder. Het staat dan niet nog eens in de lijst.
 const uitgelicht = berichten.find((b) => b.data.uitgelicht);
 const recentNieuws = berichten.filter((b) => b !== uitgelicht).slice(0, 4);
-const eersteJaar = berichten.length ? jaarVan(berichten.at(-1)!) : undefined;
 
-// De home is statisch, maar moet ook kloppen als er een tijd geen build is. Elke halte is de volgende vanaf de dag na
-// de vorige halte tot en met haar speeldag; na de laatste is er geen. Wat daarvan afhangt, staat er voor elke halte
-// die nog komt, en Periode toont het stuk van vandaag.
-const komend = toernooien.filter((t) => t.date >= nu);
-const momenten = [...komend, undefined].map((volgende, i) => {
-  // Het seizoen van de volgende halte; na de laatste halte het seizoen dat net gespeeld is.
-  const seizoen = volgende ? seizoenVan(volgende.date) : toernooien.length ? seizoenVan(toernooien.at(-1)!.date) : undefined;
-  const haltes = seizoen ? toernooien.filter((t) => seizoenVan(t.date) === seizoen) : [];
-  const nummer = volgende ? haltes.indexOf(volgende) + 1 : haltes.length;
-  return {
-    van: i > 0 ? plusDagen(komend[i - 1].date, 1) : undefined,
-    tot: volgende?.date,
-    volgende,
-    seizoen,
-    haltes,
-    daarna: volgende ? haltes.slice(nummer, nummer + 4) : [],
-    route: volgende && routeUrl(volgende),
-    nieuwsInHero: !volgende && !!uitgelicht,
-  };
-});
+// De home is statisch, maar moet ook kloppen als er een tijd geen build is: wat van de volgende halte afhangt, staat
+// er voor elke halte die nog komt (tijdlijn), en Periode toont het stuk van vandaag.
+const momenten = tijdlijn(toernooien).map((m) => ({ ...m, route: m.volgende && routeUrl({ ...m.volgende, bij: m.volgende.club }) }));
 // Het lijnplan wisselt per seizoen; binnen een seizoen wisselt per halte enkel de stip (statussen).
-const metLijn = momenten.filter((m) => m.haltes.length > 1 && !m.nieuwsInHero);
+// Na de laatste halte staat het uitgelichte bericht in de hero, dan zonder lijnplan.
+const metLijn = momenten.filter((m) => m.haltes.length > 1 && (m.volgende || !uitgelicht));
 const lijnplannen = [...new Set(metLijn.map((m) => m.seizoen))].map((seizoen) => {
   const lijst = metLijn.filter((m) => m.seizoen === seizoen);
   return { seizoen, haltes: lijst[0].haltes, van: lijst[0].van, tot: lijst.at(-1)!.tot };
 });
+// Telefoon: de vier haltes na de volgende.
+const daarnaBlokken = momenten.filter((m) => m.daarna.length > 0).map((m) => ({ ...m, daarna: m.daarna.slice(0, 4) }));
 
-const nieuwJaar = (lijst: Toernooi[], i: number) => i > 0 && lijst[i].date.slice(0, 4) !== lijst[i - 1].date.slice(0, 4);
-const vorige = (t: Toernooi) => toernooien[toernooien.indexOf(t) - 1];
+const nieuwJaar = (lijst: Toernooi[], i: number) => i > 0 && rankingJaar(lijst[i]) !== rankingJaar(lijst[i - 1]);
 const halte = (t: Toernooi) => u(`/jeugd/jeugdcuptour/kalender#halte-${t.id}`);
 
 const ranking = await laatsteRanking();
-const rankingJaar = ranking?.jaar ?? Number(nu.slice(0, 4));
-const datum = (iso: string) => `${dag(iso)} ${maand(iso)}`;
-const volgendeStand = (t: Toernooi) =>
-  ranking
-    ? Number(t.date.slice(0, 4)) === ranking.jaar
-      ? `De volgende stand komt na ${t.club} op ${datum(t.date)}.`
-      : `De ranking ${t.date.slice(0, 4)} begint bij ${t.club} op ${datum(t.date)}.`
-    : `De eerste stand komt na ${t.club} op ${datum(t.date)}.`;
+// Geboortejaren bij de categorieën: die van de lopende ranking, anders van dit jaar.
+const categorieJaar = ranking?.jaar ?? Number(vandaag().slice(0, 4));
 
 // Het PK staat op de home zolang een beheerder het aanzet (Vaste pagina's → PK).
 const pk = await leesPk();
 
 const voorClubs = [
-  { href: competitieAgenda, title: 'Competitieagenda', text: 'De wedstrijden van je ploeg in je eigen agenda', extern: true },
-  { href: badmintonVlaanderen.competitie, title: 'Uitslagen en standen', text: 'Alle reeksen, bij Badminton Vlaanderen', extern: true },
+  { href: competitie.agenda, title: 'Competitieagenda', text: 'De wedstrijden van je ploeg in je eigen agenda', extern: true },
+  { href: competitie.uitslagen, title: 'Uitslagen en standen', text: 'Alle reeksen, bij Badminton Vlaanderen', extern: true },
   { href: u('/bestuur#kalender'), title: 'PBO-kalender', text: 'Selectietrainingen, vergaderingen en evenementen' },
   { href: `mailto:${mail.secretariaat}`, title: 'Secretariaat', text: mail.secretariaat },
 ];
@@ -93,10 +75,10 @@ const voorClubs = [
                 {/* Eerst wanneer, dan wat: de datum in limoen, net als de volgende halte op de lijn eronder. */}
                 <h1 class="font-display">
                   <time
-                    datetime={volgende.date}
+                    datetime={volgende.datum}
                     class="num block text-[44px] leading-[0.95] font-extrabold tracking-[-0.03em] text-accent md:text-[64px] lg:text-[80px]"
                   >
-                    {weekdag(volgende.date)} <span class="whitespace-nowrap">{dag(volgende.date)} {maand(volgende.date)}</span>
+                    {weekdag(volgende.datum)} <span class="whitespace-nowrap">{dag(volgende.datum)} {maand(volgende.datum)}</span>
                   </time>
                   <span class="sr-only">: </span>
                   <span class="mt-2 block text-[26px] leading-[1.12] font-bold tracking-[-0.01em] md:mt-3 md:text-[34px] lg:text-[40px]">
@@ -105,7 +87,7 @@ const voorClubs = [
                 </h1>
                 <p class="mt-3 max-w-[60ch] text-base leading-normal text-mist md:mt-4 md:text-lg">
                   <span class="font-semibold text-white">{volgende.club}</span>
-                  {[volgende.hall, volgende.start && `vanaf ${volgende.start}`, volgende.prijsuitreiking && 'met prijsuitreiking']
+                  {[volgende.sporthal, volgende.start && `vanaf ${volgende.start}`, volgende.prijsuitreiking && 'met prijsuitreiking']
                     .filter(Boolean)
                     .map((x) => ` · ${x}`)
                     .join('')}
@@ -113,7 +95,7 @@ const voorClubs = [
                 {(volgende.toernooilink || route) && (
                   <div class="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 md:mt-7">
                     {/* Inschrijven, wedstrijden of uitslagen: dezelfde toernooipagina, het label volgt de datum. */}
-                    <ToernooiKnop toernooi={volgende} class="btn bg-accent text-ink" />
+                    <ToernooiKnop toernooi={volgende} wie={volgende.club} class="btn bg-accent text-ink" />
                     {route && (
                       <a
                         class:list={[
@@ -126,7 +108,7 @@ const voorClubs = [
                       >
                         <Icon name="route" size={20} stroke={2} />
                         <span>
-                          Route<span class="sr-only"> naar {volgende.hall ?? volgende.club}</span>
+                          Route<span class="sr-only"> naar {volgende.sporthal ?? volgende.club}</span>
                         </span>
                         <span class="sr-only"> (Google Maps, nieuw venster)</span>
                       </a>
@@ -183,7 +165,7 @@ const voorClubs = [
               {haltes.map((t, i) => {
                 const boven = i % 2 === 0;
                 // Per halte een li per status (later, volgende, gespeeld); Periode toont die van vandaag.
-                return statussen(t, vorige(t)).map(({ status: s, van, tot }) => (
+                return statussen(t, toernooien).map(({ status: s, van, tot }) => (
                   <Periode as="li" van={van} tot={tot}>
                     <a
                       href={halte(t)}
@@ -202,7 +184,7 @@ const voorClubs = [
                             s === 'gespeeld' && 'text-mist/75',
                           ]}
                         >
-                          {dag(t.date)} {maandKort(t.date)}
+                          {dag(t.datum)} {maandKort(t.datum)}
                         </span>
                         <span
                           class:list={[
@@ -236,7 +218,7 @@ const voorClubs = [
                         )}
                         {nieuwJaar(haltes, i) && (
                           <span class="num absolute top-1/2 left-0 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ink px-2 text-xs font-bold text-mist">
-                            {t.date.slice(0, 4)}
+                            {rankingJaar(t)}
                           </span>
                         )}
                         <span
@@ -262,7 +244,7 @@ const voorClubs = [
   <!-- Uitgelicht bericht, zolang een beheerder het uitlicht (in de hero na de laatste halte) -->
   {
     uitgelicht && komend.length > 0 && (
-      <Periode as="section" tot={komend.at(-1)!.date} class="wrap mt-3 lg:mt-5" aria-labelledby="uitgelicht-titel">
+      <Periode as="section" tot={komend.at(-1)!.datum} class="wrap mt-3 lg:mt-5" aria-labelledby="uitgelicht-titel">
         <div class="grid gap-5 rounded-card bg-paper px-6 py-7 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center lg:gap-10 lg:px-10 lg:py-9">
           <div class="min-w-0">
             <p class="text-[15px] font-semibold text-brand">
@@ -293,7 +275,7 @@ const voorClubs = [
             <p class="mt-2 max-w-[60ch] text-[17px] leading-normal lg:text-lg">{pk.zin}</p>
           </div>
           <div class="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6">
-            <ToernooiKnop toernooi={pk.toernooi} class="btn bg-ink text-white" />
+            <ToernooiKnop toernooi={pk.toernooi} wie="het PK" class="btn bg-ink text-white" />
             <a href={u('/pk')} class="inline-flex min-h-11 items-center justify-center gap-2 font-semibold text-brand hover:underline">
               Reeksen en uurschema <Icon name="pijl" size={18} stroke={2} />
             </a>
@@ -312,7 +294,7 @@ const voorClubs = [
       <p class="mt-2 max-w-[48ch] leading-normal text-ink/80">
         {
           ranking ? (
-            <>Stand na {ranking.na}, {weekdag(ranking.datum).toLowerCase()} {datum(ranking.datum)}.</>
+            <>{standNaZin(ranking.laatste)}</>
           ) : (
             <>Er staat nog geen stand online.</>
           )
@@ -322,7 +304,7 @@ const voorClubs = [
             ({ van, tot, volgende }) =>
               volgende && (
                 <Periode as="span" van={van} tot={tot}>
-                  {volgendeStand(volgende)}
+                  {volgendeStandZin(volgende, ranking?.jaar)}
                 </Periode>
               ),
           )
@@ -360,7 +342,7 @@ const voorClubs = [
                   >
                     <span>
                       <span class="font-display text-lg font-bold">{c.label}</span>
-                      <span class="num ml-2 text-[15px] text-ink/75">geboren {geboortejarenKort(c.id, rankingJaar)}</span>
+                      <span class="num ml-2 text-[15px] text-ink/75">geboren {geboortejarenKort(c.id, categorieJaar)}</span>
                     </span>
                     <Icon name="pijl" size={18} stroke={2} class="shrink-0 transition-transform group-hover:translate-x-0.5" />
                   </a>
@@ -378,8 +360,7 @@ const voorClubs = [
 
     <!-- Telefoon: de haltes na de volgende, als lijn onder elkaar -->
     {
-      momenten
-        .filter((m) => m.daarna.length > 0)
+      daarnaBlokken
         .map(({ van, tot, volgende, daarna }) => (
           <Periode
             as="section"
@@ -402,8 +383,8 @@ const voorClubs = [
                         <span class="relative self-stretch" aria-hidden="true">
                           <span class="absolute inset-y-0 left-1/2 w-0.5 -translate-x-1/2 bg-line" />
                         </span>
-                        <span class="num text-center font-display text-lg font-extrabold">{t.date.slice(0, 4)}</span>
-                        <span class="text-sm text-muted">Vanaf hier telt de ranking {t.date.slice(0, 4)}</span>
+                        <span class="num text-center font-display text-lg font-extrabold">{rankingJaar(t)}</span>
+                        <span class="text-sm text-muted">Vanaf hier telt de ranking {rankingJaar(t)}</span>
                       </p>
                     )}
                     <a href={halte(t)} class="grid min-h-[68px] grid-cols-[1rem_3rem_minmax(0,1fr)] items-center gap-x-3">
@@ -412,14 +393,14 @@ const voorClubs = [
                         {i < daarna.length - 1 && <span class="absolute top-1/2 bottom-0 left-1/2 w-0.5 -translate-x-1/2 bg-line" />}
                         <span class="relative size-3 rounded-full border-2 border-ink bg-paper" />
                       </span>
-                      <time datetime={t.date} class="text-center">
-                        <span class="num block font-display text-[26px] leading-none font-extrabold">{dag2(t.date)}</span>
-                        <span class="block text-xs font-bold text-muted uppercase">{maandKort(t.date)}</span>
+                      <time datetime={t.datum} class="text-center">
+                        <span class="num block font-display text-[26px] leading-none font-extrabold">{dag2(t.datum)}</span>
+                        <span class="block text-xs font-bold text-muted uppercase">{maandKort(t.datum)}</span>
                       </time>
                       <span class="min-w-0 py-3">
                         <span class="block font-semibold">{t.club}</span>
                         <span class="block text-sm text-muted">
-                          {[weekdag(t.date), t.hall, t.prijsuitreiking && 'prijsuitreiking'].filter(Boolean).join(' · ')}
+                          {[weekdag(t.datum), t.sporthal, t.prijsuitreiking && 'prijsuitreiking'].filter(Boolean).join(' · ')}
                         </span>
                       </span>
                     </a>

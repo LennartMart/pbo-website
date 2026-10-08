@@ -5,9 +5,8 @@ import PageIntro from '../../../components/PageIntro.astro';
 import LinkCard from '../../../components/LinkCard.astro';
 import { mail } from '../../../data/site';
 import { pagina } from '../../../lib/paginas';
-import { categorieen, geboortejaren, huidigSeizoen, komende, laatsteRanking } from '../../../lib/jeugdcup';
+import { categorieen, geboortejaren, huidigSeizoen, komende, laatsteRanking, volgendeHalteZin } from '../../../lib/jeugdcup';
 import { vandaag } from '../../../lib/datum';
-import { dag, maand } from '../../../lib/datum';
 
 const [volgende] = await komende();
 const seizoen = await huidigSeizoen();
@@ -19,7 +18,7 @@ const { title, lead, description, documenten, Content } = await pagina('jeugdcup
 <BaseLayout title={title} description={description}>
   <PageIntro
     title={title}
-    lead={volgende ? `Volgende halte: ${volgende.club} op ${dag(volgende.date)} ${maand(volgende.date)}.` : lead}
+    lead={volgende ? volgendeHalteZin(volgende) : lead}
     crumbs={[{ href: u('/jeugd'), label: 'Jeugd' }, { label: 'Jeugdcuptour' }]}
   />
 
@@ -29,7 +28,7 @@ const { title, lead, description, documenten, Content } = await pagina('jeugdcup
       href={u('/jeugd/jeugdcuptour/ranking')}
       icon="ranking"
       title={`Ranking ${ranking?.jaar ?? jaar}`}
-      text={ranking ? `Stand na ${ranking.na}. Zoek je naam per categorie.` : 'Zoek je naam per categorie.'}
+      text={ranking ? `Stand na ${ranking.laatste.club}. Zoek je naam per categorie.` : 'Zoek je naam per categorie.'}
     />
   </section>
 

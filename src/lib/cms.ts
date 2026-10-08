@@ -53,9 +53,9 @@ const tekst = { label: 'Tekst', name: 'body', widget: 'markdown', required: fals
 /** Gespeelde toernooien eerst (recentste bovenaan), daarna de komende. Typen filtert de lijst. */
 function toernooiOpties(toernooien: Toernooi[]) {
   const nu = vandaag();
-  const gespeeld = toernooien.filter((t) => t.date <= nu).reverse();
-  const komend = toernooien.filter((t) => t.date > nu);
-  return [...gespeeld, ...komend].map((t) => ({ label: `${lang(t.date)} · ${t.club}`, value: t.id }));
+  const gespeeld = toernooien.filter((t) => t.datum <= nu).reverse();
+  const komend = toernooien.filter((t) => t.datum > nu);
+  return [...gespeeld, ...komend].map((t) => ({ label: `${lang(t.datum)} · ${t.club}`, value: t.id }));
 }
 
 /**
@@ -138,12 +138,12 @@ const kalenderCollectie = {
       name: 'haltes',
       widget: 'list',
       collapsed: true,
-      summary: '{{fields.date}} · {{fields.club}}',
+      summary: '{{fields.datum}} · {{fields.club}}',
       hint: 'De volgorde maakt niet uit: de site zet ze op datum. Een gespeelde halte met standen niet verwijderen.',
       fields: [
-        { ...datum, label: 'Datum', name: 'date' },
+        { ...datum, label: 'Datum', name: 'datum' },
         { label: 'Club', name: 'club', widget: 'string', hint: 'Zoals de club zichzelf noemt, bv. "Gentse BC".' },
-        { label: 'Sporthal', name: 'hall', widget: 'string', required: false },
+        { label: 'Sporthal', name: 'sporthal', widget: 'string', required: false },
         { label: 'Adres', name: 'adres', widget: 'string', required: false, hint: 'Straat, nummer en gemeente, bv. "Driepikkelstraat 30, 9030 Mariakerke". Voor de routelink.' },
         { label: 'Beginuur', name: 'start', widget: 'string', required: false, hint: 'Zoals het op de site komt, bv. "9.00 uur".' },
         {

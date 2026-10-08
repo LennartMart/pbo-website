@@ -13,6 +13,10 @@ export const maand = (iso: string) => fmt({ month: 'long' }).format(parse(iso));
 export const maandKort = (iso: string) => maand(iso).slice(0, 3);
 export const weekdag = (iso: string) => cap(fmt({ weekday: 'long' }).format(parse(iso)));
 export const lang = (iso: string) => fmt({ day: 'numeric', month: 'long', year: 'numeric' }).format(parse(iso));
+/** "11 oktober" */
+export const dagMaand = (iso: string) => `${dag(iso)} ${maand(iso)}`;
+/** "zaterdag 11 oktober" */
+export const weekdagDagMaand = (iso: string) => `${weekdag(iso).toLowerCase()} ${dagMaand(iso)}`;
 
 /** Vandaag in Brussel als YYYY-MM-DD (bij een statische site: het moment van de build, zie Periode). */
 export const vandaag = () => new Intl.DateTimeFormat('en-CA', { timeZone: TZ }).format(new Date());
