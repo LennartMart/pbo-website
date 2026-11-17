@@ -12,7 +12,7 @@ import {
   laatsteRanking,
   rankingJaar,
   standNaZin,
-  statussen,
+  lijnStatussen,
   tijdlijn,
   volgendeStandZin,
   type Toernooi,
@@ -34,21 +34,23 @@ const recentNieuws = berichten.filter((b) => b !== uitgelicht).slice(0, 4);
 
 // De home is statisch, maar moet ook kloppen als er een tijd geen build is: wat van de volgende halte afhangt, staat
 // er voor elke halte die nog komt (tijdlijn), en Periode toont het stuk van vandaag.
-const momenten = tijdlijn(toernooien).map((m) => ({ ...m, route: m.volgende && routeUrl({ ...m.volgende, bij: m.volgende.club }) }));
-// Het lijnplan wisselt per seizoen; binnen een seizoen wisselt per halte enkel de stip (statussen).
+// `inschrijvenTot`: de laatste dag waarop je voor een latere halte kan inschrijven; tot dan staan die haltes naast
+// de volgende halte (telefoon: eronder).
+const momenten = tijdlijn(toernooien).map((m) => ({
+  ...m,
+  route: m.volgende && routeUrl({ ...m.volgende, bij: m.volgende.club }),
+  inschrijvenTot: m.inschrijven
+    .map((t) => t.inschrijvenTot)
+    .sort()
+    .at(-1),
+}));
+// Het lijnplan wisselt per seizoen; binnen een seizoen wisselt per halte enkel de stip (lijnStatussen).
 // Na de laatste halte staat het uitgelichte bericht in de hero, dan zonder lijnplan.
 const metLijn = momenten.filter((m) => m.haltes.length > 1 && (m.volgende || !uitgelicht));
 const lijnplannen = [...new Set(metLijn.map((m) => m.seizoen))].map((seizoen) => {
   const lijst = metLijn.filter((m) => m.seizoen === seizoen);
   return { seizoen, haltes: lijst[0].haltes, van: lijst[0].van, tot: lijst.at(-1)!.tot };
 });
-// Haltes waarvoor je nu kan inschrijven, onder de volgende halte. De strook verdwijnt als de laatste inschrijving sluit.
-const inschrijfstroken = momenten
-  .filter((m) => m.inschrijven.length > 0)
-  .map((m) => {
-    const laatste = m.inschrijven.map((t) => t.inschrijvenTot).reduce((a, b) => (b > a ? b : a));
-    return { ...m, tot: m.tot && m.tot < laatste ? m.tot : laatste };
-  });
 // Telefoon: de vier haltes na de volgende.
 const daarnaBlokken = momenten.filter((m) => m.daarna.length > 0).map((m) => ({ ...m, daarna: m.daarna.slice(0, 4) }));
 
@@ -75,15 +77,17 @@ const voorClubs = [
   <section class="wrap">
     <div class="on-ink overflow-hidden rounded-[28px] bg-ink text-white lg:rounded-panel">
       {
-        momenten.map(({ van, tot, volgende, seizoen, route }) => (
+        momenten.map(({ van, tot, volgende, seizoen, route, inschrijven, inschrijvenTot }) => (
           <Periode as="div" van={van} tot={tot} class="px-6 pt-8 pb-7 md:px-10 md:pt-11 lg:px-16 lg:pt-14 lg:pb-12">
             {volgende ? (
-              <div class="min-w-0">
+              // Desktop, met open inschrijvingen voor latere haltes: twee kolommen. De datum loopt over beide, de open
+              // inschrijvingen staan rechts naast titel, plaats en knoppen (subgrid: de h1 deelt de rijen van het raster).
+              <div class:list={['min-w-0', inschrijven.length > 0 && 'lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-x-12']}>
                 {/* Eerst wanneer, dan wat: de datum in limoen, net als de volgende halte op de lijn eronder. */}
-                <h1 class="font-display">
+                <h1 class="font-display lg:col-span-2 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:grid lg:grid-cols-subgrid lg:grid-rows-subgrid">
                   <time
                     datetime={volgende.datum}
-                    class="num block text-[44px] leading-[0.95] font-extrabold tracking-[-0.03em] text-accent md:text-[64px] lg:text-[80px]"
+                    class="num block text-[44px] leading-[0.95] font-extrabold tracking-[-0.03em] text-accent md:text-[64px] lg:col-span-2 lg:text-[80px]"
                   >
                     {weekdag(volgende.datum)} <span class="whitespace-nowrap">{dag(volgende.datum)} {maand(volgende.datum)}</span>
                   </time>
@@ -92,7 +96,7 @@ const voorClubs = [
                     Victor Jeugdcuptour by&nbsp;PBO
                   </span>
                 </h1>
-                <p class="mt-3 max-w-[60ch] text-base leading-normal text-mist md:mt-4 md:text-lg">
+                <p class="mt-3 max-w-[60ch] text-base leading-normal text-mist md:mt-4 md:text-lg lg:col-start-1">
                   <span class="font-semibold text-white">{volgende.club}</span>
                   {[volgende.sporthal, volgende.start && `vanaf ${volgende.start}`, volgende.prijsuitreiking && 'met prijsuitreiking']
                     .filter(Boolean)
@@ -107,7 +111,7 @@ const voorClubs = [
                   )}
                 </p>
                 {(volgende.toernooilink || route) && (
-                  <div class="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 md:mt-7">
+                  <div class="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center sm:gap-3 md:mt-7 lg:col-start-1">
                     {/* Inschrijven, wedstrijden of uitslagen: dezelfde toernooipagina, het label volgt de datum. */}
                     <ToernooiKnop toernooi={volgende} wie={volgende.club} class="btn bg-accent text-ink" />
                     {route && (
@@ -128,6 +132,55 @@ const voorClubs = [
                       </a>
                     )}
                   </div>
+                )}
+                {/* Latere haltes waarvoor je nu al kan inschrijven: desktop rechts, telefoon als strook eronder.
+                    Elke halte staat er tot en met haar laatste inschrijfdag; daarna verdwijnt het blok. */}
+                {inschrijven.length > 0 && (
+                  <Periode
+                    as="section"
+                    tot={inschrijvenTot}
+                    class="border-white/10 max-lg:-mx-6 max-lg:mt-7 max-lg:-mb-3 max-lg:border-t max-lg:px-6 max-lg:pt-5 md:max-lg:-mx-10 md:max-lg:px-10 lg:col-start-2 lg:row-span-3 lg:row-start-2 lg:w-[22rem] lg:self-end lg:border-l lg:pl-8 xl:w-[23rem] xl:pl-10"
+                    aria-labelledby={`inschrijven-${volgende.id}`}
+                  >
+                    {/* Zolang je ook voor de volgende halte nog kan inschrijven (haar eigen knop), staat er "Ook". */}
+                    <h2 id={`inschrijven-${volgende.id}`} class="font-display text-lg font-bold">
+                      {volgende.toernooilink && volgende.inschrijvenTot ? (
+                        <>
+                          <Periode as="span" tot={volgende.inschrijvenTot}>
+                            Ook inschrijvingen open
+                          </Periode>
+                          <Periode as="span" van={plusDagen(volgende.inschrijvenTot, 1)}>
+                            Inschrijvingen open
+                          </Periode>
+                        </>
+                      ) : (
+                        'Inschrijvingen open'
+                      )}
+                    </h2>
+                    <ul class="mt-1 divide-y divide-white/10">
+                      {inschrijven.map((t) => (
+                        <Periode as="li" tot={t.inschrijvenTot}>
+                          <a href={t.toernooilink} rel="noopener" class="group flex min-h-16 items-center gap-3.5 py-3 lg:py-2.5">
+                            <span class="grid size-10 shrink-0 place-items-center rounded-full border-[1.5px] border-accent/60 text-accent transition-colors group-hover:border-accent group-hover:bg-accent group-hover:text-ink">
+                              <Icon name="inschrijven" size={18} stroke={2} />
+                            </span>
+                            <span class="min-w-0 leading-snug">
+                              <span class="block">
+                                <span class="font-semibold text-white group-hover:underline max-lg:block">{t.club}</span>
+                                <span class="text-mist lg:hidden">{weekdagDagMaand(t.datum)}</span>
+                                <span class="num text-mist max-lg:hidden">
+                                  {' '}
+                                  · {dag(t.datum)} {maandKort(t.datum)}
+                                </span>
+                              </span>
+                              <span class="block text-[15px] text-accent">Inschrijven tot {weekdagDagMaand(t.inschrijvenTot)}</span>
+                            </span>
+                            <span class="sr-only"> (andere website)</span>
+                          </a>
+                        </Periode>
+                      ))}
+                    </ul>
+                  </Periode>
                 )}
               </div>
             ) : uitgelicht ? (
@@ -170,77 +223,30 @@ const voorClubs = [
         ))
       }
 
-      <!-- Latere haltes waarvoor je nu kan inschrijven. Elke halte staat er tot en met haar laatste inschrijfdag. -->
-      {
-        inschrijfstroken.map(({ van, tot, inschrijven, volgende }) => (
-          <Periode
-            as="section"
-            van={van}
-            tot={tot}
-            class="border-t border-white/10 px-6 pt-5 pb-4 md:px-10 lg:flex lg:items-center lg:gap-12 lg:px-16 lg:py-5"
-            aria-labelledby={`inschrijven-${volgende!.id}`}
-          >
-            {/* Zolang je ook voor de volgende halte nog kan inschrijven (haar eigen knop), staat er "Ook". */}
-            <h2 id={`inschrijven-${volgende!.id}`} class="font-display text-lg font-bold lg:shrink-0">
-              {volgende!.toernooilink && volgende!.inschrijvenTot ? (
-                <>
-                  <Periode as="span" tot={volgende!.inschrijvenTot}>
-                    Ook inschrijvingen open
-                  </Periode>
-                  <Periode as="span" van={plusDagen(volgende!.inschrijvenTot, 1)}>
-                    Inschrijvingen open
-                  </Periode>
-                </>
-              ) : (
-                'Inschrijvingen open'
-              )}
-            </h2>
-            <ul class="mt-1 divide-y divide-white/10 lg:mt-0 lg:flex lg:flex-wrap lg:gap-x-10 lg:divide-y-0">
-              {inschrijven.map((t) => (
-                <Periode as="li" tot={t.inschrijvenTot}>
-                  <a href={t.toernooilink} rel="noopener" class="group flex min-h-16 items-center gap-3.5 py-3">
-                    <span class="grid size-10 shrink-0 place-items-center rounded-full border-[1.5px] border-accent/60 text-accent transition-colors group-hover:border-accent group-hover:bg-accent group-hover:text-ink">
-                      <Icon name="inschrijven" size={18} stroke={2} />
-                    </span>
-                    <span class="min-w-0">
-                      <span class="block leading-snug">
-                        <span class="font-semibold text-white group-hover:underline max-lg:block">{t.club}</span>
-                        <span class="text-mist">
-                          <span class="max-lg:hidden"> · </span>
-                          {weekdagDagMaand(t.datum)}
-                        </span>
-                      </span>
-                      <span class="block text-[15px] leading-snug text-accent">
-                        Inschrijven tot {weekdagDagMaand(t.inschrijvenTot)}
-                      </span>
-                    </span>
-                    <span class="sr-only"> (andere website)</span>
-                  </a>
-                </Periode>
-              ))}
-            </ul>
-          </Periode>
-        ))
-      }
-
       <!-- Lijnplan met alle haltes, namen afwisselend boven en onder de lijn. Enkel op desktop: op de telefoon staan de haltes in "Daarna". -->
       {
         lijnplannen.map(({ seizoen, haltes, van, tot }) => (
           <Periode as="div" van={van} tot={tot} class="hidden border-t border-white/10 px-16 pt-4 pb-6 lg:block">
             <h2 class="sr-only">Alle haltes van seizoen {seizoen}</h2>
-            <ol class="grid" style={`grid-template-columns: repeat(${haltes.length}, minmax(0, 1fr))`}>
+            {/* Drie rijen voor alle haltes samen (subgrid): breekt een lange clubnaam, dan groeit de rij en blijft de lijn recht. */}
+            <ol
+              class="grid grid-rows-[minmax(3.5rem,auto)_2rem_minmax(3.5rem,auto)]"
+              style={`grid-template-columns: repeat(${haltes.length}, minmax(0, 1fr))`}
+            >
               {haltes.map((t, i) => {
                 const boven = i % 2 === 0;
                 // Per halte een li per status (later, volgende, gespeeld); Periode toont die van vandaag.
-                return statussen(t, toernooien).map(({ status: s, van, tot }) => (
-                  <Periode as="li" van={van} tot={tot}>
+                // `open`: een latere halte waarvoor je al kan inschrijven, met dezelfde potloodstip als hierboven.
+                return lijnStatussen(t, toernooien).map(({ status: s, open, van, tot }) => (
+                  <Periode as="li" van={van} tot={tot} class="row-span-3 grid grid-rows-subgrid">
                     <a
                       href={halte(t)}
-                      class="group grid h-full grid-cols-[minmax(0,1fr)] grid-rows-[3.5rem_2rem_3.5rem] justify-items-center rounded-lg text-center"
+                      class="group row-span-3 grid grid-cols-[minmax(0,1fr)] grid-rows-subgrid justify-items-center rounded-lg text-center"
                     >
                       <span
                         class:list={[
-                          'flex w-max max-w-[10.5rem] flex-col leading-tight',
+                          // Namen staan om en om boven en onder: elk mag twee kolommen breed zijn, daarna breekt de naam.
+                          'flex w-max max-w-[200%] flex-col leading-tight text-balance',
                           boven ? 'row-start-1 self-end pb-1.5' : 'row-start-3 self-start pt-1.5',
                         ]}
                       >
@@ -256,12 +262,14 @@ const voorClubs = [
                         <span
                           class:list={[
                             'text-[13px] group-hover:underline',
-                            s === 'volgende' ? 'font-semibold text-white' : s === 'gespeeld' ? 'text-mist/75' : 'text-mist',
+                            // Open: wit maar niet vet, anders raken lange clubnamen elkaar op smalle schermen.
+                            s === 'volgende' ? 'font-semibold text-white' : open ? 'text-white' : s === 'gespeeld' ? 'text-mist/75' : 'text-mist',
                           ]}
                         >
                           {t.club}
                           {s === 'gespeeld' && <span class="sr-only"> (gespeeld)</span>}
                           {s === 'volgende' && <span class="sr-only"> (volgende halte)</span>}
+                          {open && <span class="sr-only"> (inschrijven tot {dagMaand(t.inschrijvenTot!)})</span>}
                         </span>
                         {t.prijsuitreiking && <span class="text-xs font-semibold text-accent">prijsuitreiking</span>}
                       </span>
@@ -288,14 +296,20 @@ const voorClubs = [
                             {rankingJaar(t)}
                           </span>
                         )}
-                        <span
-                          class:list={[
-                            'relative rounded-full transition-transform group-hover:scale-125',
-                            s === 'gespeeld' && 'size-3.5 bg-accent',
-                            s === 'volgende' && 'size-7 border-[5px] border-accent bg-ink',
-                            s === 'later' && 'size-3.5 border-2 border-mist bg-ink',
-                          ]}
-                        />
+                        {open ? (
+                          <span class="relative grid size-6 place-items-center rounded-full border-[1.5px] border-accent bg-ink text-accent transition-transform group-hover:scale-125">
+                            <Icon name="inschrijven" size={12} stroke={2.4} />
+                          </span>
+                        ) : (
+                          <span
+                            class:list={[
+                              'relative rounded-full transition-transform group-hover:scale-125',
+                              s === 'gespeeld' && 'size-3.5 bg-accent',
+                              s === 'volgende' && 'size-7 border-[5px] border-accent bg-ink',
+                              s === 'later' && 'size-3.5 border-2 border-mist bg-ink',
+                            ]}
+                          />
+                        )}
                       </span>
                     </a>
                   </Periode>

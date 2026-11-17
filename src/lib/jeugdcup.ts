@@ -67,6 +67,22 @@ export type MetInschrijving = Toernooi & { toernooilink: string; inschrijvenTot:
 export const metInschrijving = (t: Toernooi): t is MetInschrijving => !!t.toernooilink && !!t.inschrijvenTot;
 
 /**
+ * `statussen` voor het lijnplan op de home: een latere halte is `open` zolang je er al voor kan inschrijven
+ * (tot en met `inschrijvenTot`). Daarna, tot ze de volgende wordt, is ze weer gewoon later.
+ */
+export function lijnStatussen(t: Toernooi, alle: Toernooi[], nu = vandaag()) {
+  return statussen(t, alle, nu).flatMap((f) => {
+    if (f.status !== 'later' || !metInschrijving(t) || t.inschrijvenTot < nu) return [{ ...f, open: false }];
+    const gesloten = plusDagen(t.inschrijvenTot, 1);
+    if (gesloten > f.tot!) return [{ ...f, open: true }];
+    return [
+      { ...f, tot: t.inschrijvenTot, open: true },
+      { ...f, van: gesloten, open: false },
+    ];
+  });
+}
+
+/**
  * De tijdlijn voor een statische pagina die ook moet kloppen als er een tijd geen build is. Elke halte is de volgende
  * vanaf de dag na de vorige halte tot en met haar speeldag; na de laatste is er geen. Per moment (van, tot: voor Periode)
  * de volgende halte, haar seizoen met alle haltes en de haltes die daarna nog komen. Na de laatste halte: het seizoen
