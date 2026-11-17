@@ -1,0 +1,35 @@
+---
+import { Image } from 'astro:assets';
+import { sponsors } from '../data/site';
+
+/**
+ * Sponsors in de header van elke pagina. SiteHeader zet ze er twee keer in: naast het logo vanaf tablet, als strook
+ * onder het menu op de telefoon. Zo volgt de tabvolgorde wat je ziet.
+ */
+interface Props {
+  class?: string;
+}
+
+const { class: klasse } = Astro.props;
+
+/** Eén sponsor: groot logo. Meerdere: kleiner, naast elkaar. */
+const logoKlasse =
+  sponsors.length === 1 ? 'h-auto w-full max-w-[250px] md:h-16 md:w-auto md:max-w-none lg:h-20' : 'h-10 w-auto md:h-12 lg:h-14';
+---
+
+{
+  sponsors.length > 0 && (
+    <div class:list={['items-center gap-3 md:gap-4', klasse]}>
+      <span class="shrink-0 text-[13px] font-semibold text-muted">Met steun van</span>
+      <ul class="flex min-w-0 flex-wrap items-center justify-end gap-x-5 gap-y-2">
+        {sponsors.map((s) => (
+          <li class="min-w-0">
+            <a href={s.link} class="block rounded-lg" rel="noopener">
+              <Image src={s.logo} alt={s.naam} height={80} densities={[1, 2, 3]} class={logoKlasse} loading="eager" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}

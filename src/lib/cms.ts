@@ -401,7 +401,7 @@ const mailadres = (label: string, name: string) => ({
 const instellingenCollectie = {
   name: 'instellingen',
   label: 'Site-instellingen',
-  description: 'Mailadressen, sociale media, sponsors en competitielinks. Ze staan in de footer en op meerdere pagina\'s.',
+  description: 'Mailadressen, sociale media, sponsors en competitielinks. Ze staan in de header, de footer en op meerdere pagina\'s.',
   editor: { preview: false },
   files: [
     {
@@ -440,7 +440,7 @@ const instellingenCollectie = {
           widget: 'list',
           required: false,
           summary: '{{fields.naam}}',
-          hint: 'Boven de footer, onder "Met steun van". Eén sponsor krijgt een groot logo. Leeg = geen sponsorblok.',
+          hint: 'Bovenaan elke pagina, naast het PBO-logo (telefoon: onder het menu), na "Met steun van". Eén sponsor krijgt een groot logo. Leeg = geen sponsorblok.',
           fields: [
             { label: 'Naam', name: 'naam', widget: 'string' },
             { label: 'Website', name: 'link', widget: 'string', ...https },

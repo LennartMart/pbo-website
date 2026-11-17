@@ -99,7 +99,7 @@ De ontwerpen gebruiken nog voorlopige kleuren (donkerblauw). De site gebruikt de
 | line / wash | `#D3D9CF` / `#ECEEE6` | randen, scheidingslijnen |
 
 - Logo: `src/assets/logo/pbo-mark.png` (kleur, transparant) en `pbo-mark-light.png` (wit en limoen, voor diepgroen). Gemaakt uit `wp-content/uploads/2011/05/LOGOKLEU.jpg`.
-- Sponsor Mobi-sports staat in de footer, boven het donkere blok.
+- Sponsors staan in de header van elke pagina (`src/components/Sponsors.astro`), zoals op de oude site: vanaf tablet rechts naast het PBO-logo, op de telefoon als strook onder het menu. Het hoofdmenu staat op desktop op een eigen rij eronder. Niet meer in de footer.
 
 - Fonts: Bricolage Grotesque (titels, 700/800), Instrument Sans (tekst, 400–600)
 - Radius: kaarten 24–32px, knoppen en filters volledig rond

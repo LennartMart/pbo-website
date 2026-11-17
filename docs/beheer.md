@@ -75,7 +75,7 @@ De knop past zich aan zoals bij de jeugdcupkalender: **Inschrijven tot ...**, da
 
 - **Mailadressen** van secretariaat, jeugdcup, recreanten en voorzitter. Ze staan in de footer en op elke pagina die naar contact verwijst (ranking, kalender, competitie, ...).
 - **Sociale media** onder "Volg ons" in de footer.
-- **Sponsors** boven de footer: naam, website en logo. Eén sponsor krijgt een groot logo, meerdere staan naast elkaar. Zonder sponsors verdwijnt het blok.
+- **Sponsors** bovenaan elke pagina, naast het PBO-logo (op de telefoon onder het menu): naam, website en logo. Eén sponsor krijgt een groot logo, meerdere staan naast elkaar. Zonder sponsors verdwijnt het blok.
 - **Competitie**: de links naar de competitieagenda en naar uitslagen en standen bij Badminton Vlaanderen.
 
 Links beginnen altijd met `https://`. Het hoofdmenu, de vaste footerlinks (Bestuur, Vacatures, PBO-kalender) en de Google-agenda zitten in de code.

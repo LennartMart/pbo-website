@@ -36,7 +36,7 @@ Zie `CLAUDE.md` voor stack, contentmodel, routes, migratie en fasering. Open bes
 - Naam: PBO vzw, voluit Provinciale Badmintonraad Oost-Vlaanderen vzw.
 - Logo: bestaand PBO-logo (zwarte letters "pbo" met groene zwieren). Bronnen: `wp-content/uploads/2011/05/LOGOKLEU.jpg` (kleur) en `2020/09/PBOBlacktransparant.png` (zwart).
 - Kleuren van de huidige site: logogroen `#005E44`, limoengroen `#A1F16B` (headerverloop). Gebruiker koos diepgroen voor donkere vlakken.
-- Sponsor Mobi-sports blijft zichtbaar, in de footer.
+- Sponsor Mobi-sports blijft prominent zichtbaar: in de header van elke pagina, zoals op de oude site.
 - Taal: Vlaams, je-vorm, kort en concreet.
 
 ## Evidence on Hand
