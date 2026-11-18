@@ -1,6 +1,6 @@
 /**
  * Sätteri-plugin (Markdown in Astro 7): zet het basispad voor interne links en afbeeldingen,
- * bv. /bestuur → /pbo-website/bestuur op GitHub Pages. Zelfde regel als u() in src/lib/url.ts.
+ * bv. /bestuur → /website/bestuur op GitHub Pages. Zelfde regel als u() in src/lib/url.ts.
  */
 export function basisPlugin(base = '/') {
   const prefix = base.replace(/\/+$/, '');

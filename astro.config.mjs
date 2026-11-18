@@ -7,7 +7,7 @@ import { basisPlugin } from './src/lib/markdown-basis.mjs';
 
 const base = process.env.BASE_PATH || '/';
 
-// SITE_URL en BASE_PATH komen van de GitHub Pages-workflow (https://lennartmart.github.io en /pbo-website).
+// SITE_URL en BASE_PATH komen van de GitHub Pages-workflow (https://badminton-pbo.github.io en /website).
 // Zonder die variabelen bouwt de site voor www.badminton-pbo.be.
 export default defineConfig({
   site: process.env.SITE_URL || 'https://www.badminton-pbo.be',

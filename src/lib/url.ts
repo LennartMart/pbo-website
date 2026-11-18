@@ -1,7 +1,7 @@
 const base = import.meta.env.BASE_URL.replace(/\/+$/, '');
 
 /**
- * Interne link met het basispad ervoor. Op GitHub Pages draait de site onder /pbo-website/,
+ * Interne link met het basispad ervoor. Op GitHub Pages draait de site onder /website/,
  * op badminton-pbo.be onder /. Externe links, mailto en anchors blijven ongewijzigd.
  */
 export function u(path: string): string;

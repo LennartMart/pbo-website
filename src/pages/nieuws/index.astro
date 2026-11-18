@@ -165,7 +165,7 @@ const pill =
 
   laad.then(async (pagefind) => {
     if (!pagefind || !zoekVak || !invoer || !overzicht || !resultaten || !status || !lijst || !niets) return;
-    // Pagefind kent het basispad niet (GitHub Pages: /pbo-website/).
+    // Pagefind kent het basispad niet (GitHub Pages: /website/).
     await pagefind.options({ baseUrl: u('/') });
     zoekVak.hidden = false;
 

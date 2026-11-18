@@ -14,8 +14,8 @@ Een **gewone user** mag enkel **uitslagen/rankings van de jeugdcuptour** toevoeg
 - Decap CMS (git-based, GitHub-backend) op `/admin` voor beheerders, `/admin/jeugdcup` voor gewone users (enkel rankings). Login met een GitHub-account via een PHP-OAuth-helper op de hosting (`public/admin/auth/`).
 - Pagefind voor zoeken in nieuws (client-side)
 - Productie: shared hosting (Apache + PHP) op `www.badminton-pbo.be`. Een GitHub Action bouwt en zet de site via (S)FTP online. Redirects staan in `public/.htaccess`.
-- Testversie: GitHub Pages op `https://lennartmart.github.io/pbo-website/`, via `.github/workflows/deploy.yml` bij elke push naar `main`. De workflow zet `SITE_URL` en `BASE_PATH`; testversies krijgen `noindex`.
-- Interne links en bestanden uit `public/` altijd via `u('/pad')` uit `src/lib/url.ts`, anders breken ze onder het basispad `/pbo-website`.
+- Testversie: GitHub Pages op `https://badminton-pbo.github.io/website/` (repo `Badminton-PBO/website`), via `.github/workflows/deploy.yml` bij elke push naar `main`. De workflow zet `SITE_URL` en `BASE_PATH`; testversies krijgen `noindex`.
+- Interne links en bestanden uit `public/` altijd via `u('/pad')` uit `src/lib/url.ts`, anders breken ze onder het basispad `/website`.
 
 ## Contentmodel
 

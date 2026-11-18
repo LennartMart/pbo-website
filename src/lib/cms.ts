@@ -12,7 +12,7 @@ import { nieuwsCategorieen } from './nieuws-labels';
 import { alleToernooien, type Toernooi } from './jeugdcup';
 import { lang, vandaag } from './datum';
 
-const repo = 'LennartMart/pbo-website';
+const repo = 'Badminton-PBO/website';
 /** Waar de PHP-loginhelper staat (public/admin/auth/). Op GitHub Pages wijst dit naar de echte hosting. */
 const authUrl = (process.env.CMS_AUTH_URL || 'https://www.badminton-pbo.be').replace(/\/+$/, '');
 

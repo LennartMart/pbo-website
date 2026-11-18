@@ -9,7 +9,7 @@ De site haalt alles uit bestanden in deze GitHub-repo. Wie iets aanpast in `/adm
 | Gewone user (jeugdcup) | `https://www.badminton-pbo.be/admin/jeugdcup/` | Enkel standen van de jeugdcuptour toevoegen en aanpassen |
 | Beheerder | `https://www.badminton-pbo.be/admin/` | Rankings, jeugdcupkalender, nieuws, vaste pagina's, site-instellingen |
 
-Iedereen logt in met een eigen GitHub-account. Dat account heeft schrijfrechten op de repo nodig: een beheerder nodigt het uit via GitHub → `LennartMart/pbo-website` → Settings → Collaborators → Add people (rol **Write**).
+Iedereen logt in met een eigen GitHub-account. Dat account heeft schrijfrechten op de repo nodig: een beheerder nodigt het uit via GitHub → `Badminton-PBO/website` → Settings → Collaborators → Add people (rol **Write**).
 
 Let op: GitHub kent geen rechten per map. Een gewone user ziet in `/admin/jeugdcup/` enkel de rankings, maar kan technisch via GitHub of `/admin` ook andere bestanden aanpassen. Bij een klein, vertrouwd team is dat aanvaardbaar. Elke wijziging staat met naam in de geschiedenis en is terug te draaien.
 

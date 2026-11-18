@@ -19,7 +19,7 @@ $clientSecret = $config['client_secret'] ?? '';
 $origins = [
     'https://www.badminton-pbo.be',
     'https://badminton-pbo.be',
-    'https://lennartmart.github.io',
+    'https://badminton-pbo.github.io',
 ];
 
 header('Cache-Control: no-store');
